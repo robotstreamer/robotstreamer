@@ -16,7 +16,7 @@ import robot_util
 
 parser = argparse.ArgumentParser(description='start robot control program')
 parser.add_argument('robot_id', help='Robot ID')
-parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='letsrobot.tv')
+parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.comt')
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu or mdd10", default='motor_hat')
 parser.add_argument('--serial-device', help="Serial device", default='/dev/ttyACM0')
 parser.add_argument('--male', dest='male', action='store_true')
@@ -86,10 +86,9 @@ os.system("amixer -c 2 cset numid=3 %d%%" % commandArgs.tts_volume)
 
 
 infoServer = commandArgs.info_server
-#infoServer = "letsrobot.tv"
-#infoServer = "runmyrobot.com"
+#infoServer = "robotstreamer.com"
 #infoServer = "52.52.213.92"
-#infoServer = "letsrobot.tv:3100"
+#infoServer = "robotstreamer:3100"
 
 print "info server:", infoServer
 
