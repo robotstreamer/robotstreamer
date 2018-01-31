@@ -1,4 +1,4 @@
-# runmyrobot
+# robotstreamer
 
 <h1> Open Robot Control Code For Connecting to RobotStreamer.com </h1>
 
@@ -11,7 +11,7 @@ Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of "2017-04-10-raspbian-jessie-lite".
 
 ```
-sudo wget https://raw.githubusercontent.com/runmyrobot/runmyrobot/master/scripts/install.sh -O /tmp/install.sh && bash /tmp/install.sh
+sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install.sh -O /tmp/install.sh && bash /tmp/install.sh
 ```
 
 After end installtion, all the files needed should be installed and ready for use, but you still might need to change some arguments in your "/home/pi/start_robot" file, to make it suit your robot.
@@ -75,20 +75,20 @@ sudo make install
 
 <h2> Bring you Bot to life: Programs to run on the Raspberry Pi </h2>
 
-Start by cloning the runmyrobot repository
+Start by cloning the robotstreamer repository
 ```
 cd ~
-git clone https://github.com/runmyrobot/runmyrobot
-cd runmyrobot
+git clone https://github.com/robotstreamer/robotstreamer
+cd robostreamer
 ```
 
 Go to new robot page to create a robot. If you already have one, got to manage robots. There you'll find your Robot ID and Camera ID.
 
 These two scripts need to be running in the background to bring your robot to life: controller.py, send_video.py. Here are instructions about how to start them.
 
-Copy the 'start_robot' Script from runmyrobot/Scripts to the pi home folder
+Copy the 'start_robot' Script from robotstreamer/Scripts to the pi home folder
 
-```cp ~/runmyrobot/scripts/start_robot ~/```
+```cp ~/robotstreamer/scripts/start_robot ~/```
 
 Edit the script so you can adjust some settings for controller.py and send_video.py:
 
@@ -143,7 +143,7 @@ Rotates the LED matrix | default=none
 Example start_robot:
 
 ```
-cd /home/pi/runmyrobot
+cd /home/pi/robotstreamer
 nohup scripts/repeat_start python controller.py YOURROBOTID --type motor_hat --male --voice-number 1 --led max7219 --ledrotate 180 &> /dev/null &
 nohup scripts/repeat_start python send_video.py YOURCAMERAID 0 &> /dev/null &
 ```
@@ -205,7 +205,7 @@ sudo reboot
 
 <h1> High Level Overview </h1>
 
-![robot client topology](https://raw.githubusercontent.com/runmyrobot/runmyrobot/master/documentation/RobotClientTopology.png)
+![robot client topology](https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/documentation/RobotClientTopology.png)
 
 The robot client connects via websockets to the API service to retrieve configuration information, to the chat to receive chat messages, the video/audio relays to send its camera and microphone capture, and to the control service to receive user commands.
 
