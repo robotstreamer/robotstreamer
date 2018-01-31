@@ -10,7 +10,7 @@ import subprocess
 from socketIO_client import SocketIO, LoggingNamespace
 
 robotID = '0' #Do not change this here.
-server = "runmyrobot.com"
+server = "robotstreamer.com"
 port = 8022
 print 'Using socket io to connect to', server
 socketIO = SocketIO(server, port, LoggingNamespace)
