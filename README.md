@@ -1,9 +1,7 @@
 # runmyrobot
 
-<h1> Open Robot Control Code For Connecting to LetsRobot.tv </h1>
+<h1> Open Robot Control Code For Connecting to RobotStreamer.com </h1>
 
-LetsRobot.tv is a site for interacts with other using telepresence robots. User create their own robots and add them to the site.
-https://letsrobot.tv
 
 
 <h2> Quick Install </h2>
@@ -239,5 +237,11 @@ The robot client streams ffmpeg output to the video/audio service
 
 <h4>Control Service</h4>
 Relays control messages sent from the web clients to the robot
+
+
+
+<h4>References</h4>
+
+This is a fork of the runmyrobot/runmyrobot (github) open source project.
 
 
