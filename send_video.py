@@ -26,7 +26,7 @@ class DummyProcess:
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
-parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='runmyrobot.com')
+parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
 parser.add_argument('--info-server-protocol', default="https", help="either https or http")
 parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
 parser.add_argument('--app-server-socketio-port', default=8022, help="typically use 8022 for prod, 8122 for dev, and 8125 for dev2")
@@ -58,7 +58,7 @@ robotSettings = None
 resolutionChanged = False
 currentXres = None
 currentYres = None
-server = 'runmyrobot.com'
+server = 'robotstreamer.com'
 infoServer = commandArgs.info_server
 apiServer = commandArgs.api_server
 
