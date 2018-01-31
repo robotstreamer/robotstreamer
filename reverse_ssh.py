@@ -22,7 +22,7 @@ def main():
 
 
    print "connecting to app server socket.io"
-   appServerSocketIO = SocketIO('letsrobot.tv', 8022, LoggingNamespace)
+   appServerSocketIO = SocketIO('robotstreamer.com', 8022, LoggingNamespace)
    print "finished connecting to app server"
    
    appServerSocketIO.on('connect', onHandleAppServerConnect)
