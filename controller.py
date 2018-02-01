@@ -446,7 +446,7 @@ def getChatHostPort():
 controlHostPort = {"host":"robotstreamer.com", "port":6777}
 
 #chatHostPort = getChatHostPort()
-chatHostPort = {"host":"robotstreamer.com", "port":6777}
+chatHostPort = {"host":"robotstreamer.com", "port":6776}
 
 
 print "connecting to control socket.io", controlHostPort
@@ -639,9 +639,9 @@ def say(message):
 
     
                 
-def handle_chat_message(args):
+def handle_chat_message_old(args):
 
-    print "chat message received:", args
+    print "old chat message received:", args
     rawMessage = args['message']
     withoutName = rawMessage.split(']')[1:]
     message = "".join(withoutName)
@@ -655,6 +655,29 @@ def handle_chat_message(args):
     else:
           say(message)
 
+
+
+def handle_chat_message(args):
+    print "chat message received full:", args
+    if isinstance(args, basestring):
+        print "got string", args
+
+        if args[0] == '2':
+            print "skipping", args
+            return
+        # why is this message happening?
+
+        try:
+            jsonObject = json.loads(args)
+        except:
+            print "ERROR could not read the json representation of that chat message"
+            
+        say(jsonObject['message'])
+
+        #print "ERROR: chat message was not valid"
+
+
+          
 #MDD10 speed and movement controls
 def moveMDD10(command, speedPercent):
     if command == 'F':
@@ -1131,9 +1154,11 @@ def onHandleCommand(*args):
 def onHandleExclusiveControl(*args):
    thread.start_new_thread(handle_exclusive_control, args)
 
-def onHandleChatMessage(*args):
-   thread.start_new_thread(handle_chat_message, args)
+def onHandleChatMessageOld(*args):
+   thread.start_new_thread(handle_chat_message_old, args)
 
+def onHandleChatMessage(*args):
+   thread.start_new_thread(handle_chat_message, args)   
 
    
 def onHandleAppServerConnect(*args):
@@ -1199,7 +1224,8 @@ controlSocketIO.on('disconnect', onHandleControlDisconnect)
 
 
 if commandArgs.enable_chat_server_connection:
-    chatSocket.on('chat_message_with_name', onHandleChatMessage)
+    chatSocket.on('chat_message_with_name', onHandleChatMessageOld) # old version, leaving for compatibility
+    chatSocket.on('message', onHandleChatMessage);
     chatSocket.on('connect', onHandleChatConnect)
     chatSocket.on('reconnect', onHandleChatReconnect)    
     chatSocket.on('disconnect', onHandleChatDisconnect)
