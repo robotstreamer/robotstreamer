@@ -26,6 +26,7 @@ class DummyProcess:
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
+#parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
 parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
 parser.add_argument('--info-server-protocol', default="https", help="either https or http")
 parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
@@ -51,7 +52,7 @@ parser.set_defaults(camera_enabled=True)
 parser.add_argument('--dry-run', dest='dry_run', action='store_true')
 parser.add_argument('--mic-channels', type=int, help='microphone channels, typically 1 or 2', default=1)
 parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)') # currently, this option is only used for windows screen capture
-parser.add_argument('--stream-key', default='hello')
+parser.add_argument('--stream-key', default='hellobluecat')
 
 commandArgs = parser.parse_args()
 robotSettings = None
@@ -95,7 +96,8 @@ print "server:", server
 infoServerProtocol = commandArgs.info_server_protocol
 
 print "trying to connect to app server socket io", commandArgs.app_server_socketio_host, commandArgs.app_server_socketio_port
-appServerSocketIO = SocketIO(commandArgs.app_server_socketio_host, commandArgs.app_server_socketio_port, LoggingNamespace)
+#todo need to assiciated with robotstreamer appServerSocketIO = SocketIO(commandArgs.app_server_socketio_host, commandArgs.app_server_socketio_port, LoggingNamespace)
+appServerSocketIO = None
 print "finished initializing app server socket io"
 
 def getVideoPort():
@@ -115,6 +117,9 @@ def getAudioPort():
 
 def getRobotID():
 
+    #todo: need to get from api
+    return 100
+    
     url = '%s://%s/get_robot_id/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
     return json.loads(response)['robot_id']
@@ -130,8 +135,8 @@ def getOnlineRobotSettings(robotID):
     return json.loads(response)
         
 def identifyRobotId():
-    appServerSocketIO.emit('identify_robot_id', robotID);
-
+    #todo need to implement for robotstreamer appServerSocketIO.emit('identify_robot_id', robotID);
+    pass
 
 
 def randomSleep():
@@ -145,13 +150,16 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
-    videoPort = getVideoPort()
+    #videoPort = getVideoPort()
+    videoPort = 8081
     print "getting websocket relay host for video"
-    websocketRelayHost = getWebsocketRelayHost()
 
-    print "websocket relay host for video:", websocketRelayHost
+    #todo, use api
+    #websocketRelayHost = getWebsocketRelayHost()
+    #print "websocket relay host for video:", websocketRelayHost
 
-    videoHost = websocketRelayHost['host']
+    #videoHost = websocketRelayHost['host']
+    videoHost = "184.169.234.241"
 
 
     # set brightness
@@ -178,9 +186,14 @@ def startVideoCaptureLinux():
 
 def startAudioCaptureLinux():
 
-    audioPort = getAudioPort()
-    websocketRelayHost = getWebsocketRelayHost()
-    audioHost = websocketRelayHost['host']
+    #audioPort = getAudioPort()
+    audioPort = 8083
+
+    #websocketRelayHost = getWebsocketRelayHost()
+
+    #audioHost = websocketRelayHost['host']
+    audioHost = "184.169.234.241"
+
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
 	audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
@@ -269,8 +282,9 @@ def refreshFromOnlineSettings():
     global robotSettings
     global resolutionChanged
     print "refreshing from online settings"
-    onlineSettings = getOnlineRobotSettings(robotID)
-    robotSettings = overrideSettings(commandArgs, onlineSettings)
+    #onlineSettings = getOnlineRobotSettings(robotID)
+    #robotSettings = overrideSettings(commandArgs, onlineSettings)
+    robotSettings = commandArgs
 
     if not robotSettings.mic_enabled:
         print "KILLING**********************"
@@ -308,10 +322,11 @@ def main():
     refreshFromOnlineSettings()
 
     print "args after loading from server:", robotSettings
-    
-    appServerSocketIO.on('command_to_robot', onCommandToRobot)
-    appServerSocketIO.on('connection', onConnection)
-    appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
+
+    #todo need to implement for robotstreamer
+    # appServerSocketIO.on('command_to_robot', onCommandToRobot)
+    # appServerSocketIO.on('connection', onConnection)
+    # appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
 
 
 
@@ -346,23 +361,27 @@ def main():
     while True:
 
         print "-----------------" + str(count) + "-----------------"
+
+        #todo: start using this again
+        #appServerSocketIO.wait(seconds=1)
         
-        appServerSocketIO.wait(seconds=1)
+        time.sleep(1)
 
-
+        
 
         # todo: note about the following ffmpeg_process_exists is not technically true, but need to update
         # server code to check for send_video_process_exists if you want to set it technically accurate
         # because the process doesn't always exist, like when the relay is not started yet.
         # send status to server
-        appServerSocketIO.emit('send_video_status', {'send_video_process_exists': True,
-                                            'ffmpeg_process_exists': True,
-                                            'camera_id':commandArgs.camera_id})
+        ######appServerSocketIO.emit('send_video_status', {'send_video_process_exists': True,
+        ######                                    'ffmpeg_process_exists': True,
+        ######                                    'camera_id':commandArgs.camera_id})
 
         
 
         
-        if numVideoRestarts > 100:
+        if numVideoRestarts > 20:
+            print "rebooting in 20 seconds because of too many restarts. probably lost connection to camera"
             time.sleep(20)
             os.system("sudo reboot")
         

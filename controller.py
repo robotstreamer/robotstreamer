@@ -16,7 +16,7 @@ import robot_util
 
 parser = argparse.ArgumentParser(description='start robot control program')
 parser.add_argument('robot_id', help='Robot ID')
-parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.comt')
+parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.com')
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu or mdd10", default='motor_hat')
 parser.add_argument('--serial-device', help="Serial device", default='/dev/ttyACM0')
 parser.add_argument('--male', dest='male', action='store_true')
@@ -88,7 +88,7 @@ os.system("amixer -c 2 cset numid=3 %d%%" % commandArgs.tts_volume)
 infoServer = commandArgs.info_server
 #infoServer = "robotstreamer.com"
 #infoServer = "52.52.213.92"
-#infoServer = "robotstreamer:3100"
+#infoServer = "robotstreamer.com:3100"
 
 print "info server:", infoServer
 
@@ -442,9 +442,11 @@ def getChatHostPort():
     response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
     return json.loads(response)
 
-controlHostPort = getControlHostPort()
-chatHostPort = getChatHostPort()
+#controlHostPort = getControlHostPort()
+controlHostPort = {"host":"robotstreamer.com", "port":6777}
 
+#chatHostPort = getChatHostPort()
+chatHostPort = {"host":"robotstreamer.com", "port":6777}
 
 
 print "connecting to control socket.io", controlHostPort
@@ -459,7 +461,8 @@ else:
     print "chat server connection disabled"
 
 print "connecting to app server socket.io"
-appServerSocketIO = SocketIO(infoServer, 8022, LoggingNamespace)
+#todo need to implement this for robotstreamer appServerSocketIO = SocketIO(infoServer, 8022, LoggingNamespace)
+appServerSocketIO = None
 print "finished connecting to app server"
 
 def setServoPulse(channel, pulse):
@@ -1187,10 +1190,12 @@ def onHandleControlDisconnect(*args):
 controlSocketIO.on('command_to_robot', onHandleCommand)
 controlSocketIO.on('disconnect', onHandleControlDisconnect)
 
-appServerSocketIO.on('exclusive_control', onHandleExclusiveControl)
-appServerSocketIO.on('connect', onHandleAppServerConnect)
-appServerSocketIO.on('reconnect', onHandleAppServerReconnect)
-appServerSocketIO.on('disconnect', onHandleAppServerDisconnect)
+
+# todo: need to implement this for robotstreamer
+#appServerSocketIO.on('exclusive_control', onHandleExclusiveControl)
+#appServerSocketIO.on('connect', onHandleAppServerConnect)
+#appServerSocketIO.on('reconnect', onHandleAppServerReconnect)
+#appServerSocketIO.on('disconnect', onHandleAppServerDisconnect)
 
 
 if commandArgs.enable_chat_server_connection:
@@ -1206,8 +1211,9 @@ def startReverseSshProcess(*args):
 def endReverseSshProcess(*args):
    thread.start_new_thread(handleEndReverseSshProcess, args)
 
-appServerSocketIO.on('reverse_ssh_8872381747239', startReverseSshProcess)
-appServerSocketIO.on('end_reverse_ssh_8872381747239', endReverseSshProcess)
+#todo: need to implement this for robotstreamer
+#appServerSocketIO.on('reverse_ssh_8872381747239', startReverseSshProcess)
+#appServerSocketIO.on('end_reverse_ssh_8872381747239', endReverseSshProcess)
 
 #def myWait():
 #  socketIO.wait()
@@ -1243,8 +1249,10 @@ if commandArgs.type == 'motor_hat':
         motorB = mh.getMotor(2)
 
 def ipInfoUpdate():
-    appServerSocketIO.emit('ip_information',
-                  {'ip': subprocess.check_output(["hostname", "-I"]), 'robot_id': robotID})
+    #todo: need to implement this for robotstreamer
+    #appServerSocketIO.emit('ip_information',
+    #              {'ip': subprocess.check_output(["hostname", "-I"]), 'robot_id': robotID})
+    pass
 
 
 # true if it's on the charger and it needs to be charging
@@ -1359,8 +1367,10 @@ lastInternetStatus = False
 
 
 def waitForAppServer():
-    while True:
-        appServerSocketIO.wait(seconds=1)
+    #todo: need to implement this for robotstreamer
+    #while True:
+    #    appServerSocketIO.wait(seconds=1)
+    pass
 
 def waitForControlServer():
     while True:
@@ -1392,7 +1402,7 @@ while True:
     if (waitCounter % chargeCheckInterval) == 0:
         if commandArgs.type == 'motor_hat':
             updateChargeApproximation()
-            sendChargeState()
+            #todo need to implement this for robotstreamer sendChargeState()
             if commandArgs.slow_for_low_battery:
                 setSpeedBasedOnCharge()
 
