@@ -671,10 +671,10 @@ def handle_chat_message(args):
             jsonObject = json.loads(args)
         except:
             print "ERROR could not read the json representation of that chat message"
-            
-        say(jsonObject['message'])
 
-        #print "ERROR: chat message was not valid"
+        if jsonObject['tts']:
+            say(jsonObject['message'])
+
 
 
           

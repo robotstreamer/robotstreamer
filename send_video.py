@@ -27,8 +27,8 @@ class DummyProcess:
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
 #parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
-parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
-parser.add_argument('--info-server-protocol', default="https", help="either https or http")
+parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
+parser.add_argument('--info-server-protocol', default="http", help="either https or http")
 parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
 parser.add_argument('--app-server-socketio-port', default=8022, help="typically use 8022 for prod, 8122 for dev, and 8125 for dev2")
 parser.add_argument('--api-server', help="Server that robot will connect to listen for API update events", default='api.robotstreamer.com')
@@ -150,8 +150,7 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
-    #videoPort = getVideoPort()
-    videoPort = 8081
+    videoPort = getVideoPort()
     print "getting websocket relay host for video"
 
     #todo, use api
