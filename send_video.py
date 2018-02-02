@@ -185,8 +185,7 @@ def startVideoCaptureLinux():
 
 def startAudioCaptureLinux():
 
-    #audioPort = getAudioPort()
-    audioPort = 8083
+    audioPort = getAudioPort()
 
     #websocketRelayHost = getWebsocketRelayHost()
 
