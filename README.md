@@ -1,6 +1,6 @@
 <h1> Open Robot Control Code For Connecting to RobotStreamer.com </h1>
 <br>
-RobotStreamer.com is a low latency streaming and control platform for robots and games. Broadcasters make the rules for their channels. We are open minded and don't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining.
+RobotStreamer.com is a low latency streaming and control platform for robots and games. Broadcasters make the rules for their channels. We are open minded and don't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language (F-bombs and such), it's up to the broadcaster to decide how they want to moderate.
 <br>
 
 <h2> Quick Install </h2>
