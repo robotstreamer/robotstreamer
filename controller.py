@@ -665,7 +665,7 @@ def handle_chat_message_old(args):
 def handle_chat_message(args):
     print "chat message received full:", args
     if isinstance(args, basestring):
-        print "got string", args
+        print "chat message got string", args
 
         if args[0] == '2':
             print "skipping", args
@@ -677,15 +677,27 @@ def handle_chat_message(args):
         except:
             print "ERROR could not read the json representation of that chat message"
 
+        print "message received about to check for tts", jsonObject['tts']
         if jsonObject['tts']:
+            print "tts enabled"
             split  = jsonObject['message'].split(' ', 1)
 
             voice = 'en-us'
             m = jsonObject['message']
+            print "split", split
             if len(split) > 1:
-                if split[0] in allowedVoices:
-                    voice = split[0]
-                    m = split[1]
+                if split[0][0] == ".":
+                    print "found ."
+                    if split[0][1:] in allowedVoices:
+                        print "allowed voice"
+                        voice = split[0][1:]
+                        m = split[1]
+                    else:
+                        print "not in allowed voices"
+                else:
+                    print "does not start with ."
+            else:
+                print "length problem"
                     
             say(m, voice)
 
