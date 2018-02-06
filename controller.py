@@ -57,7 +57,8 @@ parser.add_argument('--left-wheel-forward-speed', type=int)
 parser.add_argument('--left-wheel-backward-speed', type=int)
 parser.add_argument('--led-max-brightness', type=int)
 
-
+# this validation is needed or the command line will not be secure
+allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh']
 
 commandArgs = parser.parse_args()
 print commandArgs
@@ -611,8 +612,12 @@ def handle_exclusive_control(args):
 
 
                 
-def say(message):
+def say(message, voice='en-us'):
 
+    if voice not in allowedVoices:
+        print "invalid voice"
+        return
+    
     tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
     f = open(tempFilePath, "w")
     f.write(message)
@@ -631,9 +636,9 @@ def say(message):
         for hardwareNumber in (2, 0, 3, 1, 4):
             print 'plughw:%d,0' % hardwareNumber
             if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak --stdout | aplay -D plughw:%d,0' % hardwareNumber)
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
             else:
-                os.system('cat ' + tempFilePath + ' | espeak -ven-us+f%d -s170 --stdout | aplay -D plughw:%d,0' % (commandArgs.voice_number, hardwareNumber))
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
 
     os.remove(tempFilePath)
 
@@ -673,7 +678,16 @@ def handle_chat_message(args):
             print "ERROR could not read the json representation of that chat message"
 
         if jsonObject['tts']:
-            say(jsonObject['message'])
+            split  = jsonObject['message'].split(' ', 1)
+
+            voice = 'en-us'
+            m = jsonObject['message']
+            if len(split) > 1:
+                if split[0] in allowedVoices:
+                    voice = split[0]
+                    m = split[1]
+                    
+            say(m, voice)
 
 
 
