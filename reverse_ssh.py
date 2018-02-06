@@ -14,7 +14,7 @@ def main():
 
    parser.add_argument('robot_id', help='Robot ID')   
    parser.add_argument('--reverse-ssh-key-file', default='/home/pi/reverse_ssh_key1.pem')
-   parser.add_argument('--reverse-ssh-host', default='ubuntu@52.52.204.174')
+   parser.add_argument('--reverse-ssh-host', default='ubuntu@1.1.1.1')
    
    commandArgs = parser.parse_args()
    print commandArgs
