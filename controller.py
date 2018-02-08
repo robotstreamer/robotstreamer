@@ -130,6 +130,8 @@ elif commandArgs.type == 'owi_arm':
     import owi_arm
 elif commandArgs.type == 'mdd10':
     pass
+elif commandArgs.type == 'mdd10_pingpong':
+    pass
 else:
     print "invalid --type in command line"
     exit(0)
@@ -251,7 +253,7 @@ if commandArgs.type == 'motozero':
     GPIO.setup(Motor4B,GPIO.OUT)
     GPIO.setup(Motor4Enable,GPIO.OUT)
 #Cytron MDD10 GPIO setup
-if commandArgs.type == 'mdd10' :
+if commandArgs.type == 'mdd10' or commandArgs.type == 'mdd10_pingpong':
 # pwm.setPWMFreq(60)
   import RPi.GPIO as GPIO
   GPIO.setmode(GPIO.BCM)
@@ -706,6 +708,19 @@ def moveMDD10(command, speedPercent):
 	   time.sleep(turnDelay)
 
 
+def shootMDD10(command):
+
+    print "shoot mdd10 ping pong"
+    if command == 'FIRE':
+	   GPIO.output(DIG1, GPIO.HIGH)
+	   GPIO.output(DIG2, GPIO.HIGH)
+	   p1.start(100)
+	   p2.start(100)
+	   time.sleep(3)
+           turnOffMotorsMDD10()
+
+           
+
 def moveAdafruitPWM(command):
     print "move adafruit pwm command", command
         
@@ -893,7 +908,10 @@ def handle_command(args):
 
             if command == 'MAXSPEED':
                 handleMaxSpeedCommand()
-                            
+
+            if commandArgs.type == 'mdd10_pingpong':
+                shootMDD10(command)
+                
             if commandArgs.type == 'mdd10':
                 if maxSpeedEnabled:
                     print "AT MAX....................."
