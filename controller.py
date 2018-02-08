@@ -57,7 +57,8 @@ parser.add_argument('--left-wheel-forward-speed', type=int)
 parser.add_argument('--left-wheel-backward-speed', type=int)
 parser.add_argument('--led-max-brightness', type=int)
 
-
+# this validation is needed or the command line will not be secure
+allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
 
 commandArgs = parser.parse_args()
 print commandArgs
@@ -613,8 +614,12 @@ def handle_exclusive_control(args):
 
 
                 
-def say(message):
+def say(message, voice='en-us'):
 
+    if voice not in allowedVoices:
+        print "invalid voice"
+        return
+    
     tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
     f = open(tempFilePath, "w")
     f.write(message)
@@ -633,9 +638,9 @@ def say(message):
         for hardwareNumber in (2, 0, 3, 1, 4):
             print 'plughw:%d,0' % hardwareNumber
             if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak --stdout | aplay -D plughw:%d,0' % hardwareNumber)
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
             else:
-                os.system('cat ' + tempFilePath + ' | espeak -ven-us+f%d -s170 --stdout | aplay -D plughw:%d,0' % (commandArgs.voice_number, hardwareNumber))
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
 
     os.remove(tempFilePath)
 
@@ -662,7 +667,7 @@ def handle_chat_message_old(args):
 def handle_chat_message(args):
     print "chat message received full:", args
     if isinstance(args, basestring):
-        print "got string", args
+        print "chat message got string", args
 
         if args[0] == '2':
             print "skipping", args
@@ -674,8 +679,30 @@ def handle_chat_message(args):
         except:
             print "ERROR could not read the json representation of that chat message"
 
+        print "message received about to check for tts", jsonObject['tts']
         if jsonObject['tts']:
-            say(jsonObject['message'])
+        #if False:
+            print "tts enabled"
+            split  = jsonObject['message'].split(' ', 1)
+
+            voice = 'en-us'
+            m = jsonObject['message']
+            print "split", split
+            if len(split) > 1:
+                if split[0][0] == ".":
+                    print "found ."
+                    if split[0][1:] in allowedVoices:
+                        print "allowed voice"
+                        voice = split[0][1:]
+                        m = split[1]
+                    else:
+                        print "not in allowed voices"
+                else:
+                    print "does not start with ."
+            else:
+                print "length problem"
+                    
+            say(m, voice)
 
 
 
@@ -859,6 +886,7 @@ def moveGoPiGo3(command):
         
                 
 def handle_command(args):
+        print "handle_command", args
         now = datetime.datetime.now()
         now_time = now.time()
         # if it's late, make the robot slower
@@ -873,7 +901,10 @@ def handle_command(args):
         global drivingSpeed
         global handlingCommand
 
-        if 'robot_id' in args and args['robot_id'] == robotID: print "received message:", args
+        if 'robot_id' in args and args['robot_id'] == robotID:
+            print "received message:", args
+        else:
+            print "the robot id sent", args['robot_id'], "is not as expected", robotID
         # Note: If you are adding features to your bot,
         # you can get direct access to incomming commands right here.
 
@@ -1167,7 +1198,8 @@ def handleEndReverseSshProcess(args):
     print "result code of killall ssh:", resultCode
 
 def onHandleCommand(*args):
-   thread.start_new_thread(handle_command, args)
+    print "onHandleCommand", args
+    thread.start_new_thread(handle_command, args)
 
 def onHandleExclusiveControl(*args):
    thread.start_new_thread(handle_exclusive_control, args)
@@ -1176,7 +1208,7 @@ def onHandleChatMessageOld(*args):
    thread.start_new_thread(handle_chat_message_old, args)
 
 def onHandleChatMessage(*args):
-   thread.start_new_thread(handle_chat_message, args)   
+    thread.start_new_thread(handle_chat_message, args)   
 
    
 def onHandleAppServerConnect(*args):
@@ -1225,6 +1257,11 @@ def onHandleControlDisconnect(*args):
     print
     print "control socket.io disconnect"
     print
+
+def onHandleControlConnect(*args):
+    print
+    print "control socket.io connect  *******************************"
+    print
     
 
 
@@ -1232,6 +1269,7 @@ def onHandleControlDisconnect(*args):
 #from communication import socketIO
 controlSocketIO.on('command_to_robot', onHandleCommand)
 controlSocketIO.on('disconnect', onHandleControlDisconnect)
+controlSocketIO.on('connect', onHandleControlConnect)
 
 
 # todo: need to implement this for robotstreamer
