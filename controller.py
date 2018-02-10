@@ -31,8 +31,8 @@ parser.add_argument('--straight-delay', type=float, default=0.5)
 parser.add_argument('--driving-speed', type=int, default=90)
 parser.add_argument('--day-speed', type=int, default=255)
 parser.add_argument('--night-speed', type=int, default=255)
-parser.add_argument('--forward', default='[0,1,-1,1]')
-parser.add_argument('--left', default='[0,1,1,1]')
+parser.add_argument('--forward', default='[-1,1,-1,1]')
+parser.add_argument('--left', default='[1,1,1,1]')
 parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
 parser.set_defaults(festival_tts=False)
 parser.add_argument('--auto-wifi', dest='auto_wifi', action='store_true')
@@ -1011,6 +1011,10 @@ def handle_command(args):
                     #mhArm.getMotor(2).run(Adafruit_MotorHAT.FORWARD)
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
+                if command == 'FIRE':
+                    drivingSpeed = 255
+                    runMotor(0, -1)
+                    time.sleep(2.8)
 
             if commandArgs.type == 'mdd10':
                 turnOffMotorsMDD10()
