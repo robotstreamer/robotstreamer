@@ -909,8 +909,8 @@ def handle_command(args):
         # you can get direct access to incomming commands right here.
 
 
-        if handlingCommand:
-            return
+        #if handlingCommand:
+        #    return
 
 
 
@@ -927,6 +927,11 @@ def handle_command(args):
             print('got command', args)
 
             command = args['command']
+
+            #todo: this should really be, if command is not premium (paid) in general, then you can skip
+            if command != "FIRE":
+                if handlingCommand:
+                    return
 
             # don't turn set handlingCommand true for
             # commands that persist for a while and are not exclusive
@@ -1015,6 +1020,7 @@ def handle_command(args):
                     drivingSpeed = 255
                     runMotor(0, -1)
                     time.sleep(2.8)
+                    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
 
             if commandArgs.type == 'mdd10':
                 turnOffMotorsMDD10()
@@ -1315,7 +1321,7 @@ if commandArgs.type == 'motor_hat':
 
 def turnOffMotors():
     # pi hat motors
-    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    #mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
