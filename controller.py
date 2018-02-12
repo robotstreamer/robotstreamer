@@ -1322,6 +1322,7 @@ if commandArgs.type == 'motor_hat':
 def turnOffMotors():
     # pi hat motors
     #mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)    
     mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
