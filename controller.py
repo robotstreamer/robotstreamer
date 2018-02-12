@@ -457,8 +457,42 @@ print "connecting to control socket.io", controlHostPort
 controlSocketIO = SocketIO(controlHostPort['host'], controlHostPort['port'], LoggingNamespace)
 print "finished using socket io to connect to control host port", controlHostPort
 
+
+
+def say(message, voice='en-us'):
+
+    if voice not in allowedVoices:
+        print "invalid voice"
+        return
+    
+    tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+    f = open(tempFilePath, "w")
+    f.write(message)
+    f.close()
+
+
+    #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
+    
+    if commandArgs.festival_tts:
+        # festival tts
+        os.system('festival --tts < ' + tempFilePath)
+    #os.system('espeak < /tmp/speech.txt')
+
+    else:
+        # espeak tts
+        for hardwareNumber in (2, 0, 3, 1, 4):
+            print 'plughw:%d,0' % hardwareNumber
+            if commandArgs.male:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+            else:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+
+    os.remove(tempFilePath)
+
+
 if commandArgs.enable_chat_server_connection:
     print "connecting to chat socket.io", chatHostPort
+    say("opening chat socket") # somehow having this here actually makes the chat socket connection establish faster
     chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
     print 'finished using socket io to connect to chat ', chatHostPort
 else:
@@ -615,35 +649,7 @@ def handle_exclusive_control(args):
 
 
                 
-def say(message, voice='en-us'):
 
-    if voice not in allowedVoices:
-        print "invalid voice"
-        return
-    
-    tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
-    f = open(tempFilePath, "w")
-    f.write(message)
-    f.close()
-
-
-    #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
-    
-    if commandArgs.festival_tts:
-        # festival tts
-        os.system('festival --tts < ' + tempFilePath)
-    #os.system('espeak < /tmp/speech.txt')
-
-    else:
-        # espeak tts
-        for hardwareNumber in (2, 0, 3, 1, 4):
-            print 'plughw:%d,0' % hardwareNumber
-            if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
-            else:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
-
-    os.remove(tempFilePath)
 
     
                 
