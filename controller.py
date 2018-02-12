@@ -449,7 +449,8 @@ def getChatHostPort():
 controlHostPort = {"host":"robotstreamer.com", "port":6777}
 
 #chatHostPort = getChatHostPort()
-chatHostPort = {"host":"robotstreamer.com", "port":6776}
+#chatHostPort = {"host":"robotstreamer.com", "port":6776}
+chatHostPort = {"host":"54.219.138.36", "port":6776}
 
 
 print "connecting to control socket.io", controlHostPort
