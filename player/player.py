@@ -21,7 +21,7 @@ def startListenForChatServer():
    thread.start_new_thread(waitForChatServer, ())
 
   
-chatSocket = SocketIO("robotstreamer.com", 6776, LoggingNamespace)
+chatSocket = SocketIO("54.219.138.36", 6776, LoggingNamespace)
 
 
 print chatSocket
