@@ -16,7 +16,7 @@ import robot_util
 
 parser = argparse.ArgumentParser(description='start robot control program')
 parser.add_argument('robot_id', help='Robot ID')
-parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.com')
+parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.com:6001')
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu or mdd10", default='motor_hat')
 parser.add_argument('--serial-device', help="Serial device", default='/dev/ttyACM0')
 parser.add_argument('--male', dest='male', action='store_true')
@@ -436,7 +436,7 @@ if commandArgs.type == 'serial':
 
 def getControlHostPort():
 
-    url = 'https://%s/get_control_host_port/%s' % (infoServer, commandArgs.robot_id)
+    url = 'http://%s/get_control_host_port/%s' % (infoServer, commandArgs.robot_id)
     response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
     return json.loads(response)
 
@@ -445,8 +445,8 @@ def getChatHostPort():
     response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
     return json.loads(response)
 
-#controlHostPort = getControlHostPort()
-controlHostPort = {"host":"robotstreamer.com", "port":6777}
+controlHostPort = getControlHostPort()
+#controlHostPort = {"host":"robotstreamer.com", "port":6777}
 
 #chatHostPort = getChatHostPort()
 #chatHostPort = {"host":"robotstreamer.com", "port":6776}
