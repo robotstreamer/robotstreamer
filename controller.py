@@ -461,6 +461,8 @@ print "finished using socket io to connect to control host port", controlHostPor
 
 def say(message, voice='en-us'):
 
+    os.system("killall espeak")
+    
     if voice not in allowedVoices:
         print "invalid voice"
         return
@@ -492,7 +494,7 @@ def say(message, voice='en-us'):
 
 if commandArgs.enable_chat_server_connection:
     print "connecting to chat socket.io", chatHostPort
-    say("opening chat socket") # somehow having this here actually makes the chat socket connection establish faster
+    say("opening chat socket")
     chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
     print 'finished using socket io to connect to chat ', chatHostPort
 else:
@@ -1024,10 +1026,11 @@ def handle_command(args):
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
                 if command == 'FIRE':
-                    drivingSpeed = 255
-                    runMotor(0, -1)
+                    pingPongMotor = mhPingPong.getMotor(1)
+                    pingPongMotor.setSpeed(255)
+                    pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
                     time.sleep(2.8)
-                    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+                    pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
 
             if commandArgs.type == 'mdd10':
                 turnOffMotorsMDD10()
@@ -1324,6 +1327,7 @@ if commandArgs.type == 'motor_hat':
         # create a default object, no changes to I2C address or frequency
         mh = Adafruit_MotorHAT(addr=0x60)
         #mhArm = Adafruit_MotorHAT(addr=0x61)
+        mhPingPong = Adafruit_MotorHAT(addr=0x61)
     
 
 def turnOffMotors():
