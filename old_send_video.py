@@ -62,18 +62,19 @@ else:
 print "initializing socket io"
 print "server:", server
 print "port:", port
-socketIO = SocketIO(server, port, LoggingNamespace)
+#todo: put this back
+#socketIO = SocketIO(server, port, LoggingNamespace)
 print "finished initializing socket io"
 
-#ffmpeg -f qtkit -i 0 -f mpeg1video -b 400k -r 30 -s 320x240 http://52.8.81.124:8082/hello/320/240/
+#ffmpeg -f qtkit -i 0 -f mpeg1video -b 400k -r 30 -s 320x240 http://52.8.81.124:8082/hellobluecat/320/240/
 
 
 def onHandleCameraCommand(*args):
     #thread.start_new_thread(handle_command, args)
     print args
 
-
-socketIO.on('command_to_camera', onHandleCameraCommand)
+#todo: put this back
+#socketIO.on('command_to_camera', onHandleCameraCommand)
 
 
 def onHandleTakeSnapshotCommand(*args):
@@ -86,7 +87,8 @@ def onHandleTakeSnapshotCommand(*args):
     
     socketIO.emit('snapshot', {'image':base64.b64encode(data)})
 
-socketIO.on('take_snapshot_command', onHandleTakeSnapshotCommand)
+#todo: put this back
+#socketIO.on('take_snapshot_command', onHandleTakeSnapshotCommand)
 
 
 def randomSleep():
@@ -101,7 +103,7 @@ def randomSleep():
 def getVideoPort():
 
 
-    url = 'http://%s/get_video_port/%s' % (server, cameraIDAnswer)
+    url = 'http://%s:6001/get_video_port/%s' % (server, cameraIDAnswer)
 
 
     for retryNumber in range(2000):
@@ -118,7 +120,7 @@ def getVideoPort():
 def getAudioPort():
 
 
-    url = 'http://%s/get_audio_port/%s' % (server, cameraIDAnswer)
+    url = 'http://%s:6001/get_audio_port/%s' % (server, cameraIDAnswer)
 
 
     for retryNumber in range(2000):
@@ -154,7 +156,7 @@ def handleDarwin(deviceNumber, videoPort, audioPort):
     print err
 
     deviceAnswer = raw_input("Enter the number of the camera device for your robot from the list above: ")
-    commandLine = 'ffmpeg -f qtkit -i %s -f mpeg1video -b 400k -r 30 -s 320x240 http://%s:%s/hello/320/240/' % (deviceAnswer, server, videoPort)
+    commandLine = 'ffmpeg -f qtkit -i %s -f mpeg1video -b 400k -r 30 -s 320x240 http://%s:%s/hellobluecat/320/240/' % (deviceAnswer, server, videoPort)
     
     process = runFfmpeg(commandLine)
 
@@ -187,11 +189,11 @@ def handleLinux(deviceNumber, videoPort, audioPort):
         deviceAnswer = str(deviceNumber)
 
         
-    #commandLine = '/usr/local/bin/ffmpeg -s 320x240 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hello/320/240/' % (deviceAnswer, videoPort)
-    #commandLine = '/usr/local/bin/ffmpeg -s 640x480 -f video4linux2 -i /dev/video%s -f mpeg1video -b 150k -r 20 http://%s:%s/hello/640/480/' % (deviceAnswer, server, videoPort)
+    #commandLine = '/usr/local/bin/ffmpeg -s 320x240 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hellobluecat/320/240/' % (deviceAnswer, videoPort)
+    #commandLine = '/usr/local/bin/ffmpeg -s 640x480 -f video4linux2 -i /dev/video%s -f mpeg1video -b 150k -r 20 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, server, videoPort)
     # For new JSMpeg
-    #commandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s -f mpegts -codec:v mpeg1video -s 640x480 -b:v 250k -bf 0 http://%s:%s/hello/640/480/' % (deviceAnswer, server, videoPort) # ClawDaddy
-    #commandLine = '/usr/local/bin/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hello/1280/720/' % (deviceAnswer, videoPort)
+    #commandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s -f mpegts -codec:v mpeg1video -s 640x480 -b:v 250k -bf 0 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, server, videoPort) # ClawDaddy
+    #commandLine = '/usr/local/bin/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hellobluecat/1280/720/' % (deviceAnswer, videoPort)
 
 
     if args.rotate180:
@@ -200,8 +202,8 @@ def handleLinux(deviceNumber, videoPort, audioPort):
         rotationOption = ""
 
     # video with audio
-    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s %s -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hello/640/480/' % (deviceAnswer, rotationOption, args.kbps, server, videoPort)
-    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:1 -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hello/640/480/' % (args.mic_channels, server, audioPort)
+    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s %s -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, rotationOption, args.kbps, server, videoPort)
+    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:1 -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.mic_channels, server, audioPort)
 
     print videoCommandLine
     print audioCommandLine
@@ -248,7 +250,7 @@ def handleWindows(deviceNumber, videoPort):
         deviceAnswer = str(deviceNumber)
 
     device = devices[int(deviceAnswer)]
-    commandLine = 'ffmpeg -s 640x480 -f dshow -i video="%s" -f mpegts -codec:v mpeg1video -b 200k -r 20 http://%s:%s/hello/640/480/' % (device, server, videoPort)
+    commandLine = 'ffmpeg -s 640x480 -f dshow -i video="%s" -f mpegts -codec:v mpeg1video -b 200k -r 20 http://%s:%s/hellobluecat/640/480/' % (device, server, videoPort)
     
 
     process = runFfmpeg(commandLine)
@@ -293,10 +295,13 @@ def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
         
     device = devices[int(deviceAnswer)]
 
-    #commandLine = 'ffmpeg -f dshow -i video="screen-capture-recorder" -vf "scale=640:480" -f mpeg1video -b 50k -r 20 http://%s:%s/hello/640/480/' % (server, videoPort)
+    #commandLine = 'ffmpeg -f dshow -i video="screen-capture-recorder" -vf "scale=640:480" -f mpeg1video -b 50k -r 20 http://%s:%s/hellobluecat/640/480/' % (server, videoPort)
 
-    videoCommandLine = 'ffmpeg -f dshow -i video="screen-capture-recorder" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hello/640/480/' % (args.kbps, server, videoPort)
-    audioCommandLine = 'ffmpeg -f dshow -ar 44100 -ac 1 -i audio="%s" -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hello/640/480/' % (args.audio_input_device, server, audioPort)
+    # reference for -rtbufsize option
+    # https://github.com/rdp/screen-capture-recorder-to-video-windows-free/issues/84
+        
+    videoCommandLine = 'ffmpeg -rtbufsize 1024M -f dshow -i video="screen-capture-recorder" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
+    audioCommandLine = 'ffmpeg -f dshow -ar 44100 -ac 1 -i audio="%s" -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.audio_input_device, server, audioPort)
     
     print "video command line:", videoCommandLine
     print "audio command line:", audioCommandLine
@@ -377,9 +382,9 @@ def main():
     while True:
 
 
-
-        socketIO.emit('send_video_status', {'send_video_process_exists': True,
-                                            'camera_id':cameraIDAnswer})
+         #todo: put this back
+        #socketIO.emit('send_video_status', {'send_video_process_exists': True,
+         #                                   'camera_id':cameraIDAnswer})
 
         
         if streamProcessDict is not None:
@@ -454,8 +459,10 @@ def main():
             time.sleep(1)
 
             if count % 20 == 0:
-                socketIO.emit('send_video_status', {'send_video_process_exists': True,
-                                                    'camera_id':cameraIDAnswer})
+                pass
+                #todo: put this back
+                #socketIO.emit('send_video_status', {'send_video_process_exists': True,
+                #                                   'camera_id':cameraIDAnswer})
             
             if False: #count % 40 == 30:
                 print "stopping video capture just in case it has reached a state where it's looping forever, not sending video, and not dying as a process, which can happen"
@@ -466,9 +473,10 @@ def main():
             if count % 30 == 0:
                 print "send status about this process and its child process ffmpeg"
                 ffmpegProcessExists = True #streamProcessDict['video_process'].poll() is None
-                socketIO.emit('send_video_status', {'send_video_process_exists': True,
-                                                    'ffmpeg_process_exists': ffmpegProcessExists,
-                                                    'camera_id':cameraIDAnswer})
+                #todo: put this back
+                #socketIO.emit('send_video_status', {'send_video_process_exists': True,
+                #                                   'ffmpeg_process_exists': ffmpegProcessExists,
+                #                                   'camera_id':cameraIDAnswer})
 
             #if count % 190 == 180:
             #    print "reboot system in case the webcam is not working"
