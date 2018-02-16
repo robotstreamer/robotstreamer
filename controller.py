@@ -16,7 +16,7 @@ import robot_util
 
 parser = argparse.ArgumentParser(description='start robot control program')
 parser.add_argument('robot_id', help='Robot ID')
-parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.com')
+parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default='robotstreamer.com:6001')
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu or mdd10", default='motor_hat')
 parser.add_argument('--serial-device', help="Serial device", default='/dev/ttyACM0')
 parser.add_argument('--male', dest='male', action='store_true')
@@ -436,7 +436,7 @@ if commandArgs.type == 'serial':
 
 def getControlHostPort():
 
-    url = 'https://%s/get_control_host_port/%s' % (infoServer, commandArgs.robot_id)
+    url = 'http://%s/get_control_host_port/%s' % (infoServer, commandArgs.robot_id)
     response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
     return json.loads(response)
 
@@ -445,8 +445,8 @@ def getChatHostPort():
     response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
     return json.loads(response)
 
-#controlHostPort = getControlHostPort()
-controlHostPort = {"host":"robotstreamer.com", "port":6777}
+controlHostPort = getControlHostPort()
+#controlHostPort = {"host":"robotstreamer.com", "port":6777}
 
 #chatHostPort = getChatHostPort()
 #chatHostPort = {"host":"robotstreamer.com", "port":6776}
@@ -457,8 +457,44 @@ print "connecting to control socket.io", controlHostPort
 controlSocketIO = SocketIO(controlHostPort['host'], controlHostPort['port'], LoggingNamespace)
 print "finished using socket io to connect to control host port", controlHostPort
 
+
+
+def say(message, voice='en-us'):
+
+    os.system("killall espeak")
+    
+    if voice not in allowedVoices:
+        print "invalid voice"
+        return
+    
+    tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+    f = open(tempFilePath, "w")
+    f.write(message)
+    f.close()
+
+
+    #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
+    
+    if commandArgs.festival_tts:
+        # festival tts
+        os.system('festival --tts < ' + tempFilePath)
+    #os.system('espeak < /tmp/speech.txt')
+
+    else:
+        # espeak tts
+        for hardwareNumber in (2, 0, 3, 1, 4):
+            print 'plughw:%d,0' % hardwareNumber
+            if commandArgs.male:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+            else:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+
+    os.remove(tempFilePath)
+
+
 if commandArgs.enable_chat_server_connection:
     print "connecting to chat socket.io", chatHostPort
+    say("opening chat socket")
     chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
     print 'finished using socket io to connect to chat ', chatHostPort
 else:
@@ -615,35 +651,7 @@ def handle_exclusive_control(args):
 
 
                 
-def say(message, voice='en-us'):
 
-    if voice not in allowedVoices:
-        print "invalid voice"
-        return
-    
-    tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
-    f = open(tempFilePath, "w")
-    f.write(message)
-    f.close()
-
-
-    #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
-    
-    if commandArgs.festival_tts:
-        # festival tts
-        os.system('festival --tts < ' + tempFilePath)
-    #os.system('espeak < /tmp/speech.txt')
-
-    else:
-        # espeak tts
-        for hardwareNumber in (2, 0, 3, 1, 4):
-            print 'plughw:%d,0' % hardwareNumber
-            if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
-            else:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
-
-    os.remove(tempFilePath)
 
     
                 
@@ -1018,10 +1026,11 @@ def handle_command(args):
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
                 if command == 'FIRE':
-                    drivingSpeed = 255
-                    runMotor(0, -1)
+                    pingPongMotor = mhPingPong.getMotor(1)
+                    pingPongMotor.setSpeed(255)
+                    pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
                     time.sleep(2.8)
-                    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+                    pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
 
             if commandArgs.type == 'mdd10':
                 turnOffMotorsMDD10()
@@ -1318,6 +1327,7 @@ if commandArgs.type == 'motor_hat':
         # create a default object, no changes to I2C address or frequency
         mh = Adafruit_MotorHAT(addr=0x60)
         #mhArm = Adafruit_MotorHAT(addr=0x61)
+        mhPingPong = Adafruit_MotorHAT(addr=0x61)
     
 
 def turnOffMotors():
