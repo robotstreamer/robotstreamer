@@ -8,6 +8,7 @@ import json
 import robot_util_python36 as robot_util
 
 
+controlHost = "robotstreamer.com"
 
 apiHost = "robotstreamer.com:6001"
 
@@ -41,7 +42,7 @@ async def hello():
 
     port = getControlHostPort()['port']
     print("connecting to port:", port)
-    url = 'ws://54.219.37.103:%s/echo' % port
+    url = 'ws://%s:%s/echo' % (controlHost, port)
 
     async with websockets.connect(url) as websocket:
 
@@ -61,7 +62,14 @@ async def hello():
             rsbot.move(j["command"])
             count = count + 1
 
-asyncio.get_event_loop().run_until_complete(hello())
+
+while True:
+        print ("restarting loop")
+        time.sleep(0.25)
+        try:
+                asyncio.get_event_loop().run_until_complete(hello())
+        except:
+                print("error")
 
 
 
