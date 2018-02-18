@@ -10,6 +10,8 @@ turnDelay = 0.2
 drivingSpeed = 255
 straightDelay = 0.5
 
+mhPingPong = Adafruit_MotorHAT(addr=0x61)
+
 
 def runMotor(motorIndex, direction):
     motor = mh.getMotor(motorIndex+1)

@@ -1,4 +1,5 @@
 
+import os
 import asyncio
 import websockets
 import time
@@ -8,13 +9,17 @@ import json
 import robot_util_python36 as robot_util
 import _thread
 import traceback
+import tempfile
+import uuid
 
 
 
 apiHost = "robotstreamer.com:6001"
 controlHost = "robotstreamer.com"
 chatHostPort = {"host":"54.219.138.36", "port":8765}
-
+allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
+tempDir = tempfile.gettempdir()
+print("temporary directory:", tempDir)
 
 
 parser = argparse.ArgumentParser(description='start robot control program')
@@ -22,6 +27,9 @@ parser.add_argument('robot_id', help='Robot ID')
 parser.add_argument('--forward', default='[-1,1,-1,1]')
 parser.add_argument('--left', default='[1,1,1,1]')
 parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false')
+parser.add_argument('--voice-number', type=int, default=1)
+parser.add_argument('--male', dest='male', action='store_true')
+parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
 
 
 
@@ -32,6 +40,39 @@ commandArgs = parser.parse_args()
 rsbot.init(json.loads(commandArgs.forward),
            json.loads(commandArgs.left))
 
+
+
+def say(message, voice='en-us'):
+
+    os.system("killall espeak")
+    
+    if voice not in allowedVoices:
+        print("invalid voice")
+        return
+    
+    tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+    f = open(tempFilePath, "w")
+    f.write(message)
+    f.close()
+
+
+    #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
+    
+    if commandArgs.festival_tts:
+        # festival tts
+        os.system('festival --tts < ' + tempFilePath)
+    #os.system('espeak < /tmp/speech.txt')
+
+    else:
+        # espeak tts
+        for hardwareNumber in (2, 0, 3, 1, 4):
+            print('plughw:%d,0' % hardwareNumber)
+            if commandArgs.male:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+            else:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+
+    os.remove(tempFilePath)
 
 
 
@@ -86,12 +127,16 @@ async def handleChatMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
+            if 'message' in j:
+                say(j['message'])
+            else:
+                print("error, message not in chat object")
 
             
 
             
 def startControl():
-        print ("restarting loop")
+        print("restarting loop")
         time.sleep(0.25)
         try:
                 asyncio.new_event_loop().run_until_complete(handleControlMessages())
@@ -102,7 +147,7 @@ def startControl():
 
 
 def startChat():
-        print ("restarting loop")
+        print("restarting loop")
         time.sleep(0.25)
         try:
                 asyncio.new_event_loop().run_until_complete(handleChatMessages())
