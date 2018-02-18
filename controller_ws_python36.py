@@ -104,7 +104,7 @@ async def handleControlMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
-            rsbot.move(j["command"])
+            _thread.start_new_thread(rsbot.move, (j["command"],))
 
 
             
