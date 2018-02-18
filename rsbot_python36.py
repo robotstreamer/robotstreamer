@@ -127,11 +127,12 @@ def move(command):
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
                 if command == 'FIRE':
-                    pingPongMotor = mhPingPong.getMotor(1)
-                    pingPongMotor.setSpeed(255)
-                    pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
-                    time.sleep(2.8)
-                    pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                    if pingpongEnabled:
+                        pingPongMotor = mhPingPong.getMotor(1)
+                        pingPongMotor.setSpeed(255)
+                        pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
+                        time.sleep(2.8)
+                        pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
 
                 
                 turnOffMotors()
