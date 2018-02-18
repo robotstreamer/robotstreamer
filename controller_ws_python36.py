@@ -172,15 +172,22 @@ def startChat():
 #        asyncio.get_event_loop().run_until_complete(
 #                hello('ws://54.219.138.36:8765'))
         
+def main():                
+
+            print(commandArgs)
+            
+            _thread.start_new_thread(startControl, ())
+            _thread.start_new_thread(startChat, ())
+            #_thread.start_new_thread(startTest, ())
+            #startTest()
+
+            
+            while True:
+                time.sleep(1)
+
+
                 
-
-_thread.start_new_thread(startControl, ())
-_thread.start_new_thread(startChat, ())
-#_thread.start_new_thread(startTest, ())
-#startTest()
-
-while True:
-        time.sleep(1)
-
+if __name__ == '__main__':
+    main()
 
 
