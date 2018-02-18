@@ -136,6 +136,7 @@ async def handleChatMessages():
 
             
 def startControl():
+        time.sleep(10) #todo: only wait as needed (wait for interent)
         print("restarting loop")
         time.sleep(0.25)
         try:
@@ -147,6 +148,7 @@ def startControl():
 
 
 def startChat():
+        time.sleep(10) #todo: only wait as needed (wait for interenet)
         print("restarting loop")
         time.sleep(0.25)
         try:
