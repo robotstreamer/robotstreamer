@@ -30,7 +30,8 @@ parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false'
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
 parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
-
+parser.add_argument('--pingpong-enabled', dest='pingpong_enabled', action='store_true')
+parser.set_defaults(pingpong_enabled=False)
 
 
 
@@ -38,7 +39,8 @@ commandArgs = parser.parse_args()
 
 
 rsbot.init(json.loads(commandArgs.forward),
-           json.loads(commandArgs.left))
+           json.loads(commandArgs.left),
+           commandArgs.pingpong_enabled)
 
 
 

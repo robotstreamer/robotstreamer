@@ -10,7 +10,7 @@ turnDelay = 0.2
 drivingSpeed = 255
 straightDelay = 0.5
 
-mhPingPong = Adafruit_MotorHAT(addr=0x61)
+
 
 
 def runMotor(motorIndex, direction):
@@ -42,7 +42,7 @@ def times(lst, number):
 
 
 
-def init(forwardDefinition, leftDefinition):
+def init(forwardDefinition, leftDefinition, pEnabled):
 
                 global left
                 global right
@@ -50,6 +50,9 @@ def init(forwardDefinition, leftDefinition):
                 global backward
                 global motorA
                 global motorB
+                global pingpongEnabled
+                global mhPingPong
+                pingpongEnabled = pEnabled
                 forward = forwardDefinition
                 backward = times(forward, -1)
                 left = leftDefinition
@@ -64,6 +67,8 @@ def init(forwardDefinition, leftDefinition):
                 
                 atexit.register(turnOffMotors)
 
+                if pingpongEnabled:
+                    mhPingPong = Adafruit_MotorHAT(addr=0x61)
                 
 
 def turnOffMotors():
