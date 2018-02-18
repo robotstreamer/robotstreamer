@@ -6,11 +6,15 @@ import argparse
 import rsbot_python36 as rsbot
 import json
 import robot_util_python36 as robot_util
+import _thread
+import traceback
 
 
-controlHost = "robotstreamer.com"
 
 apiHost = "robotstreamer.com:6001"
+controlHost = "robotstreamer.com"
+chatHostPort = {"host":"54.219.138.36", "port":8765}
+
 
 
 parser = argparse.ArgumentParser(description='start robot control program')
@@ -38,7 +42,7 @@ def getControlHostPort():
         return json.loads(response)
             
 
-async def hello():
+async def handleControlMessages():
 
     port = getControlHostPort()['port']
     print("connecting to port:", port)
@@ -47,30 +51,87 @@ async def hello():
     async with websockets.connect(url) as websocket:
 
         print("connected to control service at", url)
-        print("websocket object:", websocket)
-        
-        count = 0
+        print("control websocket object:", websocket)
         
         while True:
 
-            print("awaiting message")
+            print("awaiting control message")
             
             message = await websocket.recv()
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
             rsbot.move(j["command"])
-            count = count + 1
 
 
-while True:
+            
+async def handleChatMessages():
+
+    url = 'ws://%s:%s' % (chatHostPort['host'], chatHostPort['port'])
+    print("chat url:", url)
+
+    async with websockets.connect(url) as websocket:
+
+        print("connected to control service at", url)
+        print("chat websocket object:", websocket)
+
+        #todo: you do need this as an connection initializer, but you should make the server not need it
+        await websocket.send(json.dumps({"message":"message"}))     
+
+        while True:
+
+            print("awaiting chat message")
+            
+            message = await websocket.recv()
+            print("< {}".format(message))
+            j = json.loads(message)
+            print(j)
+
+            
+
+            
+def startControl():
         print ("restarting loop")
         time.sleep(0.25)
         try:
-                asyncio.get_event_loop().run_until_complete(hello())
+                asyncio.new_event_loop().run_until_complete(handleControlMessages())
         except:
                 print("error")
+                traceback.print_exc()
 
+
+
+def startChat():
+        print ("restarting loop")
+        time.sleep(0.25)
+        try:
+                asyncio.new_event_loop().run_until_complete(handleChatMessages())
+        except:
+                print("error")
+                traceback.print_exc()
+
+
+#async def hello(uri):
+#       async with websockets.connect(uri) as websocket:
+#                await websocket.send(json.dumps({"message":"message"}))
+#                while True:
+#                        print("recv")
+#                        x = await websocket.recv()
+#                        print(x)
+
+#def startTest():
+#        asyncio.get_event_loop().run_until_complete(
+#                hello('ws://54.219.138.36:8765'))
+        
+                
+
+_thread.start_new_thread(startControl, ())
+_thread.start_new_thread(startChat, ())
+#_thread.start_new_thread(startTest, ())
+#startTest()
+
+while True:
+        time.sleep(1)
 
 
 

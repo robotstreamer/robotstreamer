@@ -453,7 +453,7 @@ controlHostPort = getControlHostPort()
 chatHostPort = {"host":"54.219.138.36", "port":6776}
 
 
-print "connecting to control socket.io", controlHostPort
+print "connecting to control socket.io", controlHostPort['host'], controlHostPort['port']
 controlSocketIO = SocketIO(controlHostPort['host'], controlHostPort['port'], LoggingNamespace)
 print "finished using socket io to connect to control host port", controlHostPort
 
@@ -1026,10 +1026,12 @@ def handle_command(args):
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
                 if command == 'FIRE':
+                    print "fire using mhPingPong"
                     pingPongMotor = mhPingPong.getMotor(1)
                     pingPongMotor.setSpeed(255)
                     pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
                     time.sleep(2.8)
+                    print "finished fire using hmPingPong"
                     pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
 
             if commandArgs.type == 'mdd10':
