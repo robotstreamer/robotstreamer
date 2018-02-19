@@ -138,14 +138,15 @@ async def handleChatMessages():
 
             
 def startControl():
-        time.sleep(10) #todo: only wait as needed (wait for interent)
-        print("restarting loop")
-        time.sleep(0.25)
-        try:
-                asyncio.new_event_loop().run_until_complete(handleControlMessages())
-        except:
-                print("error")
-                traceback.print_exc()
+    print("waiting a few seconds")
+    time.sleep(7) #todo: only wait as needed (wait for interent)
+    print("restarting loop")
+    time.sleep(0.25)
+    try:
+        asyncio.new_event_loop().run_until_complete(handleControlMessages())
+    except:
+        print("error")
+        traceback.print_exc()
 
 
 
