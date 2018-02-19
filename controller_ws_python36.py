@@ -130,7 +130,7 @@ async def handleChatMessages():
             j = json.loads(message)
             print(j)
             if 'message' in j:
-                say(j['message'])
+                _thread.start_new_thread(say, (j['message'],))
             else:
                 print("error, message not in chat object")
 
