@@ -9,7 +9,7 @@ turningSpeedActuallyUsed = 255
 turnDelay = 0.2
 drivingSpeed = 255
 straightDelay = 0.5
-
+movementSystemActive = False
 
 
 
@@ -81,31 +81,58 @@ def turnOffMotors():
    
 
 def move(command):
+                global movementSystemActive
 
                 d = 255
     
                 motorA.setSpeed(255)
                 motorB.setSpeed(255)
                 if command == 'F':
-                    drivingSpeed = d
-                    for motorIndex in range(4):
-                        runMotor(motorIndex, forward[motorIndex])
-                    time.sleep(straightDelay)
+                    if movementSystemActive:
+                        print("skip")
+                    else:
+                        drivingSpeed = d
+                        for motorIndex in range(4):
+                            runMotor(motorIndex, forward[motorIndex])
+                        movementSystemActive = True
+                        time.sleep(straightDelay)
+                        turnOffMotors()
+                        movementSystemActive = False
                 if command == 'B':
-                    drivingSpeed = d
-                    for motorIndex in range(4):
-                        runMotor(motorIndex, backward[motorIndex])
-                    time.sleep(straightDelay)
+                    if movementSystemActive:
+                        print("skip")
+                    else:
+                        drivingSpeed = d
+                        for motorIndex in range(4):
+                            runMotor(motorIndex, backward[motorIndex])
+                        movementSystemActive = True
+                        time.sleep(straightDelay)
+                        turnOffMotors()
+                        movementSystemActive = False
                 if command == 'L':
-                    drivingSpeed = turningSpeedActuallyUsed
-                    for motorIndex in range(4):
-                        runMotor(motorIndex, left[motorIndex])
-                    time.sleep(turnDelay)
+                    if movementSystemActive:
+                        print("skip")
+                    else:
+                        drivingSpeed = turningSpeedActuallyUsed
+                        for motorIndex in range(4):
+                            runMotor(motorIndex, left[motorIndex])
+                        movementSystemActive = True
+                        print("starting")
+                        time.sleep(turnDelay)
+                        print("finished")
+                        turnOffMotors()
+                        movementSystemActive = False
                 if command == 'R':
-                    drivingSpeed = turningSpeedActuallyUsed
-                    for motorIndex in range(4):
-                        runMotor(motorIndex, right[motorIndex])
-                    time.sleep(turnDelay)
+                    if movementSystemActive:
+                        print("skip")
+                    else:
+                        drivingSpeed = turningSpeedActuallyUsed
+                        for motorIndex in range(4):
+                            runMotor(motorIndex, right[motorIndex])
+                        movementSystemActive = True
+                        time.sleep(turnDelay)
+                        turnOffMotors()
+                        movementSystemActive = False
                 if command == 'U':
                     #mhArm.getMotor(1).setSpeed(127)
                     #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
@@ -137,7 +164,7 @@ def move(command):
                         pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
 
                 
-                turnOffMotors()
+
 
 
 
