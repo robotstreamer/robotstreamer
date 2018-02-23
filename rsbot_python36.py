@@ -10,6 +10,7 @@ turnDelay = 0.2
 drivingSpeed = 255
 straightDelay = 0.5
 movementSystemActive = False
+pingPongNumActive = 0
 
 
 
@@ -50,9 +51,9 @@ def init(forwardDefinition, leftDefinition, pEnabled):
                 global backward
                 global motorA
                 global motorB
-                global pingpongEnabled
+                global pingPongEnabled
                 global mhPingPong
-                pingpongEnabled = pEnabled
+                pingPongEnabled = pEnabled
                 forward = forwardDefinition
                 backward = times(forward, -1)
                 left = leftDefinition
@@ -67,7 +68,7 @@ def init(forwardDefinition, leftDefinition, pEnabled):
                 
                 atexit.register(turnOffMotors)
 
-                if pingpongEnabled:
+                if pingPongEnabled:
                     mhPingPong = Adafruit_MotorHAT(addr=0x61)
                 
 
@@ -82,6 +83,7 @@ def turnOffMotors():
 
 def move(command):
                 global movementSystemActive
+                global pingPongNumActive
 
                 d = 255
     
@@ -155,17 +157,23 @@ def move(command):
                     time.sleep(0.05)
                 if command == 'FIRE':
                     print("processing fire")
-                    if pingpongEnabled:
+                    if pingPongEnabled:
                         print("fire was enabled")
+                        pingPongNumActive += 1
+                        print("ping pong number active", pingPongNumActive)
                         pingPongMotor = mhPingPong.getMotor(1)
                         pingPongMotor.setSpeed(255)
                         pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
                         time.sleep(2.8)
-                        pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                        pingPongNumActive -= 1
+                        print("ping pong number active", pingPongNumActive)
+
+                        # if nobody has the cannon active anymore, release
+                        if pingPongNumActive == 0:
+                            pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+
 
                 
-
-
 
 
 
