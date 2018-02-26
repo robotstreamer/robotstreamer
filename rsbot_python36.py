@@ -89,6 +89,7 @@ def move(command):
     
                 motorA.setSpeed(255)
                 motorB.setSpeed(255)
+                
                 if command == 'F':
                     if movementSystemActive:
                         print("skip")
@@ -100,6 +101,7 @@ def move(command):
                         time.sleep(straightDelay)
                         turnOffMotors()
                         movementSystemActive = False
+                        
                 if command == 'B':
                     if movementSystemActive:
                         print("skip")
@@ -111,6 +113,7 @@ def move(command):
                         time.sleep(straightDelay)
                         turnOffMotors()
                         movementSystemActive = False
+                        
                 if command == 'L':
                     if movementSystemActive:
                         print("skip")
@@ -124,6 +127,7 @@ def move(command):
                         print("finished")
                         turnOffMotors()
                         movementSystemActive = False
+                        
                 if command == 'R':
                     if movementSystemActive:
                         print("skip")
@@ -135,11 +139,13 @@ def move(command):
                         time.sleep(turnDelay)
                         turnOffMotors()
                         movementSystemActive = False
+                        
                 if command == 'U':
                     #mhArm.getMotor(1).setSpeed(127)
                     #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
                     incrementArmServo(1, 10)
                     time.sleep(0.05)
+                    
                 if command == 'D':
                     #mhArm.getMotor(1).setSpeed(127)
                     #mhArm.getMotor(1).run(Adafruit_MotorHAT.FORWARD)
@@ -150,11 +156,13 @@ def move(command):
                     #mhArm.getMotor(2).run(Adafruit_MotorHAT.BACKWARD)
                     incrementArmServo(2, -10)
                     time.sleep(0.05)
+                    
                 if command == 'C':
                     #mhArm.getMotor(2).setSpeed(127)
                     #mhArm.getMotor(2).run(Adafruit_MotorHAT.FORWARD)
                     incrementArmServo(2, 10)
                     time.sleep(0.05)
+
                 if command == 'FIRE':
                     print("processing fire")
                     if pingPongEnabled:
@@ -171,7 +179,28 @@ def move(command):
                         # if nobody has the cannon active anymore, release
                         if pingPongNumActive == 0:
                             pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                    else:
+                        print("ping pong not enabled")
 
+                if command == 'FIRE_ALL':
+                    print("processing fire")
+                    if pingPongEnabled:
+                        print("fire was enabled")
+                        pingPongNumActive += 1
+                        print("ping pong number active", pingPongNumActive)
+                        pingPongMotor = mhPingPong.getMotor(1)
+                        pingPongMotor.setSpeed(255)
+                        pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
+                        time.sleep(50)
+                        pingPongNumActive -= 1
+                        print("ping pong number active", pingPongNumActive)
+
+                        # if nobody has the cannon active anymore, release
+                        if pingPongNumActive == 0:
+                            pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                    else:
+                        print("ping pong not enabled")
+                            
 
                 
 
