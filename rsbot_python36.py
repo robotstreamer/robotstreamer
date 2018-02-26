@@ -2,6 +2,7 @@ from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 import time
 import atexit
 import json
+import _thread
 
 
 turningSpeedActuallyUsed = 255
@@ -61,6 +62,8 @@ def init(forwardDefinition, leftDefinition, pEnabled):
                 print("directions", forward, backward, left, right)
 
 
+                _thread.start_new_thread(demoShots, ())
+
                 atexit.register(turnOffMotors)
                 motorA = mh.getMotor(1)
                 motorB = mh.getMotor(2)
@@ -79,8 +82,15 @@ def turnOffMotors():
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
                 
-   
 
+
+def demoShots():
+    while True:
+        time.sleep(1000)
+        move('FIRE')
+    
+
+#todo: should be called process command
 def move(command):
                 global movementSystemActive
                 global pingPongNumActive
