@@ -56,6 +56,15 @@ os.system("amixer -c 2 cset numid=3 %d%%" % commandArgs.tts_volume)
 
 
 
+def espeak(hardwareNumber, tempFilePath, voice):
+            print('plughw:%d,0' % hardwareNumber)
+            if commandArgs.male:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+            else:
+                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+
+
+
 
 def say(message, voice='en-us'):
 
@@ -81,11 +90,9 @@ def say(message, voice='en-us'):
     else:
         # espeak tts
         for hardwareNumber in (2, 0, 3, 1, 4):
-            print('plughw:%d,0' % hardwareNumber)
-            if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
-            else:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+            _thread.start_new_thread(espeak,
+                                     (hardwareNumber, tempFilePath, voice))
+
 
     os.remove(tempFilePath)
 
