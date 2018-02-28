@@ -7,16 +7,16 @@ def getAudioDeviceByName(name):
 	lines = text.splitlines()
 	for line in lines:
 		if name in line:
-			print line
+			print(line)
 			result = re.match("card (.*?):", line)
-			print result.group(0)
-			print result.group(1)
+			print(result.group(0))
+			print(result.group(1))
 			return int(result.group(1))
 
 
 
 if __name__ == "__main__":
-	print "as a test, checking for Yeti mic"
-	print getAudioDeviceByName("Yeti")
+	print("as a test, checking for Yeti mic")
+	print(getAudioDeviceByName("Yeti"))
 
 
