@@ -11,6 +11,8 @@ import json
 ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json"
 
 
+
+
 def getWithRetry(url, secure=True):
 
     for retryNumber in range(2000):

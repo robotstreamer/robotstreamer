@@ -1,8 +1,11 @@
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
+from robot_util_python36 import times
 import time
 import atexit
 import json
 import _thread
+import vibrate
+
 
 
 turningSpeedActuallyUsed = 255
@@ -38,8 +41,7 @@ mh = Adafruit_MotorHAT(addr=0x60)
 
 
 
-def times(lst, number):
-                    return [x*number for x in lst]
+
     
 
 
@@ -210,8 +212,10 @@ def move(command):
                             pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
                     else:
                         print("ping pong not enabled")
-                            
 
+                        
+                if command == 'VIBRATE':
+                    vibrate.vibrate(mh, forward)
                 
 
 
