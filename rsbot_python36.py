@@ -89,7 +89,7 @@ def turnOffMotors():
 def demoShots():
     while True:
         time.sleep(1000)
-        move('FIRE')
+        #move('FIRE')
     
 
 #todo: should be called process command

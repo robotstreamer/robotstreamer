@@ -31,7 +31,7 @@ def vibrate(mh, forwardDefinition):
 
         vibrateSystemActive = True
 
-        for i in range(500):
+        for i in range(100):
             a = float(i) / 1.0
 
             speed = int(sin(a) * 255.0) 
