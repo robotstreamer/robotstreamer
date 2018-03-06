@@ -59,7 +59,7 @@ def espeak(hardwareNumber, message, voice):
 
             # tested for USB audio device
             os.system("amixer -c 2 cset numid=%d %d%%" %
-                      (hardwardNumber, commandArgs.tts_volume))
+                      (hardwareNumber, commandArgs.tts_volume))
             
             tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
             f = open(tempFilePath, "w")
