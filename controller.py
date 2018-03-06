@@ -30,8 +30,8 @@ parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false'
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
 parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
-parser.add_argument('--pingpong-enabled', dest='pingpong_enabled', action='store_true')
-parser.set_defaults(pingpong_enabled=False)
+parser.add_argument('--ping-pong-enabled', dest='ping_pong_enabled', action='store_true')
+parser.set_defaults(ping_pong_enabled=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 
 
@@ -41,22 +41,25 @@ commandArgs = parser.parse_args()
 
 rsbot.init(json.loads(commandArgs.forward),
            json.loads(commandArgs.left),
-           commandArgs.pingpong_enabled)
+           commandArgs.ping_pong_enabled)
 
 
 # set volume level
 
 # tested for 3.5mm audio jack
-os.system("amixer set PCM -- 100%d%%" % commandArgs.tts_volume)
+#os.system("amixer set PCM -- 100%d%%" % commandArgs.tts_volume)
 #if commandArgs.tts_volume > 50:
     #os.system("amixer set PCM -- -100")
 
-# tested for USB audio device
-os.system("amixer -c 2 cset numid=3 %d%%" % commandArgs.tts_volume)
+
 
 
 
 def espeak(hardwareNumber, message, voice):
+
+            # tested for USB audio device
+            os.system("amixer -c 2 cset numid=%d %d%%" %
+                      (hardwardNumber, commandArgs.tts_volume))
             
             tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
             f = open(tempFilePath, "w")
