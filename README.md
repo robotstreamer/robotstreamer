@@ -11,7 +11,7 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 
 
 Copy this into the terminal, and follow the instructions.
-This script has been tested on a Raspberry Pi 3, with a fresh flash of "2017-04-10-raspbian-jessie-lite".
+This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
 
 ```
 sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install.sh -O /tmp/install.sh && bash /tmp/install.sh
