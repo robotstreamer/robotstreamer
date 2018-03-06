@@ -110,6 +110,7 @@ def getControlHostPort():
 
         url = 'http://%s/get_control_host_port/%s' % (apiHost, commandArgs.robot_id)
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
+        print("response:", response)
         return json.loads(response)
             
 

@@ -22,19 +22,25 @@ def getWithRetry(url, secure=True):
         try:
             print("GET", url)
             if secure:
-                response = urllib.request.urlopen(url).read()
+                object = urllib.request.urlopen(url)
+
             else:
                 ctx = ssl.create_default_context()
                 ctx.check_hostname = False
                 ctx.verify_mode = ssl.CERT_NONE
-                response = urllib.request.urlopen(url, context=ctx).read()
+                object = urllib.request.urlopen(url, context=ctx)
+
+
+
             break
         except:
             print("could not open url", url)
             traceback.print_exc()
             time.sleep(2)
 
-    return response
+    data = object.read()
+    encoding = object.info().get_content_charset('utf-8')
+    return data.decode(encoding)
 
 
 
