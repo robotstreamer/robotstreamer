@@ -58,9 +58,9 @@ sudo apt-get -y update
 #sudo apt-get -y dist-upgrade
 
 # Start installing everything needed
-sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
+#sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
 
-sudo pip install -U socketIO-client &&\
+#sudo pip install -U socketIO-client &&\
 
 cd ~ &&\
 
