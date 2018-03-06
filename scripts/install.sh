@@ -60,7 +60,8 @@ sudo apt-get -y update
 # Start installing everything needed
 #sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
 
-#sudo pip install -U socketIO-client &&\
+
+pip3 install websockets
 
 cd ~ &&\
 
