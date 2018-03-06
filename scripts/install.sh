@@ -68,8 +68,8 @@ git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 cd Adafruit-Motor-HAT-Python-Library &&\
 
 sudo apt-get -y install emacs &&\
-sudo apt-get -y install python-dev &&\
-sudo python setup.py install &&\
+#sudo apt-get -y install python-dev &&\
+sudo python3 setup.py install &&\
 
 cd ~ &&\
 wget ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.0.25.tar.bz2 &&\
