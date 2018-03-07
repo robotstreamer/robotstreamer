@@ -23,7 +23,9 @@ parser.add_argument('robot_id', help='Robot ID')
 
 commandArgs = parser.parse_args()
 
+robotID = commandArgs.robot_id
 
+print("robot id:", robotID)
 
             
 async def handleStatusMessages():
@@ -39,7 +41,8 @@ async def handleStatusMessages():
         print("chat websocket object:", websocket)
 
         #todo: you do need this as an connection initializer, but you should make the server not need it
-        await websocket.send(json.dumps({"message":"message"}))     
+        await websocket.send(json.dumps({"type":"connect",
+                                         "robot_id":robotID}))     
 
         while True:
 
