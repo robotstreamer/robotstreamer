@@ -52,14 +52,18 @@ rsbot.init(json.loads(commandArgs.forward),
     #os.system("amixer set PCM -- -100")
 
 
-
-
+def setVolume(percent):
+            print("setting volume to", percent, "%")
+            for cardNumber in range(0, 5):
+                        for numid in range(0,5):
+                                    os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
+            
 
 def espeak(hardwareNumber, message, voice):
 
             # tested for USB audio device
-            os.system("amixer -c 2 cset numid=%d %d%%" %
-                      (hardwareNumber, commandArgs.tts_volume))
+            #os.system("amixer -c 2 cset numid=%d %d%%" %
+            #          (hardwareNumber, commandArgs.tts_volume))
             
             tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
             f = open(tempFilePath, "w")
@@ -207,6 +211,7 @@ def startChat():
         
 def main():                
 
+                       
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
@@ -214,6 +219,8 @@ def main():
             #_thread.start_new_thread(startTest, ())
             #startTest()
 
+            setVolume(commandArgs.tts_volume)
+            
             
             while True:
                 time.sleep(1)
