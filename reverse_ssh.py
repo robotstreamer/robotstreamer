@@ -5,11 +5,9 @@ import websockets
 import time
 import argparse
 import json
-import robot_util_python36 as robot_util
 import _thread
 import traceback
-import tempfile
-import uuid
+import subprocess
 
 
 
@@ -19,6 +17,8 @@ statusEndpoint = {'host': '184.72.15.121', 'port': 6020}
 
 parser = argparse.ArgumentParser(description='start reverse ssh program')
 parser.add_argument('robot_id', help='Robot ID')
+parser.add_argument('--reverse-ssh-host', default='ubuntu@52.52.223.119')
+parser.add_argument('--reverse-ssh-key-file', default='/home/pi/rsjumpbox0.pem')
 
 
 commandArgs = parser.parse_args()
@@ -27,7 +27,25 @@ robotID = commandArgs.robot_id
 
 print("robot id:", robotID)
 
-            
+
+
+def startReverseSSH():
+    print("starting reverse ssh process")
+    returnCode = subprocess.call(["/usr/bin/ssh",
+                                  "-X",
+                                  "-i", commandArgs.reverse_ssh_key_file,
+                                  "-N",
+                                  "-R", "2222:localhost:22",
+                                  commandArgs.reverse_ssh_host])
+    print("return code", returnCode)
+
+
+def stopReverseSSH():
+    print("handling stop reverse ssh process")
+    resultCode = subprocess.call(["killall", "ssh"])
+    print("result code of killall ssh:", resultCode)
+
+    
 async def handleStatusMessages():
 
     print("running handle status messages")
@@ -53,7 +71,15 @@ async def handleStatusMessages():
             j = json.loads(message)
             print("json message:", j)
 
-
+            if 'type' in j:
+                t = j['type']
+                if t == "start_reverse_ssh":
+                        _thread.start_new_thread(startReverseSSH, ())
+                elif t == "stop_reverse_ssh":
+                        _thread.start_new_thread(stopReverseSSH, ())
+                        
+            else:
+                    print("invalid message:", j)
             
 
 
