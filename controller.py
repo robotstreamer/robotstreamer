@@ -1,4 +1,4 @@
-
+77;20707;0c
 import os
 import asyncio
 import websockets
@@ -164,11 +164,11 @@ async def handleChatMessages():
             message = await websocket.recv()
             print("< {}".format(message))
             j = json.loads(message)
-            print(j)
+            print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True:
                 _thread.start_new_thread(say, (j['message'],))
             else:
-                print("error, message not in chat object")
+                print("error, message not valid")
 
             
 
