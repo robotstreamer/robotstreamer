@@ -46,12 +46,12 @@ async def handleStatusMessages():
 
         while True:
 
-            print("awaiting chat message")
+            print("awaiting message")
             
             message = await websocket.recv()
-            print("< {}".format(message))
+            print("received message:", message)
             j = json.loads(message)
-            print("message:", j)
+            print("json message:", j)
 
 
             
