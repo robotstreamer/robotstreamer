@@ -1,4 +1,3 @@
-77;20707;0c
 import os
 import asyncio
 import websockets
@@ -16,7 +15,7 @@ import uuid
 
 apiHost = "robotstreamer.com:6001"
 controlHost = "robotstreamer.com"
-chatHostPort = {"host":"54.219.138.36", "port":8765}
+chatHostPort = {"host":"184.72.15.121", "port":8765}
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
 tempDir = tempfile.gettempdir()
 print("temporary directory:", tempDir)
