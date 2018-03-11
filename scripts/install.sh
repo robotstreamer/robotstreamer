@@ -61,7 +61,7 @@ sudo apt-get -y update
 #sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
 
 
-pip3 install websockets
+sudo pip3 install websockets
 
 cd ~ &&\
 

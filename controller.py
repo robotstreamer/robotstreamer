@@ -1,4 +1,3 @@
-
 import os
 import asyncio
 import websockets
@@ -30,8 +29,8 @@ parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false'
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
 parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
-parser.add_argument('--ping-pong-enabled', dest='ping_pong_enabled', action='store_true')
-parser.set_defaults(ping_pong_enabled=False)
+parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
+parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 
 
@@ -41,7 +40,7 @@ commandArgs = parser.parse_args()
 
 rsbot.init(json.loads(commandArgs.forward),
            json.loads(commandArgs.left),
-           commandArgs.ping_pong_enabled)
+           commandArgs.enable_ping_pong)
 
 
 # set volume level
@@ -164,11 +163,11 @@ async def handleChatMessages():
             message = await websocket.recv()
             print("< {}".format(message))
             j = json.loads(message)
-            print(j)
+            print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True:
                 _thread.start_new_thread(say, (j['message'],))
             else:
-                print("error, message not in chat object")
+                print("error, message not valid")
 
             
 
