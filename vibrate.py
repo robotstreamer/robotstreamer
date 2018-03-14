@@ -31,7 +31,7 @@ def vibrate(mh, forwardDefinition):
 
         vibrateSystemActive = True
 
-        for i in range(100):
+        for i in range(20):
             a = float(i) / 1.0
 
             speed = int(sin(a) * 255.0) 
@@ -50,7 +50,7 @@ def vibrate(mh, forwardDefinition):
                               motorIndex,
                               directions[motorIndex],
                               speed)
-            time.sleep(0.001)
+            time.sleep(0.05)
             
         
         turnOffMotors(mh)

@@ -15,7 +15,7 @@ drivingSpeed = 255
 straightDelay = 0.5
 movementSystemActive = False
 pingPongNumActive = 0
-
+freePongActive = False
 
 
 def runMotor(motorIndex, direction):
@@ -88,14 +88,15 @@ def turnOffMotors():
 
 def demoShots():
     while True:
-        time.sleep(1000)
-        #move('FIRE')
+        time.sleep(3600)
+        move('FIRE')
     
 
 #todo: should be called process command
 def move(command):
                 global movementSystemActive
                 global pingPongNumActive
+                global freePongActive
 
                 d = 255
     
@@ -191,6 +192,21 @@ def move(command):
                         # if nobody has the cannon active anymore, release
                         if pingPongNumActive == 0:
                             pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                    else:
+                        print("ping pong not enabled")
+                if command == 'FREE_FIRE':
+                    print("processing fire")
+                    if not freePongActive:
+                        freePongActive = True
+                        print("free pong fire was enabled")
+                        pingPongMotor = mhPingPong.getMotor(1)
+                        pingPongMotor.setSpeed(255)
+                        pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
+                        time.sleep(2.8)
+                        print("free ping pong", freePongActive)
+                        pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
+                        time.sleep(40)
+                        freePongActive = False
                     else:
                         print("ping pong not enabled")
 
