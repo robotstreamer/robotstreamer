@@ -1,6 +1,8 @@
 #!/bin/sh
 RELEASE=3.6.3
- 
+
+sudo apt-get update
+
 # install dependencies
 sudo apt-get install libbz2-dev liblzma-dev libsqlite3-dev libncurses5-dev libgdbm-dev zlib1g-dev libreadline-dev libssl-dev tk-dev
  
