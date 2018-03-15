@@ -205,7 +205,7 @@ def move(command):
                         time.sleep(2.8)
                         print("free ping pong", freePongActive)
                         pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
-                        time.sleep(40)
+                        time.sleep(60)
                         freePongActive = False
                     else:
                         print("ping pong not enabled")
