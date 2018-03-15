@@ -10,6 +10,7 @@ import _thread
 import traceback
 import tempfile
 import uuid
+import audio
 
 
 
@@ -165,7 +166,11 @@ async def handleChatMessages():
             j = json.loads(message)
             print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True:
-                _thread.start_new_thread(say, (j['message'],))
+                        if audio.espeakBytes(j['message']) < 400000:
+                                    print("length", audio.espeakBytes(j['message']))
+                                    _thread.start_new_thread(say, (j['message'],))
+                        else:
+                                    print("message too long")
             else:
                 print("error, message not valid")
 
