@@ -58,9 +58,10 @@ async def handleStatusMessages():
         print("connected to control service at", url)
         print("chat websocket object:", websocket)
 
-        #todo: you do need this as an connection initializer, but you should make the server not need it
+        print("starting websocket.send")
         await websocket.send(json.dumps({"type":"connect",
-                                         "robot_id":robotID}))     
+                                         "robot_id":robotID,
+                                         "local_address":subprocess.check_output(["hostname", "-I"]).decode("utf-8").strip()}))
 
         while True:
 
