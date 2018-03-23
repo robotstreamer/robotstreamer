@@ -1,84 +1,129 @@
-import thread
+
+import os
+import asyncio
+import websockets
 import time
+import argparse
 import json
+import _thread
+import traceback
 import subprocess
-import validators
+import urllib
+import urllib.request
+
+
+config = json.load(open('config.json'))
+
+userID = "26"
+
+chatEndpoint = {'host': '184.72.15.121', 'port': 8765}
+parser = argparse.ArgumentParser(description='robotstreamer chat bot')
+commandArgs = parser.parse_args()
 
 
 
 
-from socketIO_client import SocketIO, LoggingNamespace
+def jsonResponsePOST(url, jsonObject):
 
+    print("json object to POST", jsonObject)
 
+    params = json.dumps(jsonObject).encode('utf8')
+    req = urllib.request.Request(url, data=params,
+                             headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
 
-
-def waitForChatServer():
-    while True:
-        chatSocket.wait(seconds=1)        
-
-
-def startListenForChatServer():
-   thread.start_new_thread(waitForChatServer, ())
-
-  
-chatSocket = SocketIO("54.219.138.36", 6776, LoggingNamespace)
-
-
-print chatSocket
-
-startListenForChatServer()
-
-
-
-def handle_chat_message(args):
-    if args[0] == '2':
-        return # this should not be needed
-    j = json.loads(args)
-    print j['message']
-
-    m = j['message']
-    print "m:", m
-    if m[0:5] == "!play":
-        message = m.split(" ")[1]
+    jsonResponse = json.loads(response.read())
     
-        print m.split(" ")
+    print("response:", jsonResponse)
+   
+    return jsonResponse
     
-        if message[0:12] == "youtube.com/" or message[0:15] == "www.youtube.com/" or message[0:24] == "https://www.youtube.com/" or message[0:17] == "https://youtu.be/" or message[0:23] == "https://soundcloud.com/":
-                if validators.url(message):
-                    url = message
-                    print "playing", url
-                    subprocess.call(["Taskkill", "/IM", "firefox.exe", "/F"])
-                    subprocess.Popen(["C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe", url])
-                else:
-                    print "not valid url in general"
-        else:
-                print "not valid url for youtube"
-                
-                
-                
-    
-    
-    
-    
-    
-    
-    
-    
+
     
         
+async def handleStatusMessages():
+
+    global mainWebsocket
+
+    print("running handle status messages")
+
+    url = 'ws://%s:%s' % (chatEndpoint['host'], chatEndpoint['port'])
+    print("chat url:", url)
+
+    async with websockets.connect(url) as websocket:
+
+        mainWebsocket = websocket
+    
+        print("connected to service at", url)
+        print("chat websocket object:", websocket)
+
+        print("starting websocket.send")
+        #await websocket.send(json.dumps({"type":"connect",
+        #                                 "robot_id":1,
+        #                                 "local_address":"1"}))
+
+        while True:
+
+            print("awaiting message, this is optional (Ctrl-Break in Windows to Break)")
+            message = await websocket.recv()
+            print("received message:", message)
+            
 
 
 
-def onHandleChatMessage(*args):
-   thread.start_new_thread(handle_chat_message, args)
+async def handleUpdateMessages():                
+    
+    global mainWebsocket
+    count = 0
+    print("start update")
+    while True:
+            time.sleep(2)
+            print("sending")
+            m = "!play https://youtubewhatever  to play a song"
+            if count % 2 == 0:
+                m = m + " "
+            print("message to send:", m)
+            await mainWebsocket.send(json.dumps({"message": m,
+                                                                     "token": config['jwt_user_token']}))
+            count += 1
+            time.sleep(160*5)
+                
+            
+            
+            
+def startStatus():
+        print("starting status")
+        try:
+                asyncio.new_event_loop().run_until_complete(handleStatusMessages())
+        except:
+                print("error")
+                traceback.print_exc()
 
-   
-   
-chatSocket.on('message', onHandleChatMessage);
+                
+def startUpdateMessages():
+        print("starting status")
+        try:
+                asyncio.new_event_loop().run_until_complete(handleUpdateMessages())
+        except:
+                print("error")
+                traceback.print_exc()
+                
 
 
-while True:
-    time.sleep(1)
 
+def main():                
+
+    print(commandArgs)
+    print("starting chat bot")
+    _thread.start_new_thread(startStatus, ())
+    _thread.start_new_thread(startUpdateMessages, ())
+    
+    # wait forever
+    while True:
+        time.sleep(5)
+
+                
+if __name__ == '__main__':
+    main()
 
 
