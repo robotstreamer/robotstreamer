@@ -185,7 +185,7 @@ def move(command):
                         pingPongMotor = mhPingPong.getMotor(1)
                         pingPongMotor.setSpeed(255)
                         pingPongMotor.run(Adafruit_MotorHAT.FORWARD)
-                        time.sleep(2.8)
+                        time.sleep(3.1)
                         pingPongNumActive -= 1
                         print("ping pong number active", pingPongNumActive)
 
@@ -205,7 +205,7 @@ def move(command):
                         time.sleep(2.8)
                         print("free ping pong", freePongActive)
                         pingPongMotor.run(Adafruit_MotorHAT.RELEASE)
-                        time.sleep(100)
+                        time.sleep(150)
                         freePongActive = False
                     else:
                         print("ping pong not enabled")
