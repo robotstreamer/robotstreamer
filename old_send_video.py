@@ -300,11 +300,12 @@ def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
     # reference for -rtbufsize option
     # https://github.com/rdp/screen-capture-recorder-to-video-windows-free/issues/84
         
-    videoCommandLine = 'ffmpeg -rtbufsize 1024M -f dshow -i video="screen-capture-recorder" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
+    videoCommandLine = 'ffmpeg -rtbufsize 256M -f dshow -i video="screen-capture-recorder" -filter:v "crop=640:480:100:100" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
     audioCommandLine = 'ffmpeg -f dshow -ar 44100 -ac 1 -i audio="%s" -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.audio_input_device, server, audioPort)
     
     print "video command line:", videoCommandLine
     print "audio command line:", audioCommandLine
+    audioCommandLine = "dir"
     
     videoProcess = runFfmpeg(videoCommandLine)
     audioProcess = runFfmpeg(audioCommandLine)
