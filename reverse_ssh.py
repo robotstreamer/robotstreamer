@@ -36,6 +36,7 @@ def startReverseSSH():
                                   "-i", commandArgs.reverse_ssh_key_file,
                                   "-N",
                                   "-R", "2222:localhost:22",
+                                  "-o", "StrictHostKeyChecking=no",
                                   commandArgs.reverse_ssh_host])
     print("return code", returnCode)
 
