@@ -1,5 +1,6 @@
 
 import os
+import sys
 import asyncio
 import websockets
 import time
@@ -29,19 +30,37 @@ print("robot id:", robotID)
 
 
 
-def startReverseSSH():
+async def startReverseSSH(websocketToStatusService):
     print("starting reverse ssh process")
-    returnCode = subprocess.call(["/usr/bin/ssh",
+
+
+    await websocketToStatusService.send(json.dumps({"type": "info",
+                                                    "result": "starting reverse ssh process on robot"}))
+
+    
+    try:
+            result = subprocess.check_output(["/usr/bin/ssh",
                                   "-X",
                                   "-i", commandArgs.reverse_ssh_key_file,
                                   "-N",
                                   "-R", "2222:localhost:22",
                                   "-o", "StrictHostKeyChecking=no",
-                                  commandArgs.reverse_ssh_host])
-    print("return code", returnCode)
+                                                  commandArgs.reverse_ssh_host], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+            result = str(e.returncode) + " " + str(e.output)
+    except:
+            result = sys.exc_info()[0]
+            traceback.print_exc()
+
+            
+    print("sending start reverse ssh info message to", websocketToStatusService)
+    await websocketToStatusService.send(json.dumps({"type": "info",
+                                                    "result": "reverse ssh process finished running: " + str(result)}))
+
+    print("reverse ssh result", result)
 
 
-def stopReverseSSH():
+async def stopReverseSSH(senderWebsocket):
     print("handling stop reverse ssh process")
     resultCode = subprocess.call(["killall", "ssh"])
     print("result code of killall ssh:", resultCode)
@@ -76,13 +95,16 @@ async def handleStatusMessages():
             if 'type' in j:
                 t = j['type']
                 if t == "start_reverse_ssh":
-                        _thread.start_new_thread(startReverseSSH, ())
+                        f = lambda: asyncio.new_event_loop().run_until_complete(startReverseSSH(websocket))
+                        _thread.start_new_thread(f, ())
+                        print("finished sending start reverse ssh. it should be running now")
                 elif t == "stop_reverse_ssh":
-                        _thread.start_new_thread(stopReverseSSH, ())
-                        
+                        await stopReverseSSH(websocket)
+                        print("finished sending stop reverse ssh")
             else:
                     print("invalid message:", j)
             
+
 
 
 
