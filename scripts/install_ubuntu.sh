@@ -7,6 +7,8 @@ echo -en "\ec"
 echo
 
 echo -e "\e[31m**************************************************"
+echo -e "\e[31m* \e[39mRobotStreamer \e[31m*"
+echo -e "\e[31m* \e[39mNote: This is for Ubuntu 17.10 or higher \e[31m*"
 echo -e "\e[31m* \e[39mYou are now about to install everything needed \e[31m*"
 echo -e "\e[31m* \e[39mto get your robot connected to robotstreamer.com  \e[31m*"
 echo -e "\e[31m* \e[39mBefore we can start, you need to get a robot,  \e[31m*"
