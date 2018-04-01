@@ -61,12 +61,11 @@ sudo apt-get -y update
 #sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
 
 sudo apt-get -y install build-essential
-
 sudo apt-get -y install nasm
-
 sudo apt-get -y install espeak
+sudo apt-get -y install python3-pip
 
-sudo pip3 install websockets
+sudo python3 -m pip install websockets
 
 cd ~ &&\
 
