@@ -42,10 +42,12 @@ print(commandArgs)
 
 if commandArgs.type == "rsbot":
             print("initializing rsbot")
-            import rsbot_python36 as rsbot
-            rsbot.init(json.loads(commandArgs.forward),
-                       json.loads(commandArgs.left),
-                       commandArgs.enable_ping_pong)
+            import rsbot_python36 as interface
+            interface.init(json.loads(commandArgs.forward),
+                              json.loads(commandArgs.left),
+                              commandArgs.enable_ping_pong)
+elif commandArgs.type == "windows_interface":
+            import windows_interface as interface
 
 
 # set volume level
@@ -144,7 +146,7 @@ async def handleControlMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
-            _thread.start_new_thread(rsbot.move, (j["command"],))
+            _thread.start_new_thread(interface.move, (j["command"],))
 
 
             
