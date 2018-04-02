@@ -15,12 +15,12 @@ import argparse
 
 
 print "example:"
-print 'python robotstreamer/old_send_video.py 199 0 --screen-capture --kbps 250 --audio-input-device "Microphone (HD Webcam C270)"'
+print 'python robotstreamer/old_send_video.py 199 0 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"'
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
 parser.add_argument('video_device_number', default=0, type=int)
-parser.add_argument('--kbps', default=350, type=int)
+parser.add_argument('--kbps', default=2500, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
 parser.add_argument('--saturation', type=int, help='camera saturation')
@@ -194,7 +194,7 @@ def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
     # reference for -rtbufsize option
     # https://github.com/rdp/screen-capture-recorder-to-video-windows-free/issues/84
         
-    videoCommandLine = 'ffmpeg -rtbufsize 256M -f dshow -i video="screen-capture-recorder" -filter:v "crop=640:480:100:100" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
+    videoCommandLine = 'ffmpeg -rtbufsize 256M -f dshow -i video="screen-capture-recorder" -filter:v "crop=1280:720:1080:360" -framerate 25 -video_size 1280x720 -f mpegts -codec:v mpeg1video -s 1280x720 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
     audioCommandLine = 'ffmpeg -f dshow -ar 44100 -ac 1 -i audio="%s" -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.audio_input_device, server, audioPort)
     
     print "video command line:", videoCommandLine
