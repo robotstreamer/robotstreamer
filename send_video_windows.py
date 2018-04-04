@@ -13,10 +13,14 @@ import random
 
 import argparse
 
+
+print "example:"
+print 'python robotstreamer/old_send_video.py 199 0 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"'
+
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
 parser.add_argument('video_device_number', default=0, type=int)
-parser.add_argument('--kbps', default=350, type=int)
+parser.add_argument('--kbps', default=2500, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
 parser.add_argument('--saturation', type=int, help='camera saturation')
@@ -146,117 +150,7 @@ def runFfmpeg(commandLine):
     
 
 
-def handleDarwin(deviceNumber, videoPort, audioPort):
-
-    
-    p = subprocess.Popen(["ffmpeg", "-list_devices", "true", "-f", "qtkit", "-i", "dummy"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    out, err = p.communicate()
-
-    print err
-
-    deviceAnswer = raw_input("Enter the number of the camera device for your robot from the list above: ")
-    commandLine = 'ffmpeg -f qtkit -i %s -f mpeg1video -b 400k -r 30 -s 320x240 http://%s:%s/hellobluecat/320/240/' % (deviceAnswer, server, videoPort)
-    
-    process = runFfmpeg(commandLine)
-
-    return {'process': process, 'device_answer': deviceAnswer}
-
-
-def handleLinux(deviceNumber, videoPort, audioPort):
-
-    print "sleeping to give the camera time to start working"
-    randomSleep()
-    print "finished sleeping"
-
-    
-    #p = subprocess.Popen(["ffmpeg", "-list_devices", "true", "-f", "qtkit", "-i", "dummy"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #out, err = p.communicate()
-    #print err
-
-    if (args.brightness is not None) or (args.contrast is not None) or (args.saturation is not None):
-        print "adjusting camera settings"
-        os.system("v4l2-ctl -c brightness={brightness} -c contrast={contrast} -c saturation={saturation}".format(brightness=args.brightness,
-                                  contrast=args.contrast,
-                                  saturation=args.saturation))
-    else:
-        print "camera settings at default"
-
-
-    if deviceNumber is None:
-        deviceAnswer = raw_input("Enter the number of the camera device for your robot: ")
-    else:
-        deviceAnswer = str(deviceNumber)
-
-        
-    #commandLine = '/usr/local/bin/ffmpeg -s 320x240 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hellobluecat/320/240/' % (deviceAnswer, videoPort)
-    #commandLine = '/usr/local/bin/ffmpeg -s 640x480 -f video4linux2 -i /dev/video%s -f mpeg1video -b 150k -r 20 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, server, videoPort)
-    # For new JSMpeg
-    #commandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s -f mpegts -codec:v mpeg1video -s 640x480 -b:v 250k -bf 0 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, server, videoPort) # ClawDaddy
-    #commandLine = '/usr/local/bin/ffmpeg -s 1280x720 -f video4linux2 -i /dev/video%s -f mpeg1video -b 1k -r 20 http://robotstreamer.com:%s/hellobluecat/1280/720/' % (deviceAnswer, videoPort)
-
-
-    if args.rotate180:
-        rotationOption = "-vf transpose=2,transpose=2"
-    else:
-        rotationOption = ""
-
-    # video with audio
-    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size 640x480 -i /dev/video%s %s -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (deviceAnswer, rotationOption, args.kbps, server, videoPort)
-    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:1 -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.mic_channels, server, audioPort)
-
-    print videoCommandLine
-    print audioCommandLine
-    
-    videoProcess = runFfmpeg(videoCommandLine)
-    if args.mic:
-        audioProcess = runFfmpeg(audioCommandLine)
-    else:
-        audioProcess = videoProcess # this is a hack to prevent errors, should just be None value
-
-    return {'video_process': videoProcess, 'audio_process': audioProcess, 'device_answer': deviceAnswer}
-
-
-
-def handleWindows(deviceNumber, videoPort):
-
-    p = subprocess.Popen(["ffmpeg", "-list_devices", "true", "-f", "dshow", "-i", "dummy"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    
-    out, err = p.communicate() 
-    lines = err.split('\n')
-    
-    count = 0
-    
-    devices = []
-    
-    for line in lines:
-    
-        #if "]  \"" in line:
-        #    print "line:", line
-    
-        m = re.search('.*\\"(.*)\\"', line)
-        if m != None:
-            #print line
-            if m.group(1)[0:1] != '@':
-                print count, m.group(1)
-                devices.append(m.group(1))
-                count += 1
-    
-
-    if deviceNumber is None:
-        deviceAnswer = raw_input("Enter the number of the camera device for your robot from the list above: ")
-    else:
-        deviceAnswer = str(deviceNumber)
-
-    device = devices[int(deviceAnswer)]
-    commandLine = 'ffmpeg -s 640x480 -f dshow -i video="%s" -f mpegts -codec:v mpeg1video -b 200k -r 20 http://%s:%s/hellobluecat/640/480/' % (device, server, videoPort)
-    
-
-    process = runFfmpeg(commandLine)
-
-    return {'process': process, 'device_answer': device}
-    
+   
 
     
 def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
@@ -300,7 +194,7 @@ def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
     # reference for -rtbufsize option
     # https://github.com/rdp/screen-capture-recorder-to-video-windows-free/issues/84
         
-    videoCommandLine = 'ffmpeg -rtbufsize 256M -f dshow -i video="screen-capture-recorder" -filter:v "crop=640:480:100:100" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
+    videoCommandLine = 'ffmpeg -rtbufsize 256M -f dshow -i video="screen-capture-recorder" -filter:v "crop=640:480:0:0" -framerate 25 -video_size 640x480 -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
     audioCommandLine = 'ffmpeg -f dshow -ar 44100 -ac 1 -i audio="%s" -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.audio_input_device, server, audioPort)
     
     print "video command line:", videoCommandLine
@@ -316,20 +210,6 @@ def handleWindowsScreenCapture(deviceNumber, videoPort, audioPort):
 
 
 
-def snapShot(operatingSystem, inputDeviceID, filename="snapshot.jpg"):    
-
-    try:
-        os.remove('snapshot.jpg')
-    except:
-        print "did not remove file"
-
-    commandLineDict = {
-        'Darwin': 'ffmpeg -y -f qtkit -i %s -vframes 1 %s' % (inputDeviceID, filename),
-        'Linux': '/usr/local/bin/ffmpeg -y -f video4linux2 -i /dev/video%s -vframes 1 -q:v 1000 -vf scale=320:240 %s' % (inputDeviceID, filename),
-        'Windows': 'ffmpeg -y -s 320x240 -f dshow -i video="%s" -vframes 1 %s' % (inputDeviceID, filename)}
-
-    print commandLineDict[operatingSystem]
-    os.system(commandLineDict[operatingSystem])
 
 
 
@@ -347,17 +227,8 @@ def startVideoCapture():
     deviceNumber = args.video_device_number
 
     result = None
-    if platform.system() == 'Darwin':
-        result = handleDarwin(deviceNumber, videoPort, audioPort)
-    elif platform.system() == 'Linux':
-        result = handleLinux(deviceNumber, videoPort, audioPort)
-    elif platform.system() == 'Windows':
-        if args.screen_capture:
-            result = handleWindowsScreenCapture(deviceNumber, videoPort, audioPort)
-        else:
-            result = handleWindows(deviceNumber, videoPort, audioPort)
-    else:
-        print "unknown platform", platform.system()
+
+    result = handleWindowsScreenCapture(deviceNumber, videoPort, audioPort)
 
     return result
 
@@ -376,7 +247,6 @@ def main():
     print "main"
 
     streamProcessDict = None
-
 
     twitterSnapCount = 0
 
@@ -427,20 +297,6 @@ def main():
             time.sleep(0)
 
             #frameCount += 1
-
-
-        if False:
-         if platform.system() != 'Windows':
-            print "taking snapshot"
-            snapShot(platform.system(), inputDeviceID)
-            with open ("snapshot.jpg", 'rb') as f:
-                data = f.read()
-            print "emit"
-
-            # skip sending the first image because it's mostly black, maybe completely black
-            #todo: should find out why this black image happens
-            if twitterSnapCount > 0:
-                socketIO.emit('snapshot', {'image':base64.b64encode(data)})
 
 
 

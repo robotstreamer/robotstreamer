@@ -3,7 +3,6 @@ import asyncio
 import websockets
 import time
 import argparse
-#import rsbot_python36 as rsbot
 import json
 import robot_util_python36 as robot_util
 import _thread
@@ -33,15 +32,24 @@ parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
+parser.add_argument('--type', default="rsbot")
 
 
 
 commandArgs = parser.parse_args()
 
+print(commandArgs)
 
-#rsbot.init(json.loads(commandArgs.forward),
-#           json.loads(commandArgs.left),
-#           commandArgs.enable_ping_pong)
+
+if commandArgs.type == "rsbot":
+            print("initializing rsbot")
+            import rsbot_python36 as interface
+            interface.init(json.loads(commandArgs.forward),
+                              json.loads(commandArgs.left),
+                              commandArgs.enable_ping_pong)
+elif commandArgs.type == "windows_interface":
+            import windows_interface as interface
+
 
 
 # set volume level
@@ -140,7 +148,7 @@ async def handleControlMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
-            _thread.start_new_thread(rsbot.move, (j["command"],))
+            _thread.start_new_thread(interface.move, (j["command"],))
 
 
             
