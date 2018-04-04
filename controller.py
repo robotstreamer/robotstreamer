@@ -3,7 +3,7 @@ import asyncio
 import websockets
 import time
 import argparse
-import rsbot_python36 as rsbot
+#import rsbot_python36 as rsbot
 import json
 import robot_util_python36 as robot_util
 import _thread
@@ -39,9 +39,9 @@ parser.add_argument('--tts-volume', type=int, default=80)
 commandArgs = parser.parse_args()
 
 
-rsbot.init(json.loads(commandArgs.forward),
-           json.loads(commandArgs.left),
-           commandArgs.enable_ping_pong)
+#rsbot.init(json.loads(commandArgs.forward),
+#           json.loads(commandArgs.left),
+#           commandArgs.enable_ping_pong)
 
 
 # set volume level
