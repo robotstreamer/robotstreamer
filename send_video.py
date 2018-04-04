@@ -15,6 +15,7 @@ import _thread
 import copy
 import argparse
 import audio_util
+import urllib.request
 
 
 class DummyProcess:
@@ -100,6 +101,29 @@ print("trying to connect to app server socket io", commandArgs.app_server_socket
 appServerSocketIO = None
 print("finished initializing app server socket io")
 
+
+def makePOST(url, data):
+
+    params = json.dumps(data).encode('utf8')
+    req = urllib.request.Request(url,
+                                 data=params,
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response
+                
+
+
+def sendCameraAliveMessage():
+
+    print("sending camera alive message")
+    url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
+    print("url", url)
+    response = makePOST(url, {'camera_id': commandArgs.camera_id,
+                              'camera_status':'online'})
+
+
+    
+
 def getVideoPort():
 
     url = '%s://%s/get_video_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
@@ -115,6 +139,7 @@ def getAudioPort():
     return json.loads(response)['audio_stream_port']
 
 
+#todo this function probably should be removed
 def getRobotID():
 
     #todo: need to get from api
@@ -316,6 +341,8 @@ def main():
     robotID = getRobotID()
     identifyRobotId()
 
+    sendCameraAliveMessage()
+    
     print("robot id:", robotID)
 
     refreshFromOnlineSettings()
@@ -396,10 +423,15 @@ def main():
                 print("status file could not be written")
                 traceback.print_exc()
                 sys.stdout.flush()
+
                 
         if (count % 60) == 0:
+
+            sendCameraAliveMessage()
+            
             identifyRobotId()
-        
+
+            
         if robotSettings.camera_enabled:
         
             print("video process poll", videoProcess.poll(), "pid", videoProcess.pid, "restarts", numVideoRestarts)
