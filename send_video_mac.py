@@ -16,7 +16,6 @@ print('python robotstreamer/old_send_video.py 199 0 --screen-capture --kbps 2500
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
-parser.add_argument('video_device_number', default=0, type=int)
 parser.add_argument('--kbps', default=2500, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
