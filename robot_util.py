@@ -81,5 +81,8 @@ def sendCameraAliveMessage(infoServerProtocol, infoServer, cameraID):
     print("sending camera alive message")
     url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
     print("url", url)
-    response = makePOST(url, {'camera_id': cameraID,
-                              'camera_status':'online'})
+    try:
+            response = makePOST(url, {'camera_id': cameraID,
+                                      'camera_status':'online'})
+    except:
+            print("could not make post to", url)
