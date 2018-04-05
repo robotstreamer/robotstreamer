@@ -10,7 +10,7 @@ import base64
 import random
 import datetime
 import traceback
-import robot_util_python36 as robot_util
+import robot_util
 import _thread
 import copy
 import argparse
@@ -110,19 +110,10 @@ def makePOST(url, data):
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return response
-                
 
 
-def sendCameraAliveMessage():
-
-    print("sending camera alive message")
-    url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
-    print("url", url)
-    response = makePOST(url, {'camera_id': commandArgs.camera_id,
-                              'camera_status':'online'})
 
 
-    
 
 def getVideoPort():
 
@@ -144,7 +135,7 @@ def getRobotID():
 
     #todo: need to get from api
     return 100
-    
+
     url = '%s://%s/get_robot_id/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
     return json.loads(response)['robot_id']
@@ -158,7 +149,7 @@ def getOnlineRobotSettings(robotID):
     url = 'https://%s/api/v1/robots/%s' % (apiServer, robotID)
     response = robot_util.getWithRetry(url)
     return json.loads(response)
-        
+
 def identifyRobotId():
     #todo need to implement for robotstreamer appServerSocketIO.emit('identify_robot_id', robotID);
     pass
@@ -202,12 +193,12 @@ def startVideoCaptureLinux():
         print("saturation")
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
-    
+
     videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
 
     print(videoCommandLine)
     return subprocess.Popen(shlex.split(videoCommandLine))
-    
+
 
 def startAudioCaptureLinux():
 
@@ -256,7 +247,7 @@ def onCommandToRobot(*args):
                 print('enabling camera capture process')
                 print("args", args)
                 robotSettings.camera_enabled = True
-        
+
         sys.stdout.flush()
 
 
@@ -269,14 +260,14 @@ def onRobotSettingsChanged(*args):
     print('---------------------------------------')
     print('set message recieved:', args)
     refreshFromOnlineSettings()
-    
+
 
 
 def killallFFMPEGIn30Seconds():
     time.sleep(30)
     os.system("killall ffmpeg")
 
-    
+
 
 #todo, this needs to work differently. likely the configuration will be json and pull in stuff from command line rather than the other way around.
 def overrideSettings(commandArgs, onlineSettings):
@@ -325,15 +316,15 @@ def refreshFromOnlineSettings():
     else:
         print("NOT KILLING***********************")
 
-    
-    
+
+
 def main():
 
     global robotID
     global audioProcess
     global videoProcess
 
-    
+
     # overrides command line parameters using config file
     print("args on command line:", commandArgs)
 
@@ -341,8 +332,8 @@ def main():
     robotID = getRobotID()
     identifyRobotId()
 
-    sendCameraAliveMessage()
-    
+    sendCameraAliveMessage(infoServerProtocol, infoServer)
+
     print("robot id:", robotID)
 
     refreshFromOnlineSettings()
@@ -361,7 +352,7 @@ def main():
 
     sys.stdout.flush()
 
-    
+
     if robotSettings.camera_enabled:
         if not commandArgs.dry_run:
             videoProcess = startVideoCaptureLinux()
@@ -382,7 +373,7 @@ def main():
 
     count = 0
 
-    
+
     # loop forever and monitor status of ffmpeg processes
     while True:
 
@@ -390,10 +381,10 @@ def main():
 
         #todo: start using this again
         #appServerSocketIO.wait(seconds=1)
-        
+
         time.sleep(1)
 
-        
+
 
         # todo: note about the following ffmpeg_process_exists is not technically true, but need to update
         # server code to check for send_video_process_exists if you want to set it technically accurate
@@ -403,14 +394,14 @@ def main():
         ######                                    'ffmpeg_process_exists': True,
         ######                                    'camera_id':commandArgs.camera_id})
 
-        
 
-        
+
+
         if numVideoRestarts > 20:
             print("rebooting in 20 seconds because of too many restarts. probably lost connection to camera")
             time.sleep(20)
             os.system("sudo reboot")
-        
+
         if count % 20 == 0:
             try:
                 with os.fdopen(os.open('/tmp/send_video_summary.txt', os.O_WRONLY | os.O_CREAT, 0o777), 'w') as statusFile:
@@ -424,16 +415,16 @@ def main():
                 traceback.print_exc()
                 sys.stdout.flush()
 
-                
-        if (count % 60) == 0:
 
-            sendCameraAliveMessage()
-            
+        if (count % robot_util.keepAlivePeriod) == 0:
+            sendCameraAliveMessage(infoServerProtocol, infoServer)
+
+        if (count % 60) == 0:
             identifyRobotId()
 
-            
+
         if robotSettings.camera_enabled:
-        
+
             print("video process poll", videoProcess.poll(), "pid", videoProcess.pid, "restarts", numVideoRestarts)
 
             # restart video if needed
@@ -443,9 +434,9 @@ def main():
                 numVideoRestarts += 1
         else:
             print("video process poll: camera_enabled is false")
-            
 
-                
+
+
         if robotSettings.mic_enabled:
 
             if audioProcess is None:
@@ -458,16 +449,13 @@ def main():
                 randomSleep()
                 audioProcess = startAudioCaptureLinux()
                 #time.sleep(30)
-                #appServerSocketIO.emit('send_video_process_start_event', {'camera_id': commandArgs.camera_id})               
+                #appServerSocketIO.emit('send_video_process_start_event', {'camera_id': commandArgs.camera_id})
                 numAudioRestarts += 1
         else:
             print("audio process poll: mic_enabled is false")
 
-        
+
         count += 1
 
-        
+
 main()
-
-
-

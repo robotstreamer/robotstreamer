@@ -10,9 +10,11 @@ import sys
 import base64
 import random
 import argparse
+import robot_util
+
 
 print("example:")
-print('python robotstreamer/old_send_video.py 199 0 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"')
+print('python3 send_video_mac.py 199 0 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"')
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
@@ -149,10 +151,17 @@ def main():
     videoProcess = startVideoCapture()
     audioProcess = startAudioCapture()
 
+
+    count = 0
     while True:
         print("audioProcess.poll()", audioProcess.poll())
         print("videoProcess.poll()", videoProcess.poll())
+
+        if (count % robot_util.keepAlivePeriod) == 0:
+            robot_util.sendCameraAliveMessage(infoServerProtocol, infoServer)
+
         time.sleep(1)
+        count += 1
 
 
 if __name__ == "__main__":

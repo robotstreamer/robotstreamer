@@ -64,4 +64,10 @@ def sendSerialCommand(ser, command):
     #ser.close()
 
 
+def sendCameraAliveMessage(infoServerProtocol, infoServer):
 
+    print("sending camera alive message")
+    url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
+    print("url", url)
+    response = makePOST(url, {'camera_id': commandArgs.camera_id,
+                              'camera_status':'online'})
