@@ -14,9 +14,11 @@ import robot_util
 
 
 print("example:")
-print('python3 send_video_mac.py 199 0 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"')
+print('python3 send_video_mac.py 199 --screen-capture --kbps 2500 --audio-input-device "Microphone (HD Webcam C270)"')
 
 parser = argparse.ArgumentParser(description='robot control')
+parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
+parser.add_argument('--info-server-protocol', default="http", help="either https or http")
 parser.add_argument('camera_id')
 parser.add_argument('--kbps', default=2500, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
@@ -31,10 +33,10 @@ parser.set_defaults(mic=True)
 parser.add_argument('--mic-channels', type=int, help='microphone channels, typically 1 or 2', default=1)
 parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)') # currently, this option is only used for windows screen capture
 
-args = parser.parse_args()
-print("args", args)
+commandArgs = parser.parse_args()
+print("command args", commandArgs)
 server = "robotstreamer.com"
-cameraID = args.camera_id
+cameraID = commandArgs.camera_id
 
 
 def onHandleCameraCommand(*args):
@@ -98,7 +100,7 @@ def runFfmpeg(commandLine):
 
 def macVideoCapture(videoPort):
 
-    videoCommandLine = 'ffmpeg -f avfoundation -i 1:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (args.kbps, server, videoPort)
+    videoCommandLine = 'ffmpeg -f avfoundation -i 1:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (commandArgs.kbps, server, videoPort)
     print("video command line:", videoCommandLine)
     videoProcess = runFfmpeg(videoCommandLine)
     return videoProcess
@@ -157,8 +159,10 @@ def main():
         print("audioProcess.poll()", audioProcess.poll())
         print("videoProcess.poll()", videoProcess.poll())
 
-        if (count % robot_util.keepAlivePeriod) == 0:
-            robot_util.sendCameraAliveMessage(infoServerProtocol, infoServer)
+        if (count % robot_util.KeepAlivePeriod) == 0:
+            robot_util.sendCameraAliveMessage(commandArgs.info_server_protocol,
+                                              commandArgs.info_server,
+                                              commandArgs.camera_id)
 
         time.sleep(1)
         count += 1

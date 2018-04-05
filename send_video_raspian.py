@@ -102,17 +102,6 @@ appServerSocketIO = None
 print("finished initializing app server socket io")
 
 
-def makePOST(url, data):
-
-    params = json.dumps(data).encode('utf8')
-    req = urllib.request.Request(url,
-                                 data=params,
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return response
-
-
-
 
 
 def getVideoPort():
@@ -332,7 +321,9 @@ def main():
     robotID = getRobotID()
     identifyRobotId()
 
-    sendCameraAliveMessage(infoServerProtocol, infoServer)
+    sendCameraAliveMessage(infoServerProtocol,
+                           infoServer,
+                           commandArgs.camera_id)
 
     print("robot id:", robotID)
 
@@ -416,7 +407,7 @@ def main():
                 sys.stdout.flush()
 
 
-        if (count % robot_util.keepAlivePeriod) == 0:
+        if (count % robot_util.KeepAlivePeriod) == 0:
             sendCameraAliveMessage(infoServerProtocol, infoServer)
 
         if (count % 60) == 0:

@@ -10,6 +10,7 @@ import json
 
 ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json"
 
+KeepAlivePeriod = 60
 
 
 def times(lst, number):
@@ -64,10 +65,21 @@ def sendSerialCommand(ser, command):
     #ser.close()
 
 
-def sendCameraAliveMessage(infoServerProtocol, infoServer):
+
+def makePOST(url, data):
+
+    params = json.dumps(data).encode('utf8')
+    req = urllib.request.Request(url,
+                                 data=params,
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response
+
+
+def sendCameraAliveMessage(infoServerProtocol, infoServer, cameraID):
 
     print("sending camera alive message")
     url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
     print("url", url)
-    response = makePOST(url, {'camera_id': commandArgs.camera_id,
+    response = makePOST(url, {'camera_id': cameraID,
                               'camera_status':'online'})
