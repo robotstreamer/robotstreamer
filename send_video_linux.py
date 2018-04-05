@@ -321,9 +321,9 @@ def main():
     robotID = getRobotID()
     identifyRobotId()
 
-    sendCameraAliveMessage(infoServerProtocol,
-                           infoServer,
-                           commandArgs.camera_id)
+    robot_util.sendCameraAliveMessage(infoServerProtocol,
+                                      infoServer,
+                                      commandArgs.camera_id)
 
     print("robot id:", robotID)
 
@@ -408,7 +408,10 @@ def main():
 
 
         if (count % robot_util.KeepAlivePeriod) == 0:
-            sendCameraAliveMessage(infoServerProtocol, infoServer)
+            robot_util.sendCameraAliveMessage(infoServerProtocol,
+                                              infoServer,
+                                              commandArgs.camera_id)
+
 
         if (count % 60) == 0:
             identifyRobotId()
