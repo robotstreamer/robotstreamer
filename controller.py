@@ -4,7 +4,7 @@ import websockets
 import time
 import argparse
 import json
-import robot_util_python36 as robot_util
+import robot_util
 import _thread
 import traceback
 import tempfile
@@ -43,7 +43,7 @@ print(commandArgs)
 
 if commandArgs.type == "rsbot":
             print("initializing rsbot")
-            import rsbot_python36 as interface
+            import rsbot as interface
             interface.init(json.loads(commandArgs.forward),
                               json.loads(commandArgs.left),
                               commandArgs.enable_ping_pong)

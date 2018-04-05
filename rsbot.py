@@ -1,5 +1,5 @@
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
-from robot_util_python36 import times
+from robot_util import times
 import time
 import atexit
 import json

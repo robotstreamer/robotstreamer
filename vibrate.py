@@ -1,5 +1,5 @@
 from math import sin
-from robot_util_python36 import times
+from robot_util import times
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 import time
 
