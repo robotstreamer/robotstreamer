@@ -185,7 +185,7 @@ async def handleChatMessages():
                         else:
                                     print("message too long")
             else:
-                print("error, message not valid")
+                print("error, message not valid:", j)
 
             
 
