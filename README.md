@@ -211,6 +211,11 @@ chmod +x gopigo3_flash_firmware.sh
 ./gopigo3_flash_firmware.sh
 ```
 
+Reference:
+
+https://www.dexterindustries.com/GoPiGo/get-started-with-the-gopigo3-raspberry-pi-robot/test-and-troubleshoot-the-gopigo3-raspberry-pi-robot/
+
+
 <h1> High Level Overview </h1>
 
 ![robot client topology](https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/documentation/RobotClientTopology.png)
