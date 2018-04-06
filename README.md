@@ -204,7 +204,12 @@ sudo bash /home/pi/Dexter/GoPiGo3/Install/install.sh
 sudo reboot
 ```
 
-
+If you need to update the firmware:
+```
+cd Dexter/GoPiGo3/Firmware
+chmod +x gopigo3_flash_firmware.sh
+./gopigo3_flash_firmware.sh
+```
 
 <h1> High Level Overview </h1>
 
