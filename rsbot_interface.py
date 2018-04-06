@@ -89,11 +89,11 @@ def turnOffMotors():
 def demoShots():
     while True:
         time.sleep(3600)
-        #move('FIRE')
+        #handleCommand('FIRE')
     
 
 #todo: should be called process command
-def move(command):
+def handleCommand(command, keyPosition):
                 global movementSystemActive
                 global pingPongNumActive
                 global freePongActive

@@ -43,13 +43,17 @@ print(commandArgs)
 
 if commandArgs.type == "rsbot":
             print("initializing rsbot")
-            import rsbot as interface
+            import rsbot_interface as interface
             interface.init(json.loads(commandArgs.forward),
                               json.loads(commandArgs.left),
                               commandArgs.enable_ping_pong)
 elif commandArgs.type == "windows_interface":
             import windows_interface as interface
+elif commandArgs.type == "gopigo3":
+            import gopigo3_interface as interface
 
+
+            
 
 
 # set volume level
@@ -148,7 +152,8 @@ async def handleControlMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
-            _thread.start_new_thread(interface.move, (j["command"],))
+            _thread.start_new_thread(interface.handleCommand, (j["command"],
+                                                               j["key_position"]))
 
 
             
