@@ -169,6 +169,14 @@ def main():
         print("audioProcess.poll()", audioProcess.poll())
         print("videoProcess.poll()", videoProcess.poll())
 
+        if audioProcess.poll() is not None:
+            time.sleep(5)
+            startAudioCapture()
+
+        if videoProcess.poll() is not None:
+            time.sleep(5)
+            startVideoCapture()
+
         if (count % robot_util.KeepAlivePeriod) == 0:
             robot_util.sendCameraAliveMessage(commandArgs.info_server_protocol,
                                               commandArgs.info_server,
