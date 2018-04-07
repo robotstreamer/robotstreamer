@@ -111,6 +111,9 @@ def macVideoCapture(videoPort):
 
     videoCommandLine = 'ffmpeg -f avfoundation %s -i %d:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (frameRateArgument, number, commandArgs.kbps, server, videoPort)
 
+    # kill other instances if they exist
+    os.system("pkill -f %d:none" % number)
+
     print("video command line:", videoCommandLine)
     videoProcess = runFfmpeg(videoCommandLine)
     return videoProcess
@@ -120,6 +123,11 @@ def macVideoCapture(videoPort):
 def macAudioCapture(audioPort):
 
     audioCommandLine = 'ffmpeg -f avfoundation -i none:0 -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (server, audioPort)
+
+
+    # kill other instances if they exist
+    os.system("pkill -f none:0")
+
     print("audio command line:", audioCommandLine)
     audioProcess = runFfmpeg(audioCommandLine)
     return audioProcess
