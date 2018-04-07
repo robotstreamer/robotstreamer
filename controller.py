@@ -49,6 +49,7 @@ if commandArgs.type == "rsbot":
                               commandArgs.enable_ping_pong)
 elif commandArgs.type == "windows_interface":
             import windows_interface as interface
+
 elif commandArgs.type == "gopigo3":
             import gopigo3_interface as interface
 
@@ -90,6 +91,23 @@ def espeak(hardwareNumber, message, voice):
 
 
             os.remove(tempFilePath)
+
+
+
+def espeakMac(message, voice):
+
+            # tested for USB audio device
+            #os.system("amixer -c 2 cset numid=%d %d%%" %
+            #          (hardwareNumber, commandArgs.tts_volume))
+            
+            tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+            f = open(tempFilePath, "w")
+            f.write(message)
+            f.close()
+            
+            os.system('cat ' + tempFilePath + ' | espeak')
+
+            os.remove(tempFilePath)
                 
 
 
@@ -117,8 +135,14 @@ def say(message, voice='en-us'):
 
     else:
         # espeak tts
-        for hardwareNumber in (2, 0, 3, 1, 4):
-            _thread.start_new_thread(espeak, (hardwareNumber, message, voice))
+        #todo: these could be defined in the interface modules perhaps
+
+        if commandArgs.type == "mac":
+                _thread.start_new_thread(espeakMac, (message, voice))
+
+        else:
+            for hardwareNumber in (2, 0, 3, 1, 4):
+                _thread.start_new_thread(espeak, (hardwareNumber, message, voice))
 
 
     os.remove(tempFilePath)
