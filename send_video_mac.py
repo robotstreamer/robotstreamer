@@ -100,7 +100,17 @@ def runFfmpeg(commandLine):
 
 def macVideoCapture(videoPort):
 
-    videoCommandLine = 'ffmpeg -f avfoundation -i 1:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (commandArgs.kbps, server, videoPort)
+
+    if commandArgs.screen_capture:
+        frameRateArgument = "-framerate 30"
+        number = 0
+    else:
+        frameRateArgument = ""
+        number = 1
+
+
+    videoCommandLine = 'ffmpeg -f avfoundation %s -i %d:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (frameRateArgument, number, commandArgs.kbps, server, videoPort)
+
     print("video command line:", videoCommandLine)
     videoProcess = runFfmpeg(videoCommandLine)
     return videoProcess
