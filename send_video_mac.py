@@ -100,6 +100,7 @@ def runFfmpeg(commandLine):
 
 def macVideoCapture(videoPort):
 
+    global videoProcess
 
     if commandArgs.screen_capture:
         frameRateArgument = "-framerate 30"
@@ -122,6 +123,8 @@ def macVideoCapture(videoPort):
 
 def macAudioCapture(audioPort):
 
+    global audioProcess
+
     audioCommandLine = 'ffmpeg -f avfoundation -i none:0 -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (server, audioPort)
 
 
@@ -136,6 +139,7 @@ def macAudioCapture(audioPort):
 
 def startVideoCapture():
 
+    global videoProcess
     videoPort = getVideoPort()
     print("video port:", videoPort)
     videoProcess = macVideoCapture(videoPort)
@@ -144,6 +148,8 @@ def startVideoCapture():
 
 
 def startAudioCapture():
+
+    global audioProcess
 
     audioPort = getAudioPort()
     print("audio port:", audioPort)
@@ -157,6 +163,9 @@ def timeInMilliseconds():
 
 
 def main():
+
+    global videoProcess
+    global audioProcess
 
     # clean up, kill any ffmpeg process that are hanging around from a previous run
     print("killing all ffmpeg processes")
@@ -179,11 +188,11 @@ def main():
 
         if audioProcess.poll() is not None:
             time.sleep(5)
-            startAudioCapture()
+            videoProcess = startAudioCapture()
 
         if videoProcess.poll() is not None:
             time.sleep(5)
-            startVideoCapture()
+            audioProcess = startVideoCapture()
 
         if (count % robot_util.KeepAlivePeriod) == 0:
             robot_util.sendCameraAliveMessage(commandArgs.info_server_protocol,
