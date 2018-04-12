@@ -13,9 +13,17 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
 
+For Raspian:
 ```
 sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install.sh -O /tmp/install.sh && bash /tmp/install.sh
 ```
+
+For Ubuntu:
+```
+sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install_ubuntu.sh -O /tmp/install_ubuntu.sh && bash /tmp/install_ubuntu.sh
+```
+
+
 
 After end installtion, all the files needed should be installed and ready for use, but you still might need to change some arguments in your "/home/pi/start_robot" file, to make it suit your robot.
 
