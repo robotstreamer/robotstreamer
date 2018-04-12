@@ -13,12 +13,12 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
 
-For Raspian:
+For Raspian Stretch:
 ```
 sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install.sh -O /tmp/install.sh && bash /tmp/install.sh
 ```
 
-For Ubuntu:
+For Ubuntu 17.10 or later:
 ```
 sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install_ubuntu.sh -O /tmp/install_ubuntu.sh && bash /tmp/install_ubuntu.sh
 ```
