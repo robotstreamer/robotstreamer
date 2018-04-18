@@ -53,6 +53,9 @@ elif commandArgs.type == "windows_interface":
 elif commandArgs.type == "gopigo3":
             import gopigo3_interface as interface
 
+elif commandArgs.type == "gopigo":
+            import gopigo_interface as interface
+            
 
             
 
