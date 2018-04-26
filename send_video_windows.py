@@ -183,9 +183,9 @@ def startVideoCaptureLinux():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
     if (commandArgs.window_title is not None):
-        titleArg = "title=" + commandArgs.window_title
+        titleArg = 'title=' + '"' + commandArgs.window_title + '"'
     else:
-        titleArg = "desktop"
+        titleArg = 'desktop'
 
     videoCommandLine = 'ffmpeg -r 30 -f gdigrab -i {title_arg} -filter:v "crop=1920:1080:0:0" -video_size 1280x720 -f mpegts -codec:v mpeg1video -s 1280x720 -b:v 1450k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key, title_arg=titleArg)
 #commandArgs.window_title
