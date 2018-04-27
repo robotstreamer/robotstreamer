@@ -60,6 +60,7 @@ parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)
 parser.add_argument('--stream-key', default='hellobluecat')
 
 charCount = {}
+lastCharCount = None
 commandArgs = parser.parse_args()
 robotSettings = None
 resolutionChanged = False
@@ -136,7 +137,7 @@ def printOutput(label, q):
         for source, line in iter(q.get, None):
             print(line.decode("utf-8"), end="")
             charCount[label] += 1
-            print(label + "(" + str(charCount[label]) + ")", end="")
+            #print(label + "(" + str(charCount[label]) + ")", end="")
             #print("%s %s: %s" % (label, source, line))
 
             
@@ -238,7 +239,7 @@ def startVideoCaptureLinux():
 
 
     videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
-
+    
     print(videoCommandLine)
 
     #return subprocess.Popen(shlex.split(videoCommandLine))
@@ -367,6 +368,27 @@ def refreshFromOnlineSettings():
         print("NOT KILLING***********************")
 
 
+def checkForStuckProcesses():
+
+    global lastCharCount
+    if lastCharCount is not None:
+        videoInfoRate = charCount['video'] - lastCharCount['video']
+        audioInfoRate = charCount['audio'] - lastCharCount['audio']
+        print("video info rate:", videoInfoRate)
+        print("audio info rate:", audioInfoRate)
+        if abs(videoInfoRate) < 10:
+            print("video process has stopped outputting info")
+            print("KILLING VIDEO PROCESS")
+            videoProcess.kill()
+        if abs(audioInfoRate) < 10:
+            print("audio process has stopped outputting info")
+            print("KILLING AUDIO PROCESS")
+            audioProcess.kill()
+    print("ffmpeg output character count:", charCount)
+    lastCharCount = copy.deepcopy(charCount)
+
+
+    
 
 def main():
 
@@ -478,10 +500,9 @@ def main():
             identifyRobotId()
 
 
-            
-        # check for stuck processes
-        if (count % 10) == 0:
-            pass
+
+        if (count % 2) == 0:
+            checkForStuckProcesses()
             
             
 
