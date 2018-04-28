@@ -1,0 +1,3 @@
+echo be sure to run this script with sudo
+sudo killall /bin/bash python python3.6 python3 ffmpeg
+sudo /home/pi/start_robot

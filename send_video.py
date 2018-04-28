@@ -16,6 +16,10 @@ import copy
 import argparse
 import audio_util
 import urllib.request
+from subprocess import Popen, PIPE
+from threading import Thread
+from queue import Queue
+#from Queue import Queue # Python 2
 
 
 class DummyProcess:
@@ -55,6 +59,8 @@ parser.add_argument('--mic-channels', type=int, help='microphone channels, typic
 parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)') # currently, this option is only used for windows screen capture
 parser.add_argument('--stream-key', default='hellobluecat')
 
+charCount = {}
+lastCharCount = None
 commandArgs = parser.parse_args()
 robotSettings = None
 resolutionChanged = False
@@ -101,6 +107,55 @@ print("trying to connect to app server socket io", commandArgs.app_server_socket
 appServerSocketIO = None
 print("finished initializing app server socket io")
 
+
+
+
+
+def reader(pipe, queue):
+    try:
+        with pipe:
+            #for line in iter(pipe.readline, b''):
+            #    queue.put((pipe, line))
+            while True:
+                c = pipe.read(1)
+                if not c:
+                    print("End of file")
+                    break
+                #print("Read a character:", c)
+                queue.put((pipe, c))
+                
+    finally:
+        queue.put(None)
+
+        
+
+def printOutput(label, q):
+
+    global charCount
+    charCount[label] = 0
+    for _ in range(2):
+        for source, line in iter(q.get, None):
+            print(line.decode("utf-8"), end="")
+            charCount[label] += 1
+            #print(label + "(" + str(charCount[label]) + ")", end="")
+            #print("%s %s: %s" % (label, source, line))
+
+            
+    
+def runAndMonitor(label, command):
+    process = Popen(command, stdout=PIPE, stderr=PIPE, bufsize=1)
+    q = Queue()
+    Thread(target=reader, args=[process.stdout, q]).start()
+    Thread(target=reader, args=[process.stderr, q]).start()
+    Thread(target=printOutput, args=[label, q]).start()
+    return process
+
+
+
+
+
+
+#def makePOST(url, data):
 
 
 
@@ -184,9 +239,15 @@ def startVideoCaptureLinux():
 
 
     videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
-
+    
     print(videoCommandLine)
-    return subprocess.Popen(shlex.split(videoCommandLine))
+
+    #return subprocess.Popen(shlex.split(videoCommandLine))
+    return runAndMonitor("video", shlex.split(videoCommandLine))
+    
+
+    #return subprocess.Popen(shlex.split(videoCommandLine))
+
 
 
 def startAudioCaptureLinux():
@@ -205,7 +266,8 @@ def startAudioCaptureLinux():
     audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
 
     print(audioCommandLine)
-    return subprocess.Popen(shlex.split(audioCommandLine))
+    #return subprocess.Popen(shlex.split(audioCommandLine))
+    return runAndMonitor("audio", shlex.split(audioCommandLine))
 
 
 
@@ -306,6 +368,27 @@ def refreshFromOnlineSettings():
         print("NOT KILLING***********************")
 
 
+def checkForStuckProcesses():
+
+    global lastCharCount
+    if lastCharCount is not None:
+        videoInfoRate = charCount['video'] - lastCharCount['video']
+        audioInfoRate = charCount['audio'] - lastCharCount['audio']
+        print("video info rate:", videoInfoRate)
+        print("audio info rate:", audioInfoRate)
+        if abs(videoInfoRate) < 10:
+            print("video process has stopped outputting info")
+            print("KILLING VIDEO PROCESS")
+            videoProcess.kill()
+        if abs(audioInfoRate) < 10:
+            print("audio process has stopped outputting info")
+            print("KILLING AUDIO PROCESS")
+            audioProcess.kill()
+    print("ffmpeg output character count:", charCount)
+    lastCharCount = copy.deepcopy(charCount)
+
+
+    
 
 def main():
 
@@ -416,6 +499,12 @@ def main():
         if (count % 60) == 0:
             identifyRobotId()
 
+
+
+        if (count % 2) == 0:
+            checkForStuckProcesses()
+            
+            
 
         if robotSettings.camera_enabled:
 
