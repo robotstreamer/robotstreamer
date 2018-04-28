@@ -1,7 +1,7 @@
 import sys
 import time
 import gopigo
-
+import robot_util
 
 
 
@@ -31,5 +31,6 @@ def handleCommand(command, keyPosition):
         time.sleep(0.3)
         gopigo.stop()
 
+    robot_util.handleSoundCommand(command)
 
 

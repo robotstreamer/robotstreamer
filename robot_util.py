@@ -86,3 +86,17 @@ def sendCameraAliveMessage(infoServerProtocol, infoServer, cameraID):
                                       'camera_status':'online'})
     except:
             print("could not make post to", url)
+
+
+
+def aplayFile(filename):
+        for hardwareNumber in (2, 0, 1):
+                os.system('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename))
+                        
+
+def handleSoundCommand(command):
+        if len(command) >= 6:
+                if command[0:5] == "SOUND":
+                        number = int(command[5:])
+                        aplayFile('/home/pi/sound/SOUND%d.WAV' % number)
+
