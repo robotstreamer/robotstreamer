@@ -10,6 +10,7 @@ import traceback
 import tempfile
 import uuid
 import audio
+from urllib import quote
 
 
 
@@ -33,6 +34,7 @@ parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 parser.add_argument('--type', default="rsbot")
+parser.add_argument('--google-tts',dest='google',default='true')
 
 
 
@@ -87,7 +89,11 @@ def espeak(hardwareNumber, message, voice):
             f.close()
             
             print('plughw:%d,0' % hardwareNumber)
-            if commandArgs.male:
+            if commandArgs.google:
+                os.system('curl \'https://translate.google.com/translate_tts?ie=UTF-8&q=&' + quote(message.encode('utf8')) +
+                          'tl=en&client=tw-ob\' -H \'Referer: http://translate.google.com/\' -H \'User-Agent: stagefright/1.2 (Linux;Android 5.0)\'  > ./tts.mp3')
+                os.system('aplay ./tts.mp3)
+            else if commandArgs.male:
                 os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
             else:
                 os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
