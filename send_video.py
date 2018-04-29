@@ -52,6 +52,8 @@ parser.add_argument('--screen-capture', dest='screen_capture', action='store_tru
 parser.set_defaults(screen_capture=False)
 parser.add_argument('--no-mic', dest='mic_enabled', action='store_false')
 parser.set_defaults(mic_enabled=True)
+parser.add_argument('--no-audio-restart', dest='audio_restart_enabled', action='store_false')
+parser.set_defaults(audio_restart_enabled=True)
 parser.add_argument('--no-camera', dest='camera_enabled', action='store_false')
 parser.set_defaults(camera_enabled=True)
 parser.add_argument('--dry-run', dest='dry_run', action='store_true')
@@ -202,8 +204,8 @@ def identifyRobotId():
 def randomSleep():
     """A short wait is good for quick recovery, but sometimes a longer delay is needed or it will just keep trying and failing short intervals, like because the system thinks the port is still in use and every retry makes the system think it's still in use. So, this has a high likelihood of picking a short interval, but will pick a long one sometimes."""
 
-    timeToWait = random.choice((0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2))
-    t = timeToWait * 6.0
+    timeToWait = random.choice((0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1))
+    t = timeToWait * 12.0
     print("sleeping", t, "seconds")
     time.sleep(t)
 
@@ -436,7 +438,8 @@ def main():
     if robotSettings.mic_enabled:
         if not commandArgs.dry_run:
             audioProcess = startAudioCaptureLinux()
-            _thread.start_new_thread(killallFFMPEGIn30Seconds, ())
+            if commandArgs.audio_restart_enabled:
+                _thread.start_new_thread(killallFFMPEGIn30Seconds, ())
             #appServerSocketIO.emit('send_video_process_start_event', {'camera_id': commandArgs.camera_id})
         else:
             audioProcess = DummyProcess()

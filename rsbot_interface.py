@@ -195,6 +195,7 @@ def handleCommand(command, keyPosition):
                     else:
                         print("ping pong not enabled")
                 if command == 'FREE_FIRE':
+                    return
                     print("processing fire")
                     if not freePongActive:
                         freePongActive = True
