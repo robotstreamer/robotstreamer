@@ -144,8 +144,9 @@ def say(message, voice='en-us'):
                 _thread.start_new_thread(espeakMac, (message, voice))
 
         else:
-            for hardwareNumber in (2, 0, 3, 1, 4):
-                _thread.start_new_thread(espeak, (hardwareNumber, message, voice))
+            for hardwareNumber in (0, 2, 3, 1, 4):
+                #_thread.start_new_thread(espeak, (hardwareNumber, message, voice))
+                espeak(hardwareNumber, message, voice)
 
 
     os.remove(tempFilePath)
