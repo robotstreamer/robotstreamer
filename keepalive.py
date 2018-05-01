@@ -38,7 +38,7 @@ def main():
 
     # loop forever and send keep alive every robot_util.KeepAlivePeriod seconds
     while True:
-        time.sleep(1)
+        time.sleep(10)
         if (count % 5) == 0:
             print( count )
         if (count % robot_util.KeepAlivePeriod) == 0:
