@@ -47,9 +47,13 @@ if commandArgs.type == "rsbot":
             interface.init(json.loads(commandArgs.forward),
                               json.loads(commandArgs.left),
                               commandArgs.enable_ping_pong)
+
 elif commandArgs.type == "windows_interface":
             import windows_interface as interface
 
+elif commandArgs.type == "mac_interface":
+            import mac_interface as interface
+            
 elif commandArgs.type == "gopigo3":
             import gopigo3_interface as interface
 
