@@ -51,7 +51,7 @@ if commandArgs.type == "rsbot":
 elif commandArgs.type == "windows_interface":
             import windows_interface as interface
 
-elif commandArgs.type == "mac_interface":
+elif commandArgs.type == "mac":
             import mac_interface as interface
             
 elif commandArgs.type == "gopigo3":
