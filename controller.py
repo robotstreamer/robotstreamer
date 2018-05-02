@@ -231,6 +231,7 @@ def startControl():
                             print("error")
                             traceback.print_exc()
                 print("control died")
+                interface.movementSystemActive = False
 
 
 def startChat():
