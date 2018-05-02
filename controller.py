@@ -223,14 +223,14 @@ def startControl():
     time.sleep(6) #todo: only wait as needed (wait for interent)
 
     while True:
-                print("starting stat control loop")
+                print("starting control loop")
                 time.sleep(0.25)
                 try:
                             asyncio.new_event_loop().run_until_complete(handleControlMessages())
                 except:
                             print("error")
                             traceback.print_exc()
-                print("control died")
+                print("control event handler died")
                 interface.movementSystemActive = False
 
 
@@ -238,11 +238,19 @@ def startChat():
         time.sleep(10) #todo: only wait as needed (wait for interenet)
         print("restarting loop")
         time.sleep(0.25)
-        try:
-                asyncio.new_event_loop().run_until_complete(handleChatMessages())
-        except:
-                print("error")
-                traceback.print_exc()
+
+        while True:
+                    print("starting chat loop")
+                    time.sleep(0.25)
+                    
+
+        
+                    try:
+                                asyncio.new_event_loop().run_until_complete(handleChatMessages())
+                    except:
+                                print("error")
+                                traceback.print_exc()
+                    print("chat event handler died")
 
 
 #async def hello(uri):
