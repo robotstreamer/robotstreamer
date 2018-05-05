@@ -33,6 +33,7 @@ parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 parser.add_argument('--type', default="rsbot")
+parser.add_argument('--stream-key', default="123")
 
 
 
@@ -175,6 +176,9 @@ async def handleControlMessages():
 
         print("connected to control service at", url)
         print("control websocket object:", websocket)
+
+        # validation handshake
+        await websocket.send(json.dumps({"command":commandArgs.stream_key}))
         
         while True:
 
