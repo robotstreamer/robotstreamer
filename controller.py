@@ -18,6 +18,9 @@ controlHost = "robotstreamer.com"
 chatHostPort = {"host":"184.72.15.121", "port":8765}
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
 tempDir = tempfile.gettempdir()
+messagesToTTS = []
+numActiveEspeak = 0
+
 print("temporary directory:", tempDir)
 
 
@@ -82,24 +85,35 @@ def setVolume(percent):
 
 def espeak(hardwareNumber, message, voice):
 
-            # tested for USB audio device
-            #os.system("amixer -c 2 cset numid=%d %d%%" %
-            #          (hardwareNumber, commandArgs.tts_volume))
+            global numActiveEspeak
             
-            tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
-            f = open(tempFilePath, "w")
-            f.write(message)
-            f.close()
+            numActiveEspeak += 1
+            print("number of espeaks active", numActiveEspeak)
+
+            try:
+                        # tested for USB audio device
+                        #os.system("amixer -c 2 cset numid=%d %d%%" %
+                        #          (hardwareNumber, commandArgs.tts_volume))
             
-            print('plughw:%d,0' % hardwareNumber)
-            if commandArgs.male:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
-            else:
-                os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+                        tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+                        f = open(tempFilePath, "w")
+                        f.write(message)
+                        f.close()
+            
+                        print('plughw:%d,0' % hardwareNumber)
+                        if commandArgs.male:
+                                    os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+                        else:
+                                    os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
 
+            
+                        os.remove(tempFilePath)
 
-            os.remove(tempFilePath)
+            except:
+                        print("something went wrong with espeak")
 
+            numActiveEspeak -= 1
+            print("number of espeaks active", numActiveEspeak)
 
 
 def espeakMac(message, voice):
@@ -150,8 +164,8 @@ def say(message, voice='en-us'):
 
         else:
             for hardwareNumber in (0, 2, 3, 1, 4):
-                #_thread.start_new_thread(espeak, (hardwareNumber, message, voice))
-                espeak(hardwareNumber, message, voice)
+                _thread.start_new_thread(espeak, (hardwareNumber, message, voice))
+                #espeak(hardwareNumber, message, voice)
 
 
     os.remove(tempFilePath)
@@ -215,11 +229,12 @@ async def handleChatMessages():
             j = json.loads(message)
             print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True and (j['robot_id'] == commandArgs.robot_id):
-                        if audio.espeakBytes(j['message']) < 400000:
-                                    print("length", audio.espeakBytes(j['message']))
-                                    _thread.start_new_thread(say, (j['message'],))
-                        else:
-                                    print("message too long")
+                        messagesToTTS.append(j['message'])
+                        #if audio.espeakBytes(j['message']) < 400000:
+                        #            print("length", audio.espeakBytes(j['message']))
+                        #            _thread.start_new_thread(say, (j['message'],))
+                        #else:
+                        #            print("message too long")
             else:
                 print("error, message not valid:", j)
 
@@ -272,7 +287,16 @@ def startChat():
 #def startTest():
 #        asyncio.get_event_loop().run_until_complete(
 #                hello('ws://54.219.138.36:8765'))
-        
+
+
+def runPeriodicTasks():
+
+            if len(messagesToTTS) > 0 and numActiveEspeak == 0:
+                        message = messagesToTTS.pop(0)
+                        _thread.start_new_thread(say, (message,))
+                        
+
+            
 def main():                
 
                        
@@ -287,7 +311,8 @@ def main():
             
             
             while True:
-                time.sleep(1)
+                time.sleep(0.20)
+                runPeriodicTasks()
 
 
                 
