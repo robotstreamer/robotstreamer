@@ -110,7 +110,7 @@ def espeak(hardwareNumber, message, voice):
                         else:
                                     os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout > %s' % (voice, commandArgs.voice_number, wavFile))
 
-                        cropResult = os.system("ffmpeg -i %s -ss 0 -to %d -c copy %s" % (wavFile, maximumTTSTime, croppedWavFile))
+                        cropResult = os.system("/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -c copy %s" % (wavFile, maximumTTSTime, croppedWavFile))
                         print("crop result code", cropResult)
                         if cropResult == 0:
                                     print("play cropped")
