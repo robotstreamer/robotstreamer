@@ -94,9 +94,10 @@ def aplayFile(filename):
                 os.system('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename))
                         
 
-def handleSoundCommand(command):
+def handleSoundCommand(command, keyPosition):
+        print("command:", command, "key position:", keyPosition)
         if len(command) >= 6:
-                if command[0:5] == "SOUND":
+                if command[0:5] == "SOUND" and keyPosition == "down":
                         number = int(command[5:])
                         aplayFile('/home/pi/sound/SOUND%d.WAV' % number)
 
