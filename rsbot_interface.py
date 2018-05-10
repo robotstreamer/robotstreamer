@@ -104,7 +104,7 @@ def handleCommand(command, keyPosition):
                 motorA.setSpeed(255)
                 motorB.setSpeed(255)
 
-                robot_util.handleSoundCommand(command)
+                robot_util.handleSoundCommand(command, keyPosition)
                 
                 if command == 'F':
                     if movementSystemActive:
