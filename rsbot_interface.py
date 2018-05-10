@@ -5,14 +5,15 @@ import atexit
 import json
 import _thread
 import vibrate
+import robot_util
 
 
 
 turningSpeedActuallyUsed = 255
 #drivingSpeedAcutallyUsed = 255
-turnDelay = 0.2
+turnDelay = 0.1
 drivingSpeed = 255
-straightDelay = 0.5
+straightDelay = 0.6
 movementSystemActive = False
 pingPongNumActive = 0
 freePongActive = False
@@ -102,6 +103,8 @@ def handleCommand(command, keyPosition):
     
                 motorA.setSpeed(255)
                 motorB.setSpeed(255)
+
+                robot_util.handleSoundCommand(command)
                 
                 if command == 'F':
                     if movementSystemActive:

@@ -5,6 +5,7 @@ import ssl
 import urllib.request
 import getpass
 import json
+import _thread
 
 
 
@@ -91,7 +92,7 @@ def sendCameraAliveMessage(infoServerProtocol, infoServer, cameraID):
 
 def aplayFile(filename):
         for hardwareNumber in (2, 0, 1):
-                os.system('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename))
+                _thread.start_new_thread(os.system, ('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename),))
                         
 
 def handleSoundCommand(command):
