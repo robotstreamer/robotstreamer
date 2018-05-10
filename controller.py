@@ -20,6 +20,8 @@ allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi
 tempDir = tempfile.gettempdir()
 messagesToTTS = []
 numActiveEspeak = 0
+maximumTTSTime = 5
+
 
 print("temporary directory:", tempDir)
 
@@ -96,21 +98,36 @@ def espeak(hardwareNumber, message, voice):
                         #          (hardwareNumber, commandArgs.tts_volume))
             
                         tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
+                        wavFile = os.path.join(tempDir, str(uuid.uuid4()) + ".wav")
+                        croppedWavFile = os.path.join(tempDir, str(uuid.uuid4()) + ".wav")
                         f = open(tempFilePath, "w")
                         f.write(message)
                         f.close()
             
                         print('plughw:%d,0' % hardwareNumber)
                         if commandArgs.male:
-                                    os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout | aplay -D plughw:%d,0' % (voice, hardwareNumber))
+                                    os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout > %s' % (voice, waveFile))
                         else:
-                                    os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice, commandArgs.voice_number, hardwareNumber))
+                                    os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout > %s' % (voice, commandArgs.voice_number, wavFile))
+
+                        cropResult = os.system("/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -c copy %s" % (wavFile, maximumTTSTime, croppedWavFile))
+                        print("crop result code", cropResult)
+                        if cropResult == 0:
+                                    print("play cropped")
+                                    os.system('aplay -D plughw:%d,0 %s' % (hardwareNumber, croppedWavFile))
+                                    os.remove(croppedWavFile)
+                        else:
+                                    print("play full file")
+                                    os.system('aplay -D plughw:%d,0 %s' % (hardwareNumber, wavFile))                             
 
             
                         os.remove(tempFilePath)
+                        os.remove(wavFile)
 
-            except:
-                        print("something went wrong with espeak")
+
+
+            except Exception as e:
+                        print("something went wrong with espeak:", e)
 
             numActiveEspeak -= 1
             print("number of espeaks active", numActiveEspeak)

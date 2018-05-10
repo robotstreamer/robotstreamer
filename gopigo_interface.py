@@ -31,6 +31,6 @@ def handleCommand(command, keyPosition):
         time.sleep(0.3)
         gopigo.stop()
 
-    robot_util.handleSoundCommand(command)
+    robot_util.handleSoundCommand(command, keyPosition)
 
 
