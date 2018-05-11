@@ -105,10 +105,17 @@ def espeak(hardwareNumber, message, voice):
                         f.close()
             
                         print('plughw:%d,0' % hardwareNumber)
+                        print("commandArgs.male:", commandArgs.male)
                         if commandArgs.male:
-                                    os.system('cat ' + tempFilePath + ' | espeak -v%s --stdout > %s' % (voice, waveFile))
+                                    print("male")
+                                    cmd = 'cat ' + tempFilePath + ' | espeak -v%s --stdout > %s' % (voice, wavFile)
+                                    print("--------------", cmd)
+                                    os.system(cmd)
                         else:
-                                    os.system('cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout > %s' % (voice, commandArgs.voice_number, wavFile))
+                                    print("female")
+                                    cmd = 'cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout > %s' % (voice, commandArgs.voice_number, wavFile)
+                                    print("--------------", cmd)
+                                    os.system(cmd)
 
                         cropResult = os.system("/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -c copy %s" % (wavFile, maximumTTSTime, croppedWavFile))
                         print("crop result code", cropResult)
