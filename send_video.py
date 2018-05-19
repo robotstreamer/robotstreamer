@@ -160,20 +160,30 @@ def runAndMonitor(label, command):
 #def makePOST(url, data):
 
 
-
-def getVideoPort():
-
-    url = '%s://%s/get_video_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+def getVideoEndpoint():
+    url = '%s://%s/v1/get_endpoint/jsmpeg_video_capture/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
-    return json.loads(response)['mpeg_stream_port']
+    return json.loads(response)
 
-
-
-def getAudioPort():
-
-    url = '%s://%s/get_audio_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+def getAudioEndpoint():
+    url = '%s://%s/v1/get_endpoint/jsmpeg_audio_capture/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
-    return json.loads(response)['audio_stream_port']
+    return json.loads(response)
+
+
+#def getVideoPort():
+#
+#    url = '%s://%s/get_video_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+#    response = robot_util.getWithRetry(url)
+#    return json.loads(response)['mpeg_stream_port']
+
+
+
+#def getAudioPort():
+#
+#    url = '%s://%s/get_audio_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+#    response = robot_util.getWithRetry(url)
+#    return json.loads(response)['audio_stream_port']
 
 
 #todo this function probably should be removed
@@ -213,15 +223,17 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
-    videoPort = getVideoPort()
-    print("getting websocket relay host for video")
+    #videoPort = getVideoPort()
+    videoEndpoint = getVideoEndpoint()
+    print("start video capture, video endpoint:", videoEndpoint)
 
     #todo, use api
     #websocketRelayHost = getWebsocketRelayHost()
     #print("websocket relay host for video:", websocketRelayHost)
 
     #videoHost = websocketRelayHost['host']
-    videoHost = "184.169.234.241"
+    #videoHost = "184.169.234.241"
+    videoHost = videoEndpoint['host']
 
 
     # set brightness
@@ -240,7 +252,7 @@ def startVideoCaptureLinux():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
 
-    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
+    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoEndpoint['port'], xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)
 
@@ -254,18 +266,20 @@ def startVideoCaptureLinux():
 
 def startAudioCaptureLinux():
 
-    audioPort = getAudioPort()
+    #audioPort = getAudioPort()
+    audioEndpoint = getAudioEndpoint()
 
     #websocketRelayHost = getWebsocketRelayHost()
 
     #audioHost = websocketRelayHost['host']
-    audioHost = "184.169.234.241"
+    #audioHost = "184.169.234.241"
+    audioHost = audioEndpoint['host']
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
         audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
 
-    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
+    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
 
     print(audioCommandLine)
     #return subprocess.Popen(shlex.split(audioCommandLine))
