@@ -25,7 +25,7 @@ sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/s
 
 
 
-After end installtion, all the files needed should be installed and ready for use, but you still might need to change some arguments in your "/home/pi/start_robot" file, to make it suit your robot.
+After end installtion, all the files needed should be installed and ready for use, but you still need to change some arguments in your "/home/pi/start_robot" file, to make it suit your robot. Particularly you need a stream key for controller.py and you should ask rgiuly@gmail.com for that. (We're working on making this easier.)
 
 To edit your start_robot file, put this into the terminal.
 
