@@ -27,16 +27,18 @@ class DummyProcess:
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
+parser.add_argument('window_title')
+#commandArgs.window_title
+
 parser.add_argument('video_device_number', default=0, type=int)
 #parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
-parser.add_argument('--window-title', help="option argument to set a window title from which to capture")
 parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
 parser.add_argument('--info-server-protocol', default="http", help="either https or http")
 parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
 parser.add_argument('--app-server-socketio-port', default=8022, help="typically use 8022 for prod, 8122 for dev, and 8125 for dev2")
 parser.add_argument('--api-server', help="Server that robot will connect to listen for API update events", default='api.robotstreamer.com')
-parser.add_argument('--xres', type=int, default=1080)
-parser.add_argument('--yres', type=int, default=720)
+parser.add_argument('--xres', type=int, default=1920)
+parser.add_argument('--yres', type=int, default=1080)
 parser.add_argument('--audio-device-number', default=1, type=int)
 parser.add_argument('--audio-device-name')
 parser.add_argument('--kbps', default=1000, type=int)
@@ -164,7 +166,7 @@ def startVideoCaptureLinux():
     #print("websocket relay host for video:", websocketRelayHost)
 
     #videoHost = websocketRelayHost['host']
-    videoHost = "184.169.234.241"
+    videoHost = "robotstreamer.com"
 
 
     # set brightness
@@ -182,12 +184,10 @@ def startVideoCaptureLinux():
         print("saturation")
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
-    if (commandArgs.window_title is not None):
-        titleArg = 'title=' + '"' + commandArgs.window_title + '"'
-    else:
-        titleArg = 'desktop'
 
-    videoCommandLine = 'ffmpeg -r 30 -f gdigrab -i {title_arg} -filter:v "crop=1920:1080:0:0" -video_size 1280x720 -f mpegts -codec:v mpeg1video -s 1280x720 -b:v 1450k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key, title_arg=titleArg)
+    videoCommandLine = 'ffmpeg -r 30 -f gdigrab -i title="'
+    videoCommandLine += commandArgs.window_title
+    videoCommandLine += '" -filter:v "crop=1920:1080:0:0" -video_size 1280x720 -f mpegts -codec:v mpeg1video -s 1280x720 -b:v 1500 -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
 #commandArgs.window_title
 
     print(videoCommandLine)
@@ -201,7 +201,7 @@ def startAudioCaptureLinux():
     #websocketRelayHost = getWebsocketRelayHost()
 
     #audioHost = websocketRelayHost['host']
-    audioHost = "184.169.234.241"
+    audioHost = "robotstreamer.com"
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
