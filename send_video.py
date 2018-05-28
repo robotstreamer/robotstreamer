@@ -388,18 +388,26 @@ def checkForStuckProcesses():
 
     global lastCharCount
     if lastCharCount is not None:
-        videoInfoRate = charCount['video'] - lastCharCount['video']
-        audioInfoRate = charCount['audio'] - lastCharCount['audio']
-        print("video info rate:", videoInfoRate)
-        print("audio info rate:", audioInfoRate)
-        if abs(videoInfoRate) < 10:
-            print("video process has stopped outputting info")
-            print("KILLING VIDEO PROCESS")
-            videoProcess.kill()
-        if abs(audioInfoRate) < 10:
-            print("audio process has stopped outputting info")
-            print("KILLING AUDIO PROCESS")
-            audioProcess.kill()
+
+        if robotSettings.camera_enabled:
+            videoInfoRate = charCount['video'] - lastCharCount['video']
+            print("video info rate:", videoInfoRate)
+            if abs(videoInfoRate) < 10:
+                print("video process has stopped outputting info")
+                print("KILLING VIDEO PROCESS")
+                videoProcess.kill()
+
+        if robotSettings.mic_enabled:
+            audioInfoRate = charCount['audio'] - lastCharCount['audio']
+            print("audio info rate:", audioInfoRate)
+            if abs(audioInfoRate) < 10:
+                print("audio process has stopped outputting info")
+                print("KILLING AUDIO PROCESS")
+                audioProcess.kill()
+        
+
+
+            
     print("ffmpeg output character count:", charCount)
     lastCharCount = copy.deepcopy(charCount)
 

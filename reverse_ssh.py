@@ -12,7 +12,7 @@ import subprocess
 
 
 
-statusEndpoint = {'host': '184.72.15.121', 'port': 6020}
+statusEndpoint = {'host': 'robotstreamer.com', 'port': 6020}
 
 
 
