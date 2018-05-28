@@ -66,6 +66,9 @@ elif commandArgs.type == "gopigo3":
 
 elif commandArgs.type == "gopigo":
             import gopigo_interface as interface
+
+elif commandArgs.type == "gopigomessedup":
+            import gopigomessedup_interface as interface            
             
 
             
