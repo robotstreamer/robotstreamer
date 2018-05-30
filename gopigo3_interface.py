@@ -1,5 +1,6 @@
 import sys
 import time
+import robot_util
 sys.path.append("/home/pi/Dexter/GoPiGo3/Software/Python")
 import easygopigo3
 easyGoPiGo3 = easygopigo3.EasyGoPiGo3()
