@@ -32,4 +32,5 @@ def handleCommand(command, keyPosition):
         easyGoPiGo3.backward()
         time.sleep(0.35)
         easyGoPiGo3.stop()
-
+        
+    robot_util.handleSoundCommand(command, keyPosition)
