@@ -8,13 +8,14 @@ import vibrate
 import robot_util
 
 
+commandArgs = None
+
 
 turningSpeedActuallyUsed = 255
 #drivingSpeedAcutallyUsed = 255
 turnDelay = 0.1
 
-drivingSpeed = 80
-speed1 = drivingSpeed
+
 
 straightDelay = 0.6
 movementSystemActive = False
@@ -50,8 +51,12 @@ mh = Adafruit_MotorHAT(addr=0x60)
 
 
 
-def init(forwardDefinition, leftDefinition, pEnabled):
+def init(cArgs, forwardDefinition, leftDefinition, pEnabled):
 
+      
+                global commandArgs
+                global drivingSpeed
+                global speed1
                 global left
                 global right
                 global forward
@@ -60,6 +65,10 @@ def init(forwardDefinition, leftDefinition, pEnabled):
                 global motorB
                 global pingPongEnabled
                 global mhPingPong
+
+
+
+                
                 pingPongEnabled = pEnabled
                 forward = forwardDefinition
                 backward = times(forward, -1)
@@ -67,7 +76,14 @@ def init(forwardDefinition, leftDefinition, pEnabled):
                 right = times(left, -1)
                 print("directions", forward, backward, left, right)
 
+                commandArgs = cArgs
 
+
+
+                drivingSpeed = commandArgs.straight_speed
+                speed1 = drivingSpeed
+
+                
                 _thread.start_new_thread(demoShots, ())
 
                 atexit.register(turnOffMotors)

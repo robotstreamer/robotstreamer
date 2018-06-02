@@ -40,6 +40,8 @@ parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 parser.add_argument('--type', default="rsbot")
 parser.add_argument('--stream-key', default="123")
+parser.add_argument('--straight-speed', type=int, default=255)
+parser.add_argument('--turn-speed', type=int, default=255)
 
 
 
@@ -51,9 +53,10 @@ print(commandArgs)
 if commandArgs.type == "rsbot":
             print("initializing rsbot")
             import rsbot_interface as interface
-            interface.init(json.loads(commandArgs.forward),
-                              json.loads(commandArgs.left),
-                              commandArgs.enable_ping_pong)
+            interface.init(commandArgs,
+                           json.loads(commandArgs.forward),
+                           json.loads(commandArgs.left),
+                           commandArgs.enable_ping_pong)
 
 elif commandArgs.type == "windows_interface":
             import windows_interface as interface
