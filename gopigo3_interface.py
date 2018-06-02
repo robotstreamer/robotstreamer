@@ -1,5 +1,6 @@
 import sys
 import time
+import robot_util
 sys.path.append("/home/pi/Dexter/GoPiGo3/Software/Python")
 import easygopigo3
 easyGoPiGo3 = easygopigo3.EasyGoPiGo3()
@@ -32,4 +33,5 @@ def handleCommand(command, keyPosition):
         easyGoPiGo3.backward()
         time.sleep(0.35)
         easyGoPiGo3.stop()
-
+        
+    robot_util.handleSoundCommand(command, keyPosition)
