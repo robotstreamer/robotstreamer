@@ -12,7 +12,10 @@ import robot_util
 turningSpeedActuallyUsed = 255
 #drivingSpeedAcutallyUsed = 255
 turnDelay = 0.1
-drivingSpeed = 255
+
+drivingSpeed = 80
+speed1 = drivingSpeed
+
 straightDelay = 0.6
 movementSystemActive = False
 pingPongNumActive = 0
@@ -101,8 +104,8 @@ def handleCommand(command, keyPosition):
 
                 d = 255
     
-                motorA.setSpeed(255)
-                motorB.setSpeed(255)
+                motorA.setSpeed(speed1)
+                motorB.setSpeed(speed1)
 
                 robot_util.handleSoundCommand(command, keyPosition)
                 
