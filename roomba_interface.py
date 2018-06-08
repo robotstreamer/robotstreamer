@@ -30,10 +30,24 @@ thread.start_new_thread(readAll, ())
 
 while True:
     data = raw_input("PROMPT>")
-    if data == "b":
+    if data == "beep":
         ser.write(beepCode)
     elif data == 'l':
-        ser.write(chr(137) + chr(255) + chr(56) + chr(1) + chr(244))
+        ser.write(chr(146) + chr(0) + chr(100) + chr(0) + chr(0))        
+        time.sleep(0.3)
+        ser.write(chr(146) + chr(0) + chr(0) + chr(0) + chr(0))        
+    elif data == 'r':
+        ser.write(chr(146) + chr(0) + chr(0) + chr(0) + chr(100))
+        time.sleep(0.3)
+        ser.write(chr(146) + chr(0) + chr(0) + chr(0) + chr(0))        
+    elif data == 'f':
+        ser.write(chr(146) + chr(0) + chr(100) + chr(0) + chr(100))
+        time.sleep(0.3)
+        ser.write(chr(146) + chr(0) + chr(0) + chr(0) + chr(0))        
+    elif data == 'b':
+        ser.write(chr(146) + chr(255) + chr(100) + chr(255) + chr(100))
+        time.sleep(0.3)
+        ser.write(chr(146) + chr(0) + chr(0) + chr(0) + chr(0))        
     elif data == 's': #stop
         ser.write(chr(137) + chr(0) + chr(0) + chr(1) + chr(1))
     else:
