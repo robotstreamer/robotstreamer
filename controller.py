@@ -72,6 +72,10 @@ elif commandArgs.type == "gopigo":
 
 elif commandArgs.type == "gopigomessedup":
             import gopigomessedup_interface as interface            
+
+elif commandArgs.type == "roomba":
+            import roomba_interface as interface
+            interface.init()
             
 
             
