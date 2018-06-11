@@ -4,21 +4,6 @@ import _thread
 import sys
 
 
-def handleCommand(command, keyPosition):
-
-    print("handling command")
-    
-    if command == 'L':
-        move(0, 100, 0xFF, negative(100))        
-    elif command == 'R':
-        move(0, 0, 0, 100)
-    elif command == 'F':
-        move(0, 100, 0, 100)
-    elif command == 'B':
-        move(0xFF, negative(100), 0xFF, negative(100))
-
-
-
 ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
@@ -28,9 +13,23 @@ SAFE = b'\x83'
 CLEAN = b'\x87'
 BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
 
+movementSystemActive = False
 
-#time.sleep(1)
-#ser.close()
+
+def handleCommand(command, keyPosition):
+
+    print("handling command")
+    
+    if command == 'L':
+        move(0, 100, 0xFF, negative(100))        
+    elif command == 'R':
+        move(0xFF, negative(100), 0, 100)
+    elif command == 'F':
+        move(0, 100, 0, 100)
+    elif command == 'B':
+        move(0xFF, negative(100), 0xFF, negative(100))
+
+
 
 def init():
     print("init roomba")
@@ -56,10 +55,14 @@ def readAll():
 
 
 def move(motorAHigh, motorALow, motorBHigh, motorBLow):
-    print("move", motorAHigh, motorALow, motorBHigh, motorBLow)
-    ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
-    time.sleep(0.3)
-    ser.write(bytes([146, 0, 0, 0, 0]))
+    global movementSystemActive
+    if not movementSystemActive:
+        movementSystemActive = True
+        print("move", motorAHigh, motorALow, motorBHigh, motorBLow)
+        ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
+        time.sleep(0.3)
+        ser.write(bytes([146, 0, 0, 0, 0]))
+        movementSystemActive = False
 
 
 def inputFromKeyboard():
