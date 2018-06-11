@@ -21,13 +21,13 @@ def handleCommand(command, keyPosition):
     print("handling command")
     
     if command == 'L':
-        move(0, 100, 0xFF, negative(100))        
+        move(100, -100)        
     elif command == 'R':
-        move(0xFF, negative(100), 0, 100)
+        move(-100, 100)
     elif command == 'F':
-        move(0, 100, 0, 100)
+        move(100, 100)
     elif command == 'B':
-        move(0xFF, negative(100), 0xFF, negative(100))
+        move(-100, -100)
 
 
 
@@ -53,16 +53,56 @@ def readAll():
         sys.stdout.write(ser.read())
         sys.stdout.flush()
 
+def twosComp(x):
+    if x < 0:
+        return negative(-x)
+    return x
+        
 
-def move(motorAHigh, motorALow, motorBHigh, motorBLow):
+def move(motorA, motorB):
+
+    motorA1 = twosComp(motorA)
+    motorA2 = twosComp(int(motorA / 2))
+    motorB1 = twosComp(motorB)
+    motorB2 = twosComp(int(motorB / 2))
+
+    # set high bytes
+    if motorA < 0:
+        highA = 0xFF
+    else:
+        highA = 0
+    if motorB < 0:
+        highB = 0xFF
+    else:
+        highB = 0
+        
     global movementSystemActive
     if not movementSystemActive:
         movementSystemActive = True
-        print("move", motorAHigh, motorALow, motorBHigh, motorBLow)
-        ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
-        time.sleep(0.3)
-        ser.write(bytes([146, 0, 0, 0, 0]))
+
+        # ramp up
+        rawMove(highA, motorA2, highB, motorB2)
+        time.sleep(0.05)
+
+        # move full speed
+        rawMove(highA, motorA1, highB, motorB1)
+        time.sleep(0.2)
+
+        # ramp down
+        rawMove(highA, motorA2, highB, motorB2)
+        time.sleep(0.15)
+
+        # stop
+        rawMove(0, 0, 0, 0)
+        
         movementSystemActive = False
+
+        
+def rawMove(motorAHigh, motorALow, motorBHigh, motorBLow):
+
+    print("raw move", motorAHigh, motorALow, motorBHigh, motorBLow)
+    ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
+
 
 
 def inputFromKeyboard():
@@ -72,13 +112,13 @@ def inputFromKeyboard():
         if data == "beep":
             ser.write(BEEP)
         elif data == 'l':
-            move(0, 100, 0, 0)        
+            move(100, -100)        
         elif data == 'r':
-            move(0, 0, 0, 100)
+            move(-100, 100)
         elif data == 'f':
-            move(0, 100, 0, 100)
+            move(100, 100)
         elif data == 'b':
-            move(0xFF, negative(100), 0xFF, negative(100))
+            move(-100, -100)
         elif data == 's': #stop
             move(0, 0, 0, 0)
         else:
