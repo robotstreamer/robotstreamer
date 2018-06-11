@@ -106,10 +106,13 @@ def move(motorA, motorB, rampUpTime, fullSpeedTime, rampDownTime):
         
 def rawMove(motorAHigh, motorALow, motorBHigh, motorBLow):
 
-    ser.write(bytes([128])
-    ser.write(bytes([131])              
+
     
     print("raw move", motorAHigh, motorALow, motorBHigh, motorBLow)
+    #ser.write(bytes([128,128])
+    #ser.write(bytes([131])
+    ser.write(bytes([128]))
+    ser.write(bytes([131]))
     ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
 
 
@@ -121,15 +124,15 @@ def inputFromKeyboard():
         if data == "beep":
             ser.write(BEEP)
         elif data == 'l':
-            move(100, -100, True, .05, .2, .25)
+            move(100, -100, .05, .2, .25)
         elif data == 'r':
-            move(-100, 100, True, .05, .2, .25)
+            move(-100, 100, .05, .2, .25)
         elif data == 'f':
-            move(100, 100, True, .05, .2, .25)
+            move(100, 100, .05, .2, .25)
         elif data == 'b':
-            move(-100, -100, True, .05, .2, .25)
+            move(-100, -100, .05, .2, .25)
         elif data == 's': #stop
-            move(0, 0, 0, 0, True, .05, .2, .25)
+            move(0, 0, 0, 0, .05, .2, .25)
         else:
             print("data:", data)
             num = int(data, 10)
