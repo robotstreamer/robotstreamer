@@ -23,10 +23,10 @@ ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
 
-PASSIVE = '\x80'
-SAFE = '\x83'
-CLEAN = '\x87'
-BEEP = '\x8c\x03\x01\x40\x10\x8d\x03'
+PASSIVE = b'\x80'
+SAFE = b'\x83'
+CLEAN = b'\x87'
+BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
 
 
 #time.sleep(1)
@@ -34,15 +34,14 @@ BEEP = '\x8c\x03\x01\x40\x10\x8d\x03'
 
 def init():
     print("init roomba")
-    for i in range(0, 10):
-        serialWrite(PASSIVE)
-    serialWrite(SAFE)
+    ser.write(PASSIVE)
+    ser.write(SAFE)
     print("sending beep to roomba")
-    serialWrite(BEEP)
+    ser.write(BEEP)
 
     
-def serialWrite(s):
-    ser.write(s.encode())
+#def serialWrite(s):
+#    ser.write(s.encode())
 
     
 def negative(x):
@@ -58,9 +57,9 @@ def readAll():
 
 def move(motorAHigh, motorALow, motorBHigh, motorBLow):
     print("move", motorAHigh, motorALow, motorBHigh, motorBLow)
-    serialWrite(chr(146) + chr(motorAHigh) + chr(motorALow) + chr(motorBHigh) + chr(motorBLow))
+    ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
     time.sleep(0.3)
-    serialWrite(chr(146) + chr(0) + chr(0) + chr(0) + chr(0))
+    ser.write(bytes([146, 0, 0, 0, 0]))
 
 
 def inputFromKeyboard():
@@ -68,7 +67,7 @@ def inputFromKeyboard():
     while True:
         data = input("PROMPT>")
         if data == "beep":
-            serialWrite(BEEP)
+            ser.write(BEEP)
         elif data == 'l':
             move(0, 100, 0, 0)        
         elif data == 'r':
@@ -85,7 +84,8 @@ def inputFromKeyboard():
             print("num", num, "end")
             c = chr(num)
             print("char", c, "end")
-            serialWrite(c)
+            #ser.write(c)
+            ser.write(bytes([num]))
         ser.flush()
 
 
