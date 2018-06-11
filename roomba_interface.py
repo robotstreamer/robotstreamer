@@ -16,20 +16,24 @@ BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
 movementSystemActive = False
 
 
+
 def handleCommand(command, keyPosition):
 
+    global lastCommand
+
     print("handling command")
-    
+
     if command == 'L':
-        move(100, -100)        
+        move(100, -100, 0, .20, 0)
     elif command == 'R':
-        move(-100, 100)
+        move(-100, 100, 0, .20, 0)
     elif command == 'F':
-        move(100, 100)
+        move(100, 100, .09, .40, .18)
     elif command == 'B':
-        move(-100, -100)
+        move(-100, -100, .09, .40, .18)
 
 
+        
 
 def init():
     print("init roomba")
@@ -59,12 +63,14 @@ def twosComp(x):
     return x
         
 
-def move(motorA, motorB):
+def move(motorA, motorB, rampUpTime, fullSpeedTime, rampDownTime):
 
+    global movementSystemActive
+    
     motorA1 = twosComp(motorA)
-    motorA2 = twosComp(int(motorA / 2))
+    motorA2 = twosComp(int(motorA / 3))
     motorB1 = twosComp(motorB)
-    motorB2 = twosComp(int(motorB / 2))
+    motorB2 = twosComp(int(motorB / 3))
 
     # set high bytes
     if motorA < 0:
@@ -76,21 +82,21 @@ def move(motorA, motorB):
     else:
         highB = 0
         
-    global movementSystemActive
+
     if not movementSystemActive:
         movementSystemActive = True
 
         # ramp up
         rawMove(highA, motorA2, highB, motorB2)
-        time.sleep(0.05)
+        time.sleep(rampUpTime)
 
         # move full speed
         rawMove(highA, motorA1, highB, motorB1)
-        time.sleep(0.2)
+        time.sleep(fullSpeedTime)
 
         # ramp down
         rawMove(highA, motorA2, highB, motorB2)
-        time.sleep(0.15)
+        time.sleep(rampDownTime)
 
         # stop
         rawMove(0, 0, 0, 0)
@@ -112,15 +118,15 @@ def inputFromKeyboard():
         if data == "beep":
             ser.write(BEEP)
         elif data == 'l':
-            move(100, -100)        
+            move(100, -100, True, .05, .2, .25)
         elif data == 'r':
-            move(-100, 100)
+            move(-100, 100, True, .05, .2, .25)
         elif data == 'f':
-            move(100, 100)
+            move(100, 100, True, .05, .2, .25)
         elif data == 'b':
-            move(-100, -100)
+            move(-100, -100, True, .05, .2, .25)
         elif data == 's': #stop
-            move(0, 0, 0, 0)
+            move(0, 0, 0, 0, True, .05, .2, .25)
         else:
             print("data:", data)
             num = int(data, 10)
