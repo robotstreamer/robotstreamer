@@ -106,6 +106,9 @@ def move(motorA, motorB, rampUpTime, fullSpeedTime, rampDownTime):
         
 def rawMove(motorAHigh, motorALow, motorBHigh, motorBLow):
 
+    ser.write(bytes([128])
+    ser.write(bytes([131])              
+    
     print("raw move", motorAHigh, motorALow, motorBHigh, motorBLow)
     ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
 
