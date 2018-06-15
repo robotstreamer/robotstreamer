@@ -91,7 +91,7 @@ sudo make install
 
 
 
-<h2> Bring you Bot to life: Programs to run on the Raspberry Pi </h2>
+<h2> Bring your Bot to life: Programs to run on the Raspberry Pi </h2>
 
 Start by cloning the robotstreamer repository
 ```
