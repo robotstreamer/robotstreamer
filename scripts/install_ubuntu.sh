@@ -66,6 +66,7 @@ sudo apt-get -y install build-essential
 sudo apt-get -y install nasm
 sudo apt-get -y install espeak
 sudo apt-get -y install python3-pip
+sudo apt-get -y install git
 
 sudo python3 -m pip install websockets
 
