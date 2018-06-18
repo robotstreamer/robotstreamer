@@ -12,11 +12,9 @@ import uuid
 import audio
 
 
+apiHost = "http://api.robotstreamer.com:8080"
 
-apiHost = "robotstreamer.com:6001"
-controlHost = "robotstreamer.com"
-#chatHostPort = {"host":"184.72.15.121", "port":8765}
-chatHostPort = {"host":"robotstreamer.com", "port":8765}
+
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
 tempDir = tempfile.gettempdir()
 messagesToTTS = []
@@ -80,6 +78,10 @@ elif commandArgs.type == "roomba":
 elif commandArgs.type == "humanoid":
             import humanoid_interface as interface
             interface.init()
+
+elif commandArgs.type == "blank":
+            import blank_interface as interface
+   
 
                                     
 
@@ -219,19 +221,33 @@ def say(message, voice='en-us'):
 
 
 
-def getControlHostPort():
+def getControlHost():
 
-        url = 'http://%s/get_control_host_port/%s' % (apiHost, commandArgs.robot_id)
+        url = apiHost+'/get_control_host_port/'+commandArgs.robot_id 
+
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
         print("response:", response)
         return json.loads(response)
             
+def getChatHost():
+
+        #url = apiHost+'/v1/get_endpoint/rschat/'+commandArgs.robot_id #only for individual
+        url = apiHost+'/v1/get_endpoint/rschat/100' 
+
+        response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
+        print("response:", response)
+        return json.loads(response)
+
 
 async def handleControlMessages():
 
-    port = getControlHostPort()['port']
-    print("handle control messages get control port, connecting to port:", port)
-    url = 'ws://%s:%s/echo' % (controlHost, port)
+
+    controlGet = getControlHost()
+    controlHost = controlGet['host']
+    controlPort = controlGet['port']
+
+    print("handle control messages get control port, connecting to port:", controlPort)
+    url = 'ws://%s:%s/echo' % (controlHost, controlPort)
 
     async with websockets.connect(url) as websocket:
 
@@ -256,7 +272,12 @@ async def handleControlMessages():
             
 async def handleChatMessages():
 
-    url = 'ws://%s:%s' % (chatHostPort['host'], chatHostPort['port'])
+
+    chatGet = getChatHost()
+    chatHost = chatGet['host']
+    chatPort = chatGet['port']
+
+    url = 'ws://%s:%s' % (chatHost, chatPort)
     print("chat url:", url)
 
     async with websockets.connect(url) as websocket:

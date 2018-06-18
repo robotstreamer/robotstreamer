@@ -8,8 +8,7 @@ import json
 import _thread
 
 
-
-ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json"
+ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json" #this is never used 
 
 KeepAlivePeriod = 6
 
@@ -77,14 +76,15 @@ def makePOST(url, data):
     return response
 
 
-def sendCameraAliveMessage(infoServerProtocol, infoServer, cameraID):
+def sendCameraAliveMessage(apiServer, cameraID):
 
     print("sending camera alive message")
-    url = '%s://%s/v1/set_camera_status' % (infoServerProtocol, infoServer)
+    url = '%s/v1/set_camera_status' % (apiServer)
     print("url", url)
     try:
             response = makePOST(url, {'camera_id': cameraID,
-                                      'camera_status':'online'})
+                                      'camera_status':'online'}) 
+                                    #todo:send unified stream key here
     except:
             print("could not make post to", url)
 

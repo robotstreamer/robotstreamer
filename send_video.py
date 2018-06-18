@@ -32,12 +32,9 @@ class DummyProcess:
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
 parser.add_argument('video_device_number', default=0, type=int)
-#parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
-parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
-parser.add_argument('--info-server-protocol', default="http", help="either https or http")
-parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
-parser.add_argument('--app-server-socketio-port', default=8022, help="typically use 8022 for prod, 8122 for dev, and 8125 for dev2")
-parser.add_argument('--api-server', help="Server that robot will connect to listen for API update events", default='api.robotstreamer.com')
+
+
+parser.add_argument('--api-server', help="Server that robot will connect to listen for API update events", default='http://api.robotstreamer.com:8080')
 parser.add_argument('--xres', type=int, default=768)
 parser.add_argument('--yres', type=int, default=432)
 parser.add_argument('--audio-device-number', default=1, type=int)
@@ -72,8 +69,6 @@ robotSettings = None
 resolutionChanged = False
 currentXres = None
 currentYres = None
-server = 'robotstreamer.com'
-infoServer = commandArgs.info_server
 apiServer = commandArgs.api_server
 
 audioProcess = None
@@ -83,36 +78,6 @@ videoProcess = None
 
 # enable raspicam driver in case a raspicam is being used
 os.system("sudo modprobe bcm2835-v4l2")
-
-
-#if commandArgs.env == "dev":
-#    print("using dev port 8122")
-#    port = 8122
-#elif commandArgs.env == "dev2":
-#    print("using dev port 8125")
-#    port = 8125
-#elif commandArgs.env == "prod":
-#    print("using prod port 8022")
-#    port = 8022
-#else:
-#    print("invalid environment")
-#    sys.exit(0)
-
-
-print("initializing socket io")
-print("server:", server)
-#print("port:", port)
-
-
-
-
-infoServerProtocol = commandArgs.info_server_protocol
-
-print("trying to connect to app server socket io", commandArgs.app_server_socketio_host, commandArgs.app_server_socketio_port)
-#todo need to assiciated with robotstreamer appServerSocketIO = SocketIO(commandArgs.app_server_socketio_host, commandArgs.app_server_socketio_port, LoggingNamespace)
-appServerSocketIO = None
-print("finished initializing app server socket io")
-
 
 
 
@@ -156,67 +121,26 @@ def runAndMonitor(label, command):
     Thread(target=printOutput, args=[label, q]).start()
     return process
 
-
-
-
-
-
-#def makePOST(url, data):
-
-
 def getVideoEndpoint():
-    url = '%s://%s/v1/get_endpoint/jsmpeg_video_capture/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+    url = '%s/v1/get_endpoint/jsmpeg_video_capture/%s' % (apiServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
     return json.loads(response)
 
 def getAudioEndpoint():
-    url = '%s://%s/v1/get_endpoint/jsmpeg_audio_capture/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
-    response = robot_util.getWithRetry(url)
-    return json.loads(response)
-
-
-#def getVideoPort():
-#
-#    url = '%s://%s/get_video_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
-#    response = robot_util.getWithRetry(url)
-#    return json.loads(response)['mpeg_stream_port']
-
-
-
-#def getAudioPort():
-#
-#    url = '%s://%s/get_audio_port/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
-#    response = robot_util.getWithRetry(url)
-#    return json.loads(response)['audio_stream_port']
-
-
-#todo this function probably should be removed
-def getRobotID():
-
-    #todo: need to get from api
-    return 100
-
-    url = '%s://%s/get_robot_id/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
-    response = robot_util.getWithRetry(url)
-    return json.loads(response)['robot_id']
-
-def getWebsocketRelayHost():
-    url = '%s://%s/get_websocket_relay_host/%s' % (infoServerProtocol, infoServer, commandArgs.camera_id)
+    url = '%s/v1/get_endpoint/jsmpeg_audio_capture/%s' % (apiServer, commandArgs.camera_id)
     response = robot_util.getWithRetry(url)
     return json.loads(response)
 
 def getOnlineRobotSettings(robotID):
-    url = 'https://%s/api/v1/robots/%s' % (apiServer, robotID)
+    url = '%s/api/v1/robots/%s' % (apiServer, robotID)
     response = robot_util.getWithRetry(url)
     return json.loads(response)
 
-def identifyRobotId():
-    #todo need to implement for robotstreamer appServerSocketIO.emit('identify_robot_id', robotID);
-    pass
-
-
 def randomSleep():
-    """A short wait is good for quick recovery, but sometimes a longer delay is needed or it will just keep trying and failing short intervals, like because the system thinks the port is still in use and every retry makes the system think it's still in use. So, this has a high likelihood of picking a short interval, but will pick a long one sometimes."""
+    """A short wait is good for quick recovery, but sometimes a longer delay is needed or it will just keep 
+    trying and failing short intervals, like because the system thinks the port is still in use and every retry 
+    makes the system think it's still in use. So, this has a high likelihood of picking a short interval, 
+    but will pick a long one sometimes."""
 
     timeToWait = random.choice((0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1))
     t = timeToWait * 12.0
@@ -227,17 +151,11 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
-    #videoPort = getVideoPort()
     videoEndpoint = getVideoEndpoint()
-    print("start video capture, video endpoint:", videoEndpoint)
-
-    #todo, use api
-    #websocketRelayHost = getWebsocketRelayHost()
-    #print("websocket relay host for video:", websocketRelayHost)
-
-    #videoHost = websocketRelayHost['host']
-    #videoHost = "184.169.234.241"
     videoHost = videoEndpoint['host']
+    videoPort = videoEndpoint['port']
+
+    print("start video capture, video endpoint:", videoEndpoint)
 
 
     # set brightness
@@ -256,35 +174,32 @@ def startVideoCaptureLinux():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
 
-    videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoEndpoint['port'], xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
+    videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} \
+                        -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'\
+                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(),\
+                        kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)
 
     #return subprocess.Popen(shlex.split(videoCommandLine))
     return runAndMonitor("video", shlex.split(videoCommandLine))
-    
-
-    #return subprocess.Popen(shlex.split(videoCommandLine))
 
 
 
 def startAudioCaptureLinux():
 
-    #audioPort = getAudioPort()
+
     audioEndpoint = getAudioEndpoint()
-
-    #websocketRelayHost = getWebsocketRelayHost()
-
-    #audioHost = websocketRelayHost['host']
-    #audioHost = "184.169.234.241"
     audioHost = audioEndpoint['host']
+    audioPort = audioEndpoint['port']
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
         audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
 
     #audioCommandLine = '%s -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
-    audioCommandLine = '%s -f alsa -ar 48000 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
+    audioCommandLine = '%s -f alsa -ar 48000 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
+                        % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
     #return subprocess.Popen(shlex.split(audioCommandLine))
     return runAndMonitor("audio", shlex.split(audioCommandLine))
@@ -428,15 +343,10 @@ def main():
     # overrides command line parameters using config file
     print("args on command line:", commandArgs)
 
+    robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id)
+    #starts the backend services and
 
-    robotID = getRobotID()
-    identifyRobotId()
-
-    robot_util.sendCameraAliveMessage(infoServerProtocol,
-                                      infoServer,
-                                      commandArgs.camera_id)
-
-    print("robot id:", robotID)
+    print("camera id:", commandArgs.camera_id)
 
     refreshFromOnlineSettings()
 
@@ -446,9 +356,6 @@ def main():
     # appServerSocketIO.on('command_to_robot', onCommandToRobot)
     # appServerSocketIO.on('connection', onConnection)
     # appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
-
-
-
 
 
 
@@ -524,13 +431,8 @@ def main():
             print("")
             print("sending camera alive message")
             print("")
-            robot_util.sendCameraAliveMessage(infoServerProtocol,
-                                              infoServer,
+            robot_util.sendCameraAliveMessage(apiServer,
                                               commandArgs.camera_id)
-
-
-        if (count % 60) == 0:
-            identifyRobotId()
 
 
 
