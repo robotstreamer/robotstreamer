@@ -95,7 +95,7 @@ sudo python3 setup.py install &&\
 #make -j4 &&\
 #sudo make install
 
-sudo apt-get install ffmpeg
+sudo apt-get -y install ffmpeg
 
 cd ~ &&\
 git clone https://github.com/robotstreamer/robotstreamer &&\
