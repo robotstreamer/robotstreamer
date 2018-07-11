@@ -264,6 +264,7 @@ async def handleChatMessages():
             j = json.loads(message)
             print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True and (j['robot_id'] == commandArgs.robot_id):
+                        del messagesToTTS[:]
                         messagesToTTS.append(j['message'])
                         #if audio.espeakBytes(j['message']) < 400000:
                         #            print("length", audio.espeakBytes(j['message']))
