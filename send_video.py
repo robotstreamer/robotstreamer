@@ -52,6 +52,8 @@ parser.add_argument('--screen-capture', dest='screen_capture', action='store_tru
 parser.set_defaults(screen_capture=False)
 parser.add_argument('--no-mic', dest='mic_enabled', action='store_false')
 parser.set_defaults(mic_enabled=True)
+parser.add_argument('--no-restart-on-video-fail', dest='restart_on_video_fail', action='store_false')
+parser.set_defaults(restart_on_video_fail=True)
 parser.add_argument('--no-audio-restart', dest='audio_restart_enabled', action='store_false')
 parser.set_defaults(audio_restart_enabled=True)
 parser.add_argument('--no-camera', dest='camera_enabled', action='store_false')
@@ -60,6 +62,8 @@ parser.add_argument('--dry-run', dest='dry_run', action='store_true')
 parser.add_argument('--mic-channels', type=int, help='microphone channels, typically 1 or 2', default=1)
 parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)') # currently, this option is only used for windows screen capture
 parser.add_argument('--stream-key', default='hellobluecat')
+parser.add_argument('--ffmpeg-path', default='/usr/local/bin/ffmpeg')
+
 
 charCount = {}
 lastCharCount = None
@@ -252,7 +256,7 @@ def startVideoCaptureLinux():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
 
-    videoCommandLine = '/usr/local/bin/ffmpeg -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoEndpoint['port'], xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
+    videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'.format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(), kbps=robotSettings.kbps, video_host=videoHost, video_port=videoEndpoint['port'], xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)
 
@@ -279,8 +283,8 @@ def startAudioCaptureLinux():
     if robotSettings.audio_device_name is not None:
         audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
 
-    audioCommandLine = '/usr/local/bin/ffmpeg -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
-
+    #audioCommandLine = '%s -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
+    audioCommandLine = '%s -f alsa -ar 48000 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
     print(audioCommandLine)
     #return subprocess.Popen(shlex.split(audioCommandLine))
     return runAndMonitor("audio", shlex.split(audioCommandLine))
@@ -475,7 +479,7 @@ def main():
 
     # loop forever and monitor status of ffmpeg processes
     while True:
-
+        
         print("-----------------" + str(count) + "-----------------")
 
         #todo: start using this again
@@ -497,9 +501,10 @@ def main():
 
 
         if numVideoRestarts > 20:
-            print("rebooting in 20 seconds because of too many restarts. probably lost connection to camera")
-            time.sleep(20)
-            os.system("sudo reboot")
+            if commandArgs.restart_on_video_fail:
+                print("rebooting in 20 seconds because of too many restarts. probably lost connection to camera")
+                time.sleep(20)
+                os.system("sudo reboot")
 
         if count % 20 == 0:
             try:
@@ -516,6 +521,9 @@ def main():
 
 
         if (count % robot_util.KeepAlivePeriod) == 0:
+            print("")
+            print("sending camera alive message")
+            print("")
             robot_util.sendCameraAliveMessage(infoServerProtocol,
                                               infoServer,
                                               commandArgs.camera_id)

@@ -11,7 +11,7 @@ import _thread
 
 ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json"
 
-KeepAlivePeriod = 60
+KeepAlivePeriod = 6
 
 
 def times(lst, number):

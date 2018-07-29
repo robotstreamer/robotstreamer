@@ -76,7 +76,12 @@ elif commandArgs.type == "gopigomessedup":
 elif commandArgs.type == "roomba":
             import roomba_interface as interface
             interface.init()
-            
+
+elif commandArgs.type == "humanoid":
+            import humanoid_interface as interface
+            interface.init()
+
+                                    
 
             
 
@@ -93,7 +98,14 @@ def setVolume(percent):
             print("setting volume to", percent, "%")
             for cardNumber in range(0, 5):
                         for numid in range(0,5):
+                                    if cardNumber == 1 and numid == 3:
+                                                # this is audio input level so don't set it
+                                                continue
+                                    print("---------------------")
+                                    print("setting card number:", cardNumber, "numid:", numid)
                                     os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
+                                    print("---------------------")
+                                    #time.sleep(5)
             
 
 def espeak(hardwareNumber, message, voice):
@@ -218,7 +230,7 @@ def getControlHostPort():
 async def handleControlMessages():
 
     port = getControlHostPort()['port']
-    print("connecting to port:", port)
+    print("handle control messages get control port, connecting to port:", port)
     url = 'ws://%s:%s/echo' % (controlHost, port)
 
     async with websockets.connect(url) as websocket:
@@ -264,7 +276,6 @@ async def handleChatMessages():
             j = json.loads(message)
             print("message:", j)
             if ('message' in j) and ('tts' in j) and j['tts'] == True and (j['robot_id'] == commandArgs.robot_id):
-                        del messagesToTTS[:]
                         messagesToTTS.append(j['message'])
                         #if audio.espeakBytes(j['message']) < 400000:
                         #            print("length", audio.espeakBytes(j['message']))
