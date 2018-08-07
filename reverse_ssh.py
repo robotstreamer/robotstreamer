@@ -109,16 +109,17 @@ async def handleStatusMessages():
 
 
 def startStatus():
-        time.sleep(2) #todo: only wait as needed (wait for interenet)
-        print("restarting loop")
 
+        while True:
+                time.sleep(2) #todo: only wait as needed (wait for interenet)
+                print("starting asyncio new event loop")
 
         
-        try:
-                asyncio.new_event_loop().run_until_complete(handleStatusMessages())
-        except:
-                print("error")
-                traceback.print_exc()
+                try:
+                        asyncio.new_event_loop().run_until_complete(handleStatusMessages())
+                except:
+                        print("error: asyncio.new_event_loop has crashed")
+                        traceback.print_exc()
 
 
                 
