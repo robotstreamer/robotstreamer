@@ -4,7 +4,7 @@ import _thread
 import sys
 
 
-ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
+ser = serial.Serial(port='/dev/ttyAMA0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
 
