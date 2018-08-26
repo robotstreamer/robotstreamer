@@ -268,8 +268,5 @@ Relays control messages sent from the web clients to the robot
 
 
 
-<h4>References</h4>
-
-This is a fork of the runmyrobot/runmyrobot (github) open source project.
 
 
