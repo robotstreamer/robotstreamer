@@ -12,7 +12,6 @@ import uuid
 import audio
 
 
-apiHost = "http://api.robotstreamer.com:8080"
 
 
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
@@ -40,13 +39,15 @@ parser.add_argument('--type', default="rsbot")
 parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
-
+parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 
 
 commandArgs = parser.parse_args()
 
 print(commandArgs)
 
+
+apiHost = commandArgs.api_url
 
 if commandArgs.type == "rsbot":
             print("initializing rsbot")
