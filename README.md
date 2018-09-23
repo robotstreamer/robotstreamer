@@ -188,20 +188,13 @@ insert following line and save:
 That's it!
 
 
-
-
-
-<h1> Hardware Compatibility </h1>
+<h2> Hardware Compatibility </h2>
 
 Adafruit Motor Hat
 
 Serial Port based commands
 
 GoPiGo
-
-L298N
-
-MotoZero
 
 Missing something?, you can add it, open source!
 
