@@ -5,7 +5,7 @@ RobotStreamer is a low latency live streaming platform. Stream from you desktop.
 
 Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
-You can create streams with Robots (movable cameras with TTS) and you can also create tradional live streams from the desktop as you would on Youtube, Twitch, or Mixer for example.
+You can create streams with Robots (movable cameras with TTS) and you can also create tradional live streams from the desktop. We currently use a different protocol than most live streaming platforms for lower latency.
 
 
 
