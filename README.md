@@ -13,7 +13,22 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 
 <br>
 
-<h2> Quick Install </h2>
+<h2> Normal Desktop Live Stream: Installation
+
+There are two ways to stream from your Desktop to RobotStreamer:
+
+
+Recommended: On desktop, you can stream using OBS, follow instructions here:
+https://github.com/robotstreamer/robotstreamer_win_obs
+
+You can also stream directly using ffmpeg. Use instructions below but send_video_windows.py rather than just send_video.
+
+Note that you'll want to visit the discord for questions and such. Streaming from Desktop is still a beta feature.
+https://discord.gg/n6B7ymy
+
+
+
+<h2> Robot Live Stream: Installation </h2>
 
 
 Copy this into the terminal, and follow the instructions.
@@ -64,40 +79,11 @@ The RasPi will need the following things install so it can talk to your motor an
 ```pip install socketIO-client```
 
 
-(4) Install alsa-lib
-```
-cd /usr/local/src 
-wget ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.0.25.tar.bz2 
-tar xjf alsa-lib-1.0.25.tar.bz2
-cd /usr/local/src/alsa-lib-1.0.25 
-./configure --host=arm-unknown-linux-gnueabi 
-make -j4 
-sudo make install
-```
-
-(5) Install x264
-```
-cd /usr/local/src
-git clone git://git.videolan.org/x264
-cd x264
-./configure --host=arm-unknown-linux-gnueabi --enable-static --disable-opencl
-make -j4
-sudo make install
-```
-
-(6) Install FFmpeg
-```
-cd /usr/local/src
-git clone https://github.com/FFmpeg/FFmpeg.git
-cd FFmpeg
-./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree --enable-gnutls --extra-libs=-ldl
-make -j4
-sudo make install
-```
+(4) Install FFmpeg
+sudo apt-get install ffmpeg
 
 
-
-<h2> Bring your Bot to life: Programs to run on the Raspberry Pi </h2>
+<h2> Robot Stream: Bring your Bot to life: Programs to run on the Raspberry Pi </h2>
 
 Start by cloning the robotstreamer repository
 ```
