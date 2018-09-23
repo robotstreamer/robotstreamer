@@ -12,7 +12,7 @@ We have a system called funbits that lets the streamers monetize their streams.
 
 <br>
 
-<h2> Normal Desktop Live Stream: Installation </h2>
+<h2> Desktop Live Stream: Installation </h2>
 
 There are two ways to stream from your Desktop to RobotStreamer:
 
