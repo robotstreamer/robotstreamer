@@ -10,7 +10,7 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 
 <br>
 
-<h2> Normal Desktop Live Stream: Installation
+<h2> Normal Desktop Live Stream: Installation </h2>
 
 There are two ways to stream from your Desktop to RobotStreamer:
 
