@@ -8,7 +8,7 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 
 <img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
-<img align="right" height=375 width=400 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
+<img align="right" height=125 width=193 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
 
 <br>
