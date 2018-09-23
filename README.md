@@ -27,6 +27,11 @@ https://discord.gg/n6B7ymy
 
 <h2> Robot Live Stream: Installation </h2>
 
+RobotStreamer runs some software on your robot to connect to the server and send audio/video streams. If you'd like to order a robot, contact rick at rgiuly@gmail.com or you can make your own.
+
+We typically test with Raspberry Pi on Raspian but you can use other hardware and OS's also if you know what you are doing.
+
+Installation:
 
 Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
