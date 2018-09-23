@@ -232,14 +232,13 @@ https://www.dexterindustries.com/GoPiGo/get-started-with-the-gopigo3-raspberry-p
 
 <h1> High Level Overview </h1>
 
-![robot client topology](https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/documentation/RobotClientTopology.png)
+The robot communicates with our control server via websockets. It communicates with our audio and video stream servers via http stream. Users connect to our servers.
 
 The robot client connects via websockets to the API service to retrieve configuration information, to the chat to receive chat messages, the video/audio relays to send its camera and microphone capture, and to the control service to receive user commands.
 
 <h2>Interfaces: </h2>
-Control server via socket.io
-Application server via socket.io and HTTP
-Chat server via socket.io
+Control server via websockets
+Chat server via websockets
 Sends video stream via websockets
 Sends audio stream via websockets
 
