@@ -3,8 +3,9 @@
 
 RobotStreamer is a low latency live streaming platform. Stream from you desktop. Connect your movable cameras with TTS (robots) to *RobotStreamer.com*.
 
-Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language (F-bombs and such), it's up to the broadcaster to decide how they want to moderate if at all.
+Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
+You can create streams with Robots (movable cameras with TTS) and you can also create tradional live streams from the desktop as you would on Youtube, Twitch, or Mixer for example.
 
 
 
@@ -14,11 +15,10 @@ Broadcasters make the rules for their channels. RobotStreamer is open minded and
 
 There are two ways to stream from your Desktop to RobotStreamer:
 
-
-Recommended: On desktop, you can stream using OBS, follow instructions here:
+On desktop, you can stream using OBS and ffmpeg, follow instructions here:
 https://github.com/robotstreamer/robotstreamer_win_obs
 
-You can also stream directly using ffmpeg. Use instructions below but send_video_windows.py rather than just send_video.
+You can also stream directly using just ffmpeg although you may have issues with quality. Use instructions below but send_video_windows.py rather than just send_video.
 
 Note that you'll want to visit the discord for questions and such. Streaming from Desktop is still a beta feature.
 https://discord.gg/n6B7ymy
