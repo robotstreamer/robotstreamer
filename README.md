@@ -9,9 +9,6 @@ You can create streams with Robots (movable cameras with TTS), that's our specia
 
 We have a system called funbits that lets the streamers monetize their streams.
 
-
-<br>
-
 <h2> Desktop Live Stream: Installation </h2>
 
 There are two ways to stream from your Desktop to RobotStreamer:
