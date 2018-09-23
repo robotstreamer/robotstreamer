@@ -9,7 +9,7 @@ You can create streams with Robots (movable cameras with TTS), that's our specia
 
 We have a system called funbits that lets the streamers monetize their streams.
 
-<h2> Desktop Live Stream: Installation </h2>
+<h1> Desktop Live Stream: Installation </h1>
 
 There are two ways to stream from your Desktop to RobotStreamer:
 
@@ -28,7 +28,7 @@ https://discord.gg/n6B7ymy
 
 
 
-<h2> Robot Live Stream: Installation </h2>
+<h1> Robot Live Stream: Installation </h1>
 
 RobotStreamer runs some software on your robot to connect to the server and send audio/video streams. If you'd like to order a robot, contact rick at rgiuly@gmail.com or you can make your own.
 
@@ -230,7 +230,7 @@ Reference:
 https://www.dexterindustries.com/GoPiGo/get-started-with-the-gopigo3-raspberry-pi-robot/test-and-troubleshoot-the-gopigo3-raspberry-pi-robot/
 
 
-<h1> High Level Overview </h1>
+<h2> High Level Overview </h2>
 
 The robot communicates with our control server via websockets. It communicates with our audio and video stream servers via http stream. Users connect to our servers.
 
