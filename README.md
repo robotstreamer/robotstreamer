@@ -3,10 +3,11 @@
 
 RobotStreamer is a low latency live streaming platform. Stream from you desktop. Connect your movable cameras with TTS (robots) to *RobotStreamer.com*.
 
-Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
+Broadcasters make the rules for their channels. Unlike most platforms, RobotStreamer is open to just about any content. Just maintain basic ethical decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
-You can create streams with Robots (movable cameras with TTS) and you can also create tradional live streams from the desktop. We currently use a different protocol than most live streaming platforms for lower latency.
+You can create streams with Robots (movable cameras with TTS), that's our specialty, and you can also create tradional live IRL streams or game streams from the desktop. We currently use a different protocol than most live streaming platforms for lower latency.
 
+We have a system called funbits that lets the streamers monetize their streams.
 
 
 <br>
