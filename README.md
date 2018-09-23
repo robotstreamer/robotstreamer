@@ -27,7 +27,6 @@ https://discord.gg/n6B7ymy
 
 <h2> Robot Live Stream: Installation </h2>
 
-<img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
 Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
@@ -51,8 +50,8 @@ IMPORTANT: Particularly you need a stream key for controller.py and you should a
 ```
 python controller.py --stream-key YOURKEYHERE ...
 ```
+<img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
-<img align="right" height=236 width=193 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
 To edit your start_robot file, put this into the terminal.
 
@@ -77,6 +76,7 @@ The RasPi will need the following things install so it can talk to your motor an
 
 ```pip install socketIO-client```
 
+<img align="right" height=236 width=193 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
 (4) Install FFmpeg
 sudo apt-get install ffmpeg
