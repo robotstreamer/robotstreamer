@@ -1,10 +1,16 @@
 <h1> Open Robot Control Code For Connecting to RobotStreamer.com </h1>
 <br>
 
-robotstreamer an open source project you can use to connect your robot to *RobotStreamer.com*, a new low latency streaming and control platform for robots and games.
+RobotStreamer is a low latency live streaming platform. Stream from you desktop. Connect your movable cameras with TTS (robots) to *RobotStreamer.com*.
 
-<img align="right" width="150" height="80" src="images/freedom.png">
 Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language (F-bombs and such), it's up to the broadcaster to decide how they want to moderate if at all.
+
+
+<img align="right" src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
+
+<img align="right" src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
+
+
 <br>
 
 <h2> Quick Install </h2>
