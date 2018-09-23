@@ -3,11 +3,18 @@
 
 RobotStreamer is a low latency live streaming platform. Stream from you desktop. Connect your movable cameras with TTS (robots) to *RobotStreamer.com*.
 
-Broadcasters make the rules for their channels. Unlike most platforms, RobotStreamer is open to just about any content. Just maintain basic ethical decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
+Broadcasters make the rules for their channels. Unlike most platforms, RobotStreamer is open to just about any content. Edgy stuff is welcome here. It is the internet after all. Just maintain basic ethical decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
 You can create streams with Robots (movable cameras with TTS), that's our specialty, and you can also create tradional live IRL streams or game streams from the desktop. We currently use a different protocol than most live streaming platforms for lower latency.
 
 We have a system called funbits that lets the streamers monetize their streams.
+
+
+<h1> How to contribute </h1>
+
+Making your own live stream or robot? We'd like to hear from you. Join our discord and let us know what you are interested in doing.
+https://discord.gg/n6B7ymy
+
 
 <h1> Desktop Live Stream: Installation </h1>
 
@@ -180,13 +187,8 @@ insert following line and save:
 
 That's it!
 
-<h2> How does this work </h2>
 
-We use ffmpeg to stream audio and socket.io to send control messages.
 
-<h2> How to contribute </h2>
-
-The is a community project. Making your own bot? Adding your own control stuff? Cool! We'd like to hear from you.
 
 
 <h1> Hardware Compatibility </h1>
@@ -204,7 +206,7 @@ MotoZero
 Missing something?, you can add it, open source!
 
 
-<h1> Instructions for Specific Hardward Configurations </h1>
+<h2> Instructions for Specific Hardward Configurations </h2>
 
 <h2> GoPiGo3 </h2>
 
@@ -230,7 +232,7 @@ Reference:
 https://www.dexterindustries.com/GoPiGo/get-started-with-the-gopigo3-raspberry-pi-robot/test-and-troubleshoot-the-gopigo3-raspberry-pi-robot/
 
 
-<h2> High Level Overview </h2>
+<h1> How Does This Work </h1>
 
 The robot communicates with our control server via websockets. It communicates with our audio and video stream servers via http stream. Users connect to our servers.
 
