@@ -6,7 +6,7 @@ RobotStreamer is a low latency live streaming platform. Stream from you desktop.
 Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language (F-bombs and such), it's up to the broadcaster to decide how they want to moderate if at all.
 
 
-<img align="right" height=400 width=375 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
+<img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
 <img align="right" height=375 width=400 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
