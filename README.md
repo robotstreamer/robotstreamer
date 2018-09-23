@@ -6,9 +6,6 @@ RobotStreamer is a low latency live streaming platform. Stream from you desktop.
 Broadcasters make the rules for their channels. RobotStreamer is open minded and doesn't impose many rules as a site, just basic decency, keep it legal, and keep it entertaining. For language (F-bombs and such), it's up to the broadcaster to decide how they want to moderate if at all.
 
 
-<img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
-
-<img align="right" height=236 width=193 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
 
 <br>
@@ -30,6 +27,7 @@ https://discord.gg/n6B7ymy
 
 <h2> Robot Live Stream: Installation </h2>
 
+<img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
 Copy this into the terminal, and follow the instructions.
 This script has been tested on a Raspberry Pi 3, with a fresh flash of raspian stretch.
@@ -54,6 +52,7 @@ IMPORTANT: Particularly you need a stream key for controller.py and you should a
 python controller.py --stream-key YOURKEYHERE ...
 ```
 
+<img align="right" height=236 width=193 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_roomba.jpg">
 
 To edit your start_robot file, put this into the terminal.
 
