@@ -1,10 +1,10 @@
 #!/usr/bin/bash
-declare installdirectory=$(pwd) userinput;
+declare userinput
 echo 'This script will install the dependencies for robotstreamer.';
 echo 'You will be required to enter the password for root, because dnf requires root privileges to install packages.';
 echo 'It will the download the source code from the robotstreamer github.';
 echo 'This source code will be placed in the working directory: ';
-echo "$installdirectory";
+pwd;
 echo 'Type y and press enter to continue:'
 read userinput;
 [ "$userinput" == 'y' ] || exit;
