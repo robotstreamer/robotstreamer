@@ -115,7 +115,7 @@ def rawMove(motorAHigh, motorALow, motorBHigh, motorBLow):
     #ser.write(bytes([128,128])
     #ser.write(bytes([131])
     ser.write(bytes([128]))
-    ser.write(bytes([131]))
+    ser.write(bytes([132]))
     ser.write(bytes([146, motorAHigh, motorALow, motorBHigh, motorBLow]))
 
 
