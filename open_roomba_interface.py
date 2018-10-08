@@ -2,9 +2,11 @@ import serial
 import time
 import _thread
 import sys
+import robot_util
 
 
-ser = serial.Serial(port='/dev/ttyAMA0', baudrate=115200)
+ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
+#ser = serial.Serial(port='/dev/ttyAMA0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
 
@@ -32,8 +34,9 @@ def handleCommand(command, keyPosition):
     elif command == 'B':
         move(-100, -100, .09, .40, .18)
 
+    robot_util.handleSoundCommand(command, keyPosition)
 
-        
+    
 
 def init():
     print("init roomba")
