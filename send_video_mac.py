@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
 parser.add_argument('--info-server-protocol', default="http", help="either https or http")
 parser.add_argument('camera_id')
-parser.add_argument('--kbps', default=2500, type=int)
+parser.add_argument('--kbps', default=650, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
 parser.add_argument('--saturation', type=int, help='camera saturation')
@@ -110,7 +110,7 @@ def macVideoCapture(videoPort):
         number = 1
 
 
-    videoCommandLine = 'ffmpeg -f avfoundation %s -i %d:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (frameRateArgument, number, commandArgs.kbps, server, videoPort)
+    videoCommandLine = 'ffmpeg -r 30 -f avfoundation %s -i %d:none -f mpegts -codec:v mpeg1video -s 640x480 -b:v %dk -bf 0 -muxdelay 0.001 http://%s:%s/hellobluecat/640/480/' % (frameRateArgument, number, commandArgs.kbps, server, videoPort)
 
     # kill other instances if they exist
     os.system("pkill -f %d:none" % number)
