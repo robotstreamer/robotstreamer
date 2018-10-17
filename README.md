@@ -22,9 +22,13 @@ There are two ways to stream from your Desktop to RobotStreamer:
 
 
 On desktop, you can stream using OBS and ffmpeg, follow instructions here:
+
 Win:
+
 https://github.com/robotstreamer/robotstreamer_win_obs
+
 Mac:
+
 https://github.com/robotstreamer/robotstreamer_mac_obs
 
 
