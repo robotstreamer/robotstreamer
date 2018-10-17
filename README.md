@@ -20,8 +20,13 @@ https://discord.gg/n6B7ymy
 
 There are two ways to stream from your Desktop to RobotStreamer:
 
+
 On desktop, you can stream using OBS and ffmpeg, follow instructions here:
+Win:
 https://github.com/robotstreamer/robotstreamer_win_obs
+Mac:
+https://github.com/robotstreamer/robotstreamer_mac_obs
+
 
 You can also stream directly using just ffmpeg although you may have issues with quality. Use instructions below but send_video_windows.py rather than just send_video.
 
