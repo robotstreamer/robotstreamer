@@ -66,15 +66,24 @@ For Ubuntu 17.10 or later:
 sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/scripts/install_ubuntu.sh -O /tmp/install_ubuntu.sh && bash /tmp/install_ubuntu.sh
 ```
 
+To install your need your id's and keys to connect to robotstreamer.com. After logging in to website (and registering if needed), create your robot entry by going here. Fill in robot name and submit. The result will tell you your robot id, camera id, and stream key.
+http://robotstreamer.com/new_stream.html
 
+During installation, you will be prompted for a robot id and camera id.
 
-After end installtion, all the files needed should be installed and ready for use, but you still need to change some arguments in your "/home/pi/start_robot" file, to make it suit your robot.
+After installaction, you need to set the --stream-key parameter for send_video.py and for controller.py in the file "/home/pi/start_robot"
 
+For example:
 
-IMPORTANT: Particularly you need a stream key for controller.py and you should ask rgiuly@gmail.com for that. (We're working on making this easier so you don't have to ask.)
 ```
 python controller.py --stream-key YOURKEYHERE ...
 ```
+
+```
+python send_video.py --stream-key YOURKEYHERE ...
+```
+
+
 <img align="right" height=231 width=309 src="https://raw.githubusercontent.com/robotstreamer/images/master/robotstreamer_humanoid.jpg">
 
 
