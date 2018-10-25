@@ -76,6 +76,10 @@ elif commandArgs.type == "roomba":
             import roomba_interface as interface
             interface.init()
 
+elif commandArgs.type == "roomba_kristie":
+            import roomba_kristie_interface as interface
+            interface.init()
+            
 elif commandArgs.type == "open_roomba":
             import open_roomba_interface as interface
             interface.init()
