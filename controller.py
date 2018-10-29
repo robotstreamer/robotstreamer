@@ -88,6 +88,9 @@ elif commandArgs.type == "humanoid":
             import humanoid_interface as interface
             interface.init()
 
+elif commandArgs.type == "v4l2":
+            import v4l2_interface as interface
+
 elif commandArgs.type == "blank":
             import blank_interface as interface
    
