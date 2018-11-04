@@ -1,4 +1,6 @@
 import os
+from robot_util import times
+import robot_util
 
 def handleCommand(command, keyPosition):
     #fblr
@@ -7,6 +9,8 @@ def handleCommand(command, keyPosition):
 
     if keyPosition != "down":
         return
+
+    robot_util.handleSoundCommand(command, keyPosition)
 
     if command == 'F':
         print("onforward")
