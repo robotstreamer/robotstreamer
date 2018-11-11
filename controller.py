@@ -62,7 +62,7 @@ elif commandArgs.type == "windows_interface":
 
 elif commandArgs.type == "mac":
             import mac_interface as interface
-            
+
 elif commandArgs.type == "gopigo3":
             import gopigo3_interface as interface
 
@@ -70,7 +70,7 @@ elif commandArgs.type == "gopigo":
             import gopigo_interface as interface
 
 elif commandArgs.type == "gopigomessedup":
-            import gopigomessedup_interface as interface            
+            import gopigomessedup_interface as interface
 
 elif commandArgs.type == "roomba":
             import roomba_interface as interface
@@ -79,7 +79,7 @@ elif commandArgs.type == "roomba":
 elif commandArgs.type == "roomba_kristie":
             import roomba_kristie_interface as interface
             interface.init()
-            
+
 elif commandArgs.type == "open_roomba":
             import open_roomba_interface as interface
             interface.init()
@@ -91,13 +91,14 @@ elif commandArgs.type == "humanoid":
 elif commandArgs.type == "v4l2":
             import v4l2_interface as interface
 
+elif commandArgs.type == "tank":
+            import tank_interface as interface
+            interface.init(
+
 elif commandArgs.type == "blank":
             import blank_interface as interface
-   
 
-                                    
 
-            
 
 
 # set volume level
@@ -120,7 +121,7 @@ def setVolume(percent):
                                     os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
                                     print("---------------------")
                                     #time.sleep(5)
-            
+
 
 def espeak(hardwareNumber, message, voice):
 
@@ -191,7 +192,6 @@ def espeakMac(message, voice):
             os.system('cat ' + tempFilePath + ' | espeak')
 
             os.remove(tempFilePath)
-                
 
 
 
@@ -240,7 +240,7 @@ def getControlHost():
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
         print("response:", response)
         return json.loads(response)
-            
+
 def getChatHost():
 
         #url = apiHost+'/v1/get_endpoint/rschat/'+commandArgs.robot_id #only for individual
@@ -281,7 +281,7 @@ async def handleControlMessages():
                                                                j["key_position"]))
 
 
-            
+
 async def handleChatMessages():
 
 
@@ -318,9 +318,7 @@ async def handleChatMessages():
             else:
                 print("error, message not valid:", j)
 
-            
 
-            
 def startControl():
     print("waiting a few seconds")
     time.sleep(6) #todo: only wait as needed (wait for interent)
@@ -374,10 +372,9 @@ def runPeriodicTasks():
             if len(messagesToTTS) > 0 and numActiveEspeak == 0:
                         message = messagesToTTS.pop(0)
                         _thread.start_new_thread(say, (message,))
-                        
 
-            
-def main():                
+
+def main():
 
                        
             print(commandArgs)
@@ -395,7 +392,6 @@ def main():
                 runPeriodicTasks()
 
 
-                
 if __name__ == '__main__':
     main()
 
