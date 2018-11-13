@@ -33,7 +33,7 @@ class l298n_driver:
         #pwm COULD be used for speed although its better for current limit
         self.pwm = GPIO.PWM(self.enable, 1)  
         self.pwm.ChangeFrequency(10000)   
-        self.pwm.start(90)
+        self.pwm.start(100)
 
         self.movementSystemActive = False
         print("l298n_driver initialised")
