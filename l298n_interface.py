@@ -2,29 +2,6 @@ import time
 import RPi.GPIO as GPIO 
 
 movementSystemActive = False
-speed = 15000
-
-
-def handleCommand(command, keyPosition):
- 
-    global movementSystemActive
-    global speed
-
-    if keyPosition == "down":
-
-            if command == 'F':
-                l298n.move("left", speed, "false"); 
-                print("move interface F")
-            if command == 'B':
-                l298n.move("right", speed, "false"); 
-                print("move interface B")
-            if command == 'L':
-                l298n.move("forward", speed, "false"); 
-                print("move interface L")
-            if command == 'R':
-                l298n.move("backward", speed, "false"); 
-                print("move interface R")
-
 
 class l298n_driver:
 
@@ -53,19 +30,15 @@ class l298n_driver:
         GPIO.output(self.l1, 0)  
         GPIO.output(self.l2, 0) 
 
-        print("l298n_driver initialised")
+        #pwm COULD be used for speed although its better for current limit
         self.pwm = GPIO.PWM(self.enable, 1)  
         self.pwm.ChangeFrequency(10000)   
         self.pwm.start(90)
 
         self.movementSystemActive = False
+        print("l298n_driver initialised")
  
     def move(self, dir):
-
-
-        #self.pwm = GPIO.PWM(self.l1, 1)  
-        #self.pwm.ChangeFrequency(1000) 
-        #pwm.start(50) #50/50 duty  
 
         if self.movementSystemActive == False:
             self.movementSystemActive = True
@@ -103,26 +76,59 @@ class l298n_driver:
                 GPIO.output(self.l2, 1) 
                 time.sleep(0.5)
 
-
+            #all stop
             GPIO.output(self.r1, 0)  
             GPIO.output(self.r2, 0)  
             GPIO.output(self.l1, 0)  
             GPIO.output(self.l2, 0) 
 
-            if dir == "F":
-                time.sleep(1)
-            if dir == "B":
-                time.sleep(1)
-
-
+            #prevents sharp change
+            #if dir == "F":
+            #    time.sleep(1)
+            #if dir == "B":
+            #    time.sleep(1)
 
         self.movementSystemActive = False
+
+
+    def burnIn(self, dir):
+
+        if dir == "R":
+            GPIO.output(self.r1, 0)  
+            GPIO.output(self.r2, 1)  
+            GPIO.output(self.l1, 1)  
+            GPIO.output(self.l2, 0) 
+
+        if dir == "L":
+
+            GPIO.output(self.r1, 1)  
+            GPIO.output(self.r2, 0)  
+            GPIO.output(self.l1, 0)  
+            GPIO.output(self.l2, 1)  
+
+        if dir == "F":
+
+            GPIO.output(self.r1, 1)  
+            GPIO.output(self.r2, 0)  
+            GPIO.output(self.l1, 1)  
+            GPIO.output(self.l2, 0) 
+
+
+        if dir == "B":
+
+            GPIO.output(self.r1, 0)  
+            GPIO.output(self.r2, 1)  
+            GPIO.output(self.l1, 0)  
+            GPIO.output(self.l2, 1) 
+
+
+
 
 
 def init():
     global l298n
     l298n = l298n_driver([5, 6, 13, 19, 26])    
-    #6 in a row = 5,6,13,19,26
+    #5 in a row = 5,6,13,19,26
 
 
 def handleCommand(command, keyPosition):
@@ -149,6 +155,18 @@ def inputFromKeyboard():
         if data == "d":
             handleCommand('L', 'down')
 
+
+        if data == "B":
+            print("burn in B")
+            l298n.burnIn("B")
+
+        if data == "F":
+            print("burn in F")
+            l298n.burnIn("F")
+            
+        if data == "S":
+            print("burn in sim")
+            l298n.burnIn("sim")
 
 if __name__ == "__main__":
 
