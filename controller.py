@@ -321,7 +321,7 @@ async def handleChatMessages():
                                     if commandArgs.play_nontts_softly:
                                                 if len(j['message']) > 0:
                                                             if len(messagesToTTS) <= 1:
-                                                                        messagesToTTS.append((j['message'][1:], 0.25))
+                                                                        messagesToTTS.append((j['message'][1:], 0.15))
                         #if audio.espeakBytes(j['message']) < 400000:
                         #            print("length", audio.espeakBytes(j['message']))
                         #            _thread.start_new_thread(say, (j['message'],))
