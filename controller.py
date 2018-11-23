@@ -41,7 +41,8 @@ parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
-
+parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
+parser.set_defaults(disable_volume_set=False)
 
 commandArgs = parser.parse_args()
 
@@ -399,9 +400,9 @@ def main():
             #_thread.start_new_thread(startTest, ())
             #startTest()
 
-            setVolume(commandArgs.tts_volume)
-            
-            
+            if not commandArgs.disable_volume_set:
+                setVolume(commandArgs.tts_volume)
+
             while True:
                 time.sleep(0.20)
                 runPeriodicTasks()
