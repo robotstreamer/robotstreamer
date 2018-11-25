@@ -32,6 +32,7 @@ parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false'
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
 parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
+parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='store_true')
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
@@ -41,7 +42,8 @@ parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
-
+parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
+parser.set_defaults(disable_volume_set=False)
 
 commandArgs = parser.parse_args()
 
@@ -77,12 +79,23 @@ elif commandArgs.type == "roomba":
             import roomba_interface as interface
             interface.init()
 
+elif commandArgs.type == "roomba_kristie":
+            import roomba_kristie_interface as interface
+            interface.init()
+            
 elif commandArgs.type == "open_roomba":
             import open_roomba_interface as interface
             interface.init()
 
 elif commandArgs.type == "humanoid":
             import humanoid_interface as interface
+            interface.init()
+
+elif commandArgs.type == "v4l2":
+            import v4l2_interface as interface
+
+elif commandArgs.type == "tank":
+            import tank_interface as interface
             interface.init()
 
 elif commandArgs.type == "blank":
@@ -116,7 +129,8 @@ def setVolume(percent):
                                     #time.sleep(5)
             
 
-def espeak(hardwareNumber, message, voice):
+# volume=1 is normal
+def espeak(hardwareNumber, message, voice, volume):
 
             global numActiveEspeak
             
@@ -148,7 +162,9 @@ def espeak(hardwareNumber, message, voice):
                                     print("--------------", cmd)
                                     os.system(cmd)
 
-                        cropResult = os.system("/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -c copy %s" % (wavFile, maximumTTSTime, croppedWavFile))
+                        cropCommand = "/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -filter:audio volume=%f %s" % (wavFile, maximumTTSTime, volume, croppedWavFile)
+                        print(cropCommand)
+                        cropResult = os.system(cropCommand)
                         print("crop result code", cropResult)
                         if cropResult == 0:
                                     print("play cropped")
@@ -189,7 +205,7 @@ def espeakMac(message, voice):
 
 
 
-def say(message, voice='en-us'):
+def say(message, messageVolume, voice='en-us'):
 
     os.system("killall espeak")
     
@@ -219,7 +235,7 @@ def say(message, voice='en-us'):
 
         else:
             for hardwareNumber in (0, 2, 3, 1, 4):
-                _thread.start_new_thread(espeak, (hardwareNumber, message, voice))
+                _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
                 #espeak(hardwareNumber, message, voice)
 
 
@@ -302,8 +318,16 @@ async def handleChatMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print("message:", j)
-            if ('message' in j) and ('tts' in j) and j['tts'] == True and (j['robot_id'] == commandArgs.robot_id):
-                        messagesToTTS.append(j['message'])
+            if ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
+                        if ('tts' in j) and j['tts'] == True:
+                                    print("tts option is on")
+                                    messagesToTTS.append((j['message'], 1))
+                        else:
+                                    print("tts option is off")
+                                    if commandArgs.play_nontts_softly:
+                                                if len(j['message']) > 0:
+                                                            if len(messagesToTTS) <= 1:
+                                                                        messagesToTTS.append((j['message'][1:], 0.15))
                         #if audio.espeakBytes(j['message']) < 400000:
                         #            print("length", audio.espeakBytes(j['message']))
                         #            _thread.start_new_thread(say, (j['message'],))
@@ -366,8 +390,8 @@ def startChat():
 def runPeriodicTasks():
 
             if len(messagesToTTS) > 0 and numActiveEspeak == 0:
-                        message = messagesToTTS.pop(0)
-                        _thread.start_new_thread(say, (message,))
+                        message, messageVolume = messagesToTTS.pop(0)
+                        _thread.start_new_thread(say, (message, messageVolume))
                         
 
             
@@ -381,9 +405,9 @@ def main():
             #_thread.start_new_thread(startTest, ())
             #startTest()
 
-            setVolume(commandArgs.tts_volume)
-            
-            
+            if not commandArgs.disable_volume_set:
+                setVolume(commandArgs.tts_volume)
+
             while True:
                 time.sleep(0.20)
                 runPeriodicTasks()
