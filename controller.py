@@ -39,6 +39,7 @@ parser.add_argument('--type', default="rsbot")
 parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
+parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 
 

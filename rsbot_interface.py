@@ -13,7 +13,6 @@ commandArgs = None
 
 turningSpeedActuallyUsed = 255
 #drivingSpeedAcutallyUsed = 255
-turnDelay = 0.1
 
 
 
@@ -158,7 +157,7 @@ def handleCommand(command, keyPosition):
                             runMotor(motorIndex, left[motorIndex])
                         movementSystemActive = True
                         print("starting")
-                        time.sleep(turnDelay)
+                        time.sleep(commandArgs.turn_delay)
                         print("finished")
                         turnOffMotors()
                         movementSystemActive = False
@@ -171,7 +170,7 @@ def handleCommand(command, keyPosition):
                         for motorIndex in range(4):
                             runMotor(motorIndex, right[motorIndex])
                         movementSystemActive = True
-                        time.sleep(turnDelay)
+                        time.sleep(commandArgs.turn_delay)
                         turnOffMotors()
                         movementSystemActive = False
                         
