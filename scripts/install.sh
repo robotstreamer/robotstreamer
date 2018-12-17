@@ -32,6 +32,13 @@ read input_camera
 echo
 echo
 
+
+echo -e "\e[33mPlease enter your Stream Key:\e[39m "
+read input_stream_key
+
+echo
+echo
+
 if ! [[ $input_camera =~ $re ]] ; then
    echo "Error: Camera ID is not a number" >&2; exit 1
 fi
@@ -47,8 +54,8 @@ echo '# (1) Put in the ids for your robot, YOURROBOTID and YOURCAMERAID' >> ~/st
 echo '# (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot' >> ~/start_robot
 echo 'cd /home/pi/robotstreamer' >> ~/start_robot
 echo "nohup scripts/repeat_start /usr/bin/python3 reverse_ssh.py ${input_robot} &> /dev/null &" >> ~/start_robot
-echo "nohup scripts/repeat_start /usr/bin/python3 controller.py ${input_robot} &> /dev/null &" >> ~/start_robot
-echo "nohup scripts/repeat_start /usr/bin/python3 send_video.py ${input_camera} 0 &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start /usr/bin/python3 controller.py ${input_robot} --stream-key ${input_stream_key} &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start /usr/bin/python3 send_video.py ${input_camera} 0 --stream-key ${input_stream_key} --ffmpeg-path /usr/bin/ffmpeg &> /dev/null &" >> ~/start_robot
 
 # Make sure the system is up to date
 sudo apt-get -y update
