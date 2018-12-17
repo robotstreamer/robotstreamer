@@ -32,7 +32,7 @@ parser.add_argument('window_title')
 
 parser.add_argument('video_device_number', default=0, type=int)
 #parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com')
-parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='robotstreamer.com:6001')
+parser.add_argument('--info-server', help="handles things such as rest API requests about ports, for example 1.1.1.1:8082", default='api.robotstreamer.com:8080')
 parser.add_argument('--info-server-protocol', default="http", help="either https or http")
 parser.add_argument('--app-server-socketio-host', default="robotstreamer.com", help="wherever app is running")
 parser.add_argument('--app-server-socketio-port', default=8022, help="typically use 8022 for prod, 8122 for dev, and 8125 for dev2")
