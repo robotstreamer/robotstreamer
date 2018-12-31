@@ -10,7 +10,7 @@ import traceback
 import tempfile
 import uuid
 import audio
-
+import datetime
 
 
 
@@ -19,6 +19,10 @@ tempDir = tempfile.gettempdir()
 messagesToTTS = []
 numActiveEspeak = 0
 maximumTTSTime = 5
+
+currentControlWebsocket = None
+lastPongTime = datetime.datetime.now()
+controlOK = True
 
 
 print("temporary directory:", tempDir)
@@ -261,9 +265,33 @@ def getChatHost():
         return json.loads(response)
 
 
+async def handleControlTester():
+
+            global controlOK
+            
+            while True:
+                        time.sleep(5)
+                        if currentControlWebsocket is not None:
+                                    print("sending rs ping message")
+                                    await currentControlWebsocket.send('{"command":"RS_PING"}')
+                        else:
+                                    print("control websocket is not initialized")
+
+
+                        elapsed = datetime.datetime.now() - lastPongTime
+                        print("elapsed time since last acklowledgement:", elapsed.total_seconds())
+                        if (elapsed.total_seconds() > 20):
+                                    print("control test failed, signaling restart")
+                                    controlOK = False
+
+                                    
+            
+            
 async def handleControlMessages():
 
-
+    global currentControlWebsocket
+    global lastPongTime
+            
     controlGet = getControlHost()
     controlHost = controlGet['host']
     controlPort = controlGet['port']
@@ -278,6 +306,8 @@ async def handleControlMessages():
 
         # validation handshake
         await websocket.send(json.dumps({"command":commandArgs.stream_key}))
+
+        currentControlWebsocket = websocket
         
         while True:
 
@@ -287,6 +317,9 @@ async def handleControlMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print(j)
+            if 'command' in j and j['command'] == "RS_PONG":
+                        lastPongTime = datetime.datetime.now()
+                        
             _thread.start_new_thread(interface.handleCommand, (j["command"],
                                                                j["key_position"]))
 
@@ -355,6 +388,25 @@ def startControl():
                 interface.movementSystemActive = False
 
 
+
+def startControlTester():
+    print("control tester, waiting a few seconds")
+    time.sleep(6) #todo: only wait as needed (wait for interent)
+
+    if True:
+                print("starting control tester loop")
+                time.sleep(1)
+                try:
+                            asyncio.new_event_loop().run_until_complete(handleControlTester())
+                except:
+                            print("error")
+                            traceback.print_exc()
+                print("control tester event handler died so killing process")
+
+
+
+                
+
 def startChat():
         time.sleep(10) #todo: only wait as needed (wait for interenet)
         print("restarting loop")
@@ -389,6 +441,11 @@ def startChat():
 
 def runPeriodicTasks():
 
+            if not controlOK:
+                        print("exiting because the control connection has failed")
+                        exit(1)
+                        
+            
             if len(messagesToTTS) > 0 and numActiveEspeak == 0:
                         message, messageVolume = messagesToTTS.pop(0)
                         _thread.start_new_thread(say, (message, messageVolume))
@@ -401,7 +458,8 @@ def main():
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
-            _thread.start_new_thread(startChat, ())
+            _thread.start_new_thread(startControlTester, ())
+            _thread.start_new_thread(startChat, ())            
             #_thread.start_new_thread(startTest, ())
             #startTest()
 
