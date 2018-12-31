@@ -48,6 +48,9 @@ parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
 parser.set_defaults(disable_volume_set=False)
+parser.add_argument('--kill-on-bad-connection', dest='kill_on_bad_connection', action='store_true')
+parser.set_defaults(kill_on_bad_connection=False)
+
 
 commandArgs = parser.parse_args()
 
@@ -441,7 +444,7 @@ def startChat():
 
 def runPeriodicTasks():
 
-            if not controlOK:
+            if not controlOK and commandArgs.kill_on_bad_connection:
                         print("exiting because the control connection has failed")
                         exit(1)
                         
