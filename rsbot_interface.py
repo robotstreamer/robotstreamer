@@ -116,6 +116,9 @@ def handleCommand(command, keyPosition):
                 global movementSystemActive
                 global pingPongNumActive
                 global freePongActive
+                
+                if keyPosition != "down":
+                    return
 
                 d = 255
     
