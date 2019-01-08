@@ -20,9 +20,9 @@ messagesToTTS = []
 numActiveEspeak = 0
 maximumTTSTime = 5
 
-currentControlWebsocket = None
-lastPongTime = datetime.datetime.now()
-controlOK = True
+currentWebsocket = {'chat': None, 'control': None}
+lastPongTime = {'chat': datetime.datetime.now(), 'control': datetime.datetime.now()}
+websocketOK = {'chat': True, 'control': True}
 
 
 print("temporary directory:", tempDir)
@@ -268,33 +268,29 @@ def getChatHost():
         return json.loads(response)
 
 
-async def handleControlTester():
+async def handleWesocketTester(key):
 
-            global controlOK
-            
             while True:
                         time.sleep(5)
-                        if currentControlWebsocket is not None:
+                        if currentWebsocket[key] is not None:
                                     print("sending rs ping message")
-                                    await currentControlWebsocket.send('{"command":"RS_PING"}')
+                                    await currentWebsocket[key].send('{"command":"RS_PING"}')
                         else:
                                     print("control websocket is not initialized")
 
 
-                        elapsed = datetime.datetime.now() - lastPongTime
-                        print("elapsed time since last acklowledgement:", elapsed.total_seconds())
-                        if (elapsed.total_seconds() > 20):
-                                    print("control test failed, signaling restart")
-                                    controlOK = False
+                        elapsed = datetime.datetime.now() - lastPongTime[key]
+                        print("elapsed time since last acklowledgement (%s):" % key,
+                              elapsed.total_seconds())
+                        if (elapsed.total_seconds() > 30):
+                                    print(key, "test failed, signaling restart")
+                                    websocketOK[key] = False
 
                                     
             
             
 async def handleControlMessages():
 
-    global currentControlWebsocket
-    global lastPongTime
-            
     controlGet = getControlHost()
     controlHost = controlGet['host']
     controlPort = controlGet['port']
@@ -310,7 +306,7 @@ async def handleControlMessages():
         # validation handshake
         await websocket.send(json.dumps({"command":commandArgs.stream_key}))
 
-        currentControlWebsocket = websocket
+        currentWebsocket['control'] = websocket
         
         while True:
 
@@ -321,7 +317,7 @@ async def handleControlMessages():
             j = json.loads(message)
             print(j)
             if 'command' in j and j['command'] == "RS_PONG":
-                        lastPongTime = datetime.datetime.now()
+                        lastPongTime['control'] = datetime.datetime.now()
                         
             _thread.start_new_thread(interface.handleCommand, (j["command"],
                                                                j["key_position"]))
@@ -346,6 +342,8 @@ async def handleChatMessages():
         #todo: you do need this as an connection initializer, but you should make the server not need it
         await websocket.send(json.dumps({"message":"message"}))     
 
+        currentWebsocket['chat'] = websocket
+        
         while True:
 
             print("awaiting chat message")
@@ -354,6 +352,10 @@ async def handleChatMessages():
             print("< {}".format(message))
             j = json.loads(message)
             print("message:", j)
+
+            if 'command' in j and j['command'] == "RS_PONG":
+                        lastPongTime['chat'] = datetime.datetime.now()
+            
             if ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
                         if ('tts' in j) and j['tts'] == True:
                                     print("tts option is on")
@@ -392,15 +394,15 @@ def startControl():
 
 
 
-def startControlTester():
-    print("control tester, waiting a few seconds")
+def startWebsocketTester(key):
+    print(key, "tester, waiting a few seconds")
     time.sleep(6) #todo: only wait as needed (wait for interent)
 
     if True:
-                print("starting control tester loop")
+                print("starting", key, "tester loop")
                 time.sleep(1)
                 try:
-                            asyncio.new_event_loop().run_until_complete(handleControlTester())
+                            asyncio.new_event_loop().run_until_complete(handleWesocketTester(key))
                 except:
                             print("error")
                             traceback.print_exc()
@@ -444,10 +446,11 @@ def startChat():
 
 def runPeriodicTasks():
 
-            if not controlOK and commandArgs.kill_on_failed_connection:
-                        print("exiting because the control connection has failed")
-                        exit(1)
-                        
+            for key in websocketOK:
+                        if not websocketOK[key] and commandArgs.kill_on_failed_connection:
+                                    print("exiting because the " + key + " connection has failed")
+                                    exit(1)
+
             
             if len(messagesToTTS) > 0 and numActiveEspeak == 0:
                         message, messageVolume = messagesToTTS.pop(0)
@@ -461,7 +464,8 @@ def main():
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
-            _thread.start_new_thread(startControlTester, ())
+            for key in websocketOK:
+                        _thread.start_new_thread(startWebsocketTester, (key,))
             _thread.start_new_thread(startChat, ())            
             #_thread.start_new_thread(startTest, ())
             #startTest()
