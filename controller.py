@@ -260,8 +260,8 @@ def getControlHost():
             
 def getChatHost():
 
-        #url = apiHost+'/v1/get_endpoint/rschat/'+commandArgs.robot_id #only for individual
-        url = apiHost+'/v1/get_endpoint/rschat/100' 
+        #url = apiHost+'/v1/get_random_endpoint/rschat/'+commandArgs.robot_id #only for individual
+        url = apiHost+'/v1/get_random_endpoint/rschat/100' 
 
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
         print("response:", response)
