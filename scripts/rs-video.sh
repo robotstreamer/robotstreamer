@@ -2,7 +2,8 @@
 
 #usage: fngetaudioport <robot id>
 fngetvideoport(){
-  declare -r porturl='http://robotstreamer.com:6001/v1/get_endpoint/jsmpeg_video_capture/'"$1";
+#  declare -r porturl='http://robotstreamer.com:6001/v1/get_endpoint/jsmpeg_video_capture/'"$1";
+  declare -r porturl='http://api.robotstreamer.com:8080/v1/get_endpoint/jsmpeg_video_capture/'"$1";
   declare  port;
 
   read port < <( wget -O - "$porturl" 2> /dev/null | head -n 1 |
@@ -76,12 +77,12 @@ if [[ "$port" =~ ^[0-9]+$ ]];
 then
   declare res="$4"'x'"$5";
   declare x11grabarg="$2"'+0,0';
-  declare videoendpoint='http://robotstreamer.com:'"$port"'/hellobluecat/1280/720/';
+  declare videoendpoint='http://computer.robotstreamer.com:'"$port"'/hellobluecat/1280/720/';
   declare -a ffmpegargs=( '-hide_banner'
       '-video_size' "$res"
       '-framerate' "$3"
       '-f' 'x11grab' '-i' "$x11grabarg" '-f' 'mpegts'
-      '-codec:v' 'mpeg1video' '-s' "$res" '-b:v' '1200k'
+      '-codec:v' 'mpeg1video' '-s' "$res" '-b:v' '1000k'
       '-bf' '0' '-muxdelay' '0.001'
       "$videoendpoint"
   );
