@@ -282,7 +282,7 @@ async def handleWesocketTester(key):
                         elapsed = datetime.datetime.now() - lastPongTime[key]
                         print("elapsed time since last acklowledgement (%s):" % key,
                               elapsed.total_seconds())
-                        if (elapsed.total_seconds() > 30):
+                        if (elapsed.total_seconds() > 60):
                                     print(key, "test failed, signaling restart")
                                     websocketOK[key] = False
 
