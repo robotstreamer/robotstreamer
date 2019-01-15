@@ -100,6 +100,10 @@ elif commandArgs.type == "humanoid":
 
 elif commandArgs.type == "v4l2":
             import v4l2_interface as interface
+            
+elif commandArgs.type == "l298n":
+            import l298n_interface as interface
+            interface.init()
 
 elif commandArgs.type == "tank":
             import tank_interface as interface
