@@ -165,7 +165,7 @@ def espeak(hardwareNumber, message, voice, volume):
                         print("commandArgs.male:", commandArgs.male)
                         if commandArgs.male:
                                     print("male")
-                                    cmd = 'cat ' + tempFilePath + ' | espeak -p %d -v%s --stdout > %s' % (commandArgs.tts_pitch, pitch, voice, wavFile)
+                                    cmd = 'cat ' + tempFilePath + ' | espeak -p %d -v%s --stdout > %s' % (commandArgs.tts_pitch, voice, wavFile)
                                     print("--------------", cmd)
                                     os.system(cmd)
                         else:
