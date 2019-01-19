@@ -40,6 +40,7 @@ parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='s
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
+parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
 parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
@@ -164,12 +165,12 @@ def espeak(hardwareNumber, message, voice, volume):
                         print("commandArgs.male:", commandArgs.male)
                         if commandArgs.male:
                                     print("male")
-                                    cmd = 'cat ' + tempFilePath + ' | espeak -v%s --stdout > %s' % (voice, wavFile)
+                                    cmd = 'cat ' + tempFilePath + ' | espeak -p %d -v%s --stdout > %s' % (commandArgs.tts_pitch, pitch, voice, wavFile)
                                     print("--------------", cmd)
                                     os.system(cmd)
                         else:
                                     print("female")
-                                    cmd = 'cat ' + tempFilePath + ' | espeak -v%s+f%d -s170 --stdout > %s' % (voice, commandArgs.voice_number, wavFile)
+                                    cmd = 'cat ' + tempFilePath + ' | espeak -p %d -v%s+f%d -s170 --stdout > %s' % (commandArgs.tts_pitch, voice, commandArgs.voice_number, wavFile)
                                     print("--------------", cmd)
                                     os.system(cmd)
 
