@@ -67,7 +67,7 @@ sudo wget https://raw.githubusercontent.com/robotstreamer/robotstreamer/master/s
 ```
 
 To install your need your id's and keys to connect to robotstreamer.com. After logging in to website (and registering if needed), create your robot entry by going here. Fill in robot name and submit. The result will tell you your robot id, camera id, and stream key.
-http://www.robotstreamer.com/new_stream.html
+http://robotstreamer.com/new_stream.html
 
 During installation, you will be prompted for a robot id and camera id.
 

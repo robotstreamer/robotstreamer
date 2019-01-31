@@ -2,7 +2,8 @@
 
 #usage: fngetaudioport <robot id>
 fngetaudioport(){
-  declare -r porturl='http://robotstreamer.com:6001/v1/get_endpoint/jsmpeg_audio_capture/'"$1";
+#  declare -r porturl='http://robotstreamer.com:6001/v1/get_endpoint/jsmpeg_audio_capture/'"$1";
+  declare -r porturl='http://api.robotstreamer.com:8080/v1/get_endpoint/jsmpeg_audio_capture/'"$1";
   declare  port;
 
   read port < <( wget -O - "$porturl" 2> /dev/null | head -n 1 |
@@ -71,10 +72,10 @@ declare port='';
 read port < <( fngetaudioport "$1" );
 if [[ "$port" =~ ^[0-9]+$ ]];
 then
-  declare audioendpoint='http://robotstreamer.com:'"$port"'/hellobluecat/640/480';
+  declare audioendpoint='http://computer.robotstreamer.com:'"$port"'/hellobluecat/640/480';
   declare -a ffmpegargs=( '-hide_banner'
       '-f' 'pulse' '-ar' '44100' '-ac' '2' '-i' "$2" '-f' 'mpegts'
-      '-codec:a' 'mp2' '-b:a' '192k'
+      '-codec:a' 'mp2' '-b:a' '320k'
       '-muxdelay' '0.001' "$audioendpoint" );
 
   ffmpeg "${ffmpegargs[@]}";
