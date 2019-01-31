@@ -39,6 +39,7 @@ parser.add_argument('--xres', type=int, default=768)
 parser.add_argument('--yres', type=int, default=432)
 parser.add_argument('--audio-device-number', default=1, type=int)
 parser.add_argument('--audio-device-name')
+parser.add_argument('--audio-rate', default=48000, type=int, help="this is 44100 or 48000 usually")
 parser.add_argument('--kbps', default=350, type=int)
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
@@ -198,8 +199,8 @@ def startAudioCaptureLinux():
         audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
 
     #audioCommandLine = '%s -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
-    audioCommandLine = '%s -f alsa -ar 48000 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
-                        % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
+    audioCommandLine = '%s -f alsa -ar %d -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
+                        % (robotSettings.ffmpeg_path, robotSettings.audio_rate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
     #return subprocess.Popen(shlex.split(audioCommandLine))
     return runAndMonitor("audio", shlex.split(audioCommandLine))
