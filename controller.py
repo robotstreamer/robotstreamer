@@ -364,7 +364,9 @@ async def handleChatMessages():
             if ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
                         if ('tts' in j) and j['tts'] == True:
                                     print("tts option is on")
-                                    messagesToTTS.append((j['message'], 1))
+                                    # paid messages can queue but unpaid cannot
+                                    if len(messagesToTTS) <= 1 or (('tts_price' in j) and (j['tts_price'] > 0.01)):
+                                                messagesToTTS.append((j['message'], 1))
                         else:
                                     print("tts option is off")
                                     if commandArgs.play_nontts_softly:
