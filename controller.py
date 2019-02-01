@@ -365,7 +365,7 @@ async def handleChatMessages():
                         if ('tts' in j) and j['tts'] == True:
                                     print("tts option is on")
                                     # paid messages can queue but unpaid cannot
-                                    if len(messagesToTTS) <= 1 or (('tts_price' in j) and (j['tts_price'] > 0.01)):
+                                    if len(messagesToTTS) <= 1 or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
                                                 messagesToTTS.append((j['message'], 1))
                         else:
                                     print("tts option is off")
