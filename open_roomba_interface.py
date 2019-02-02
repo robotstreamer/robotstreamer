@@ -8,7 +8,8 @@ import robot_util
 try:
     ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
 except Exception as e:
-    print(e)
+    print("serial error 1", e)
+
 #ser = serial.Serial(port='/dev/ttyAMA0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
@@ -48,8 +49,8 @@ def init():
         ser.write(SAFE)
         print("sending beep to roomba")
         ser.write(BEEP)
-    except:
-        print("died")
+    except Exception as e:
+        print("serial error 2", e)
 
     
 #def serialWrite(s):
