@@ -5,7 +5,10 @@ import sys
 import robot_util
 
 
-ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
+try:
+    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
+except Exception as e:
+    print(e)
 #ser = serial.Serial(port='/dev/ttyAMA0', baudrate=115200)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
@@ -39,11 +42,14 @@ def handleCommand(command, keyPosition):
     
 
 def init():
-    print("init roomba")
-    ser.write(PASSIVE)
-    ser.write(SAFE)
-    print("sending beep to roomba")
-    ser.write(BEEP)
+    try:
+        print("init roomba")
+        ser.write(PASSIVE)
+        ser.write(SAFE)
+        print("sending beep to roomba")
+        ser.write(BEEP)
+    except:
+        print("died")
 
     
 #def serialWrite(s):
