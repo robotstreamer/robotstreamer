@@ -122,7 +122,7 @@ Start by cloning the robotstreamer repository
 ```
 cd ~
 git clone https://github.com/robotstreamer/robotstreamer
-cd robostreamer
+cd robotstreamer
 ```
 
 Go to new robot page to create a robot. If you already have one, got to manage robots. There you'll find your Robot ID and Camera ID.
