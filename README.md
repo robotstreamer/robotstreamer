@@ -16,6 +16,9 @@ Making your own live stream or robot? We'd like to hear from you. Join our disco
 https://discord.gg/n6B7ymy
 
 
+RobotStreamer lets you set up either a Desktop Stream or a Robot Stream, here's how to do each:
+
+
 <h1> Desktop Live Stream: Installation </h1>
 
 There are two ways to stream from your Desktop to RobotStreamer:
@@ -205,6 +208,21 @@ insert following line and save:
 ```
 
 That's it!
+
+
+<h2> How to add sounds </h2>
+
+Save 16 bit wav file in /home/pi/sound folder and it has to be all capital letters even the file extension.
+
+For example: SOUND1.WAV
+
+Another example: SOUND25.WAV
+
+Has to be exactly like that but number can be different.
+
+Then set command in your button config json text in your robot settings like SOUND1 or SOUND25
+
+Have to use the word SOUND for it to know it's a sound.
 
 
 <h2> Hardware Compatibility </h2>
