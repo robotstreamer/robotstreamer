@@ -1,7 +1,9 @@
 <h1> Open Robot Control Code For Connecting to RobotStreamer.com </h1>
 <br>
 
-RobotStreamer is a low latency live streaming platform. Stream from you desktop. Connect your movable cameras with TTS (robots) to *RobotStreamer.com*. We're a new project but already have interest from top live streamers like Ice Poseidon for robot camera control with massive numbers of users.
+RobotStreamer is robot control network and low latency live streaming platform. Can can stream from a robot (typically a mobile robot with camera connected by wifi) or from a traditional camera. Yes that means you can stream whatever kind of video you want on here.
+
+Connect your movable cameras with TTS (robots) to *RobotStreamer.com*. We're a new project but already have interest from top live streamers like Ice Poseidon for robot camera control with massive numbers of users.
 
 Broadcasters make the rules for their channels. Unlike most platforms, RobotStreamer is open to just about any content. Edgy stuff is welcome here. It is the internet after all. Just maintain basic ethical decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
