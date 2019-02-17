@@ -9,6 +9,10 @@ You can create streams with Robots (movable cameras with TTS), that's our specia
 
 We have a system called funbits that lets the streamers monetize their streams.
 
+<h1> API Documentation </h1>
+
+https://github.com/Jackool/robotstreamer-api/
+
 
 <h1> How to contribute </h1>
 
