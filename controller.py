@@ -365,13 +365,13 @@ async def handleChatMessages():
                         if ('tts' in j) and j['tts'] == True:
                                     print("tts option is on")
                                     # paid messages can queue but unpaid cannot
-                                    if len(messagesToTTS) <= 1 or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
+                                    if len(messagesToTTS) == 0 or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
                                                 messagesToTTS.append((j['message'], 1))
                         else:
                                     print("tts option is off")
                                     if commandArgs.play_nontts_softly:
                                                 if len(j['message']) > 0:
-                                                            if len(messagesToTTS) <= 1:
+                                                            if len(messagesToTTS) == 0:
                                                                         messagesToTTS.append((j['message'][1:], 0.15))
                         #if audio.espeakBytes(j['message']) < 400000:
                         #            print("length", audio.espeakBytes(j['message']))
