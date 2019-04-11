@@ -110,6 +110,10 @@ elif commandArgs.type == "tank":
             import tank_interface as interface
             interface.init()
 
+elif commandArgs.type == "sbcshop":
+            import sbcshop_interface as interface
+            interface.init()
+
 elif commandArgs.type == "blank":
             import blank_interface as interface
    
