@@ -51,6 +51,7 @@ parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='s
 parser.set_defaults(disable_volume_set=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
+parser.add_argument('--free-tts-queue-size', type=int, default=1)
 
 
 commandArgs = parser.parse_args()
@@ -369,7 +370,7 @@ async def handleChatMessages():
                         if ('tts' in j) and j['tts'] == True:
                                     print("tts option is on")
                                     # paid messages can queue but unpaid cannot
-                                    if len(messagesToTTS) == 0 or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
+                                    if len(messagesToTTS) < commandArgs.free_tts_queue_size or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
                                                 messagesToTTS.append((j['message'], 1))
                         else:
                                     print("tts option is off")
