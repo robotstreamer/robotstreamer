@@ -96,6 +96,10 @@ elif commandArgs.type == "open_roomba":
             import open_roomba_interface as interface
             interface.init()
 
+elif commandArgs.type == "parallaxy":
+            import parallaxy_interface as interface
+            interface.init()
+
 elif commandArgs.type == "humanoid":
             import humanoid_interface as interface
             interface.init()
