@@ -22,7 +22,23 @@ pingPongNumActive = 0
 freePongActive = False
 
 
+mh = Adafruit_MotorHAT(addr=0x60)
+def getMotorHAT():
+    global mh
+    # occationally do this reinitialization in case it has stopped working
+    if random.randint(0, 50) == 0:
+        mh = Adafruit_MotorHAT(addr=0x60)
+    return mh
+    
+
+import random
+
 def runMotor(motorIndex, direction):
+
+    global mh
+
+    mh = getMotorHAT()
+    
     motor = mh.getMotor(motorIndex+1)
     if direction == 1:
         motor.setSpeed(drivingSpeed)
@@ -39,19 +55,12 @@ def runMotor(motorIndex, direction):
 
 
 
-# create a default object, no changes to I2C address or frequency
-mh = Adafruit_MotorHAT(addr=0x60)
-
-
-
-
-
-    
 
 
 
 def init(cArgs, forwardDefinition, leftDefinition, pEnabled):
 
+                global mh
       
                 global commandArgs
                 global drivingSpeed
@@ -98,6 +107,10 @@ def init(cArgs, forwardDefinition, leftDefinition, pEnabled):
 
 def turnOffMotors():
 
+    global mh
+
+    mh = getMotorHAT()
+    
     mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)    
     mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
@@ -113,6 +126,8 @@ def demoShots():
 
 #todo: should be called process command
 def handleCommand(command, keyPosition):
+
+    
                 global movementSystemActive
                 global pingPongNumActive
                 global freePongActive
