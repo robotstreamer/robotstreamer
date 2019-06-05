@@ -11,7 +11,7 @@ import tempfile
 import uuid
 import audio
 import datetime
-
+import moderation
 
 
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
@@ -52,13 +52,14 @@ parser.set_defaults(disable_volume_set=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
 parser.add_argument('--free-tts-queue-size', type=int, default=2)
+parser.add_argument('--moderation-file', default=None)
 
 
 commandArgs = parser.parse_args()
 
 print(commandArgs)
 
-
+modFileName=commandArgs.moderation_file
 apiHost = commandArgs.api_url
 
 if commandArgs.type == "rsbot":
@@ -328,10 +329,16 @@ async def handleControlMessages():
             print(j)
             if 'command' in j and j['command'] == "RS_PONG":
                         lastPongTime['control'] = datetime.datetime.now()
-                        
-            _thread.start_new_thread(interface.handleCommand, (j["command"],
-                                                               j["key_position"]))
-
+            if modFileName == None:
+              _thread.start_new_thread(interface.handleCommand, (j["command"],
+                                                                 j["key_position"]))
+            else:
+                if moderation.moderateControl(j, modFileName):
+                    print('command approved')
+                    _thread.start_new_thread(interface.handleCommand, (j["command"],
+                                                                       j["key_position"]))
+                else:
+                    print('command rejected by moderation')
 
             
 async def handleChatMessages():
