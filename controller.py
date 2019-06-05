@@ -114,6 +114,10 @@ elif commandArgs.type == "tank":
 elif commandArgs.type == "sbcshop":
             import sbcshop_interface as interface
             interface.init()
+            
+elif commandArgs.type == "parallaxy":
+            import parallaxy_interface as interface
+            interface.init()
 
 elif commandArgs.type == "blank":
             import blank_interface as interface
