@@ -25,10 +25,15 @@ freePongActive = False
 mh = Adafruit_MotorHAT(addr=0x60)
 def getMotorHAT():
     global mh
-    # occationally do this reinitialization in case it has stopped working
-    if random.randint(0, 50) == 0:
-        mh = Adafruit_MotorHAT(addr=0x60)
     return mh
+    
+    # occationally do this reinitialization in case it has stopped working
+    #if random.randint(0, 50) == 0:
+    #    print()
+    #    print("******** GETTING MOTOR HAT OBJECT AGAIN ********")
+    #    print()
+    #    mh = Adafruit_MotorHAT(addr=0x60)
+    #return mh
     
 
 import random
