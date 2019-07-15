@@ -1,0 +1,2 @@
+#!/bin/bash
+kill $(ps aux | grep '[0-9] [/]usr/bin/python3 controller.py' | awk '{print $2}')
