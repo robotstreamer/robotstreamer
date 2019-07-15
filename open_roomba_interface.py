@@ -47,7 +47,11 @@ def init():
         print("init roomba")
         ser.write(PASSIVE)
         ser.write(SAFE)
-        print("sending beep to roomba")
+        print("sending 3 beep to roomba")
+        ser.write(BEEP)
+        time.sleep(0.7)
+        ser.write(BEEP)
+        time.sleep(0.7)
         ser.write(BEEP)
     except Exception as e:
         print("serial error 2", e)
@@ -64,7 +68,7 @@ def negative(x):
 def readAll():
     print("read all")
     while True:
-        sys.stdout.write(ser.read())
+        sys.stdout.write(str(ser.read()))
         sys.stdout.flush()
 
 def twosComp(x):
