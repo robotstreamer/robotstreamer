@@ -16,7 +16,7 @@ except Exception as e:
 
 
 
-
+RESET = b'\x07'
 PASSIVE = b'\x80'
 SAFE = b'\x83'
 CLEAN = b'\x87'
@@ -29,9 +29,17 @@ BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
 def init():
     try:
         print("init roomba")
+        print("writing reset")
+        ser.write(RESET)
+        time.sleep(16)
+        print("writing passive")
         ser.write(PASSIVE)
+        time.sleep(0.1)
+        print("writing safe")
         ser.write(SAFE)
+        time.sleep(0.1)
         print("sending 3 beeps to roomba")
+        print("writing beeps")
         ser.write(BEEP)
         time.sleep(0.7)
         ser.write(BEEP)
