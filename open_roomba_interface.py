@@ -14,6 +14,7 @@ except Exception as e:
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=57600)
 #ser = serial.Serial(port='/dev/ttyUSB0', baudrate=19200)
 
+RESET = b'\x07'
 PASSIVE = b'\x80'
 SAFE = b'\x83'
 CLEAN = b'\x87'
@@ -45,14 +46,16 @@ def handleCommand(command, keyPosition):
 def init():
     try:
         print("init roomba")
-        ser.write(PASSIVE)
-        ser.write(SAFE)
-        print("sending 3 beep to roomba")
-        ser.write(BEEP)
-        time.sleep(0.7)
-        ser.write(BEEP)
-        time.sleep(0.7)
-        ser.write(BEEP)
+        ser.write(RESET)
+        time.sleep(0.1)
+        #ser.write(PASSIVE)
+        #ser.write(SAFE)
+        #print("sending 3 beep to roomba")
+        #ser.write(BEEP)
+        #time.sleep(0.7)
+        #ser.write(BEEP)
+        #time.sleep(0.7)
+        #ser.write(BEEP)
     except Exception as e:
         print("serial error 2", e)
 
