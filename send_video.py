@@ -34,7 +34,7 @@ parser.add_argument('camera_id')
 parser.add_argument('video_device_number', default=0, type=int)
 
 
-parser.add_argument('--api-server', help="Server that robot will connect to listen for API update events", default='http://api.robotstreamer.com:8080')
+parser.add_argument('--api-url', help="Server that robot will connect to listen for API update events", default='http://api.robotstreamer.com:8080')
 parser.add_argument('--xres', type=int, default=768)
 parser.add_argument('--yres', type=int, default=432)
 parser.add_argument('--audio-device-number', default=1, type=int)
@@ -70,7 +70,7 @@ robotSettings = None
 resolutionChanged = False
 currentXres = None
 currentYres = None
-apiServer = commandArgs.api_server
+apiServer = commandArgs.api_url
 
 audioProcess = None
 videoProcess = None
@@ -344,7 +344,7 @@ def main():
     # overrides command line parameters using config file
     print("args on command line:", commandArgs)
 
-    robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id)
+    robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id, commandArgs.stream_key)
     #starts the backend services and
 
     print("camera id:", commandArgs.camera_id)
@@ -433,7 +433,8 @@ def main():
             print("sending camera alive message")
             print("")
             robot_util.sendCameraAliveMessage(apiServer,
-                                              commandArgs.camera_id)
+                                              commandArgs.camera_id,
+                                              robotSettings.stream_key)
 
 
 
