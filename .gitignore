@@ -4,6 +4,7 @@ robotoutput.txt
 nohup.out
 npm-debug.log
 gpio.conf
+output.mp3
 
 #ignore jetbrains files
 .idea/

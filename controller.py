@@ -116,12 +116,10 @@ elif commandArgs.type == "sbcshop":
 
 elif commandArgs.type == "blank":
             import blank_interface as interface
-   
 
-                                    
-
-            
-
+elif commandArgs.type == "sexbot":
+            import sexbot_interface as interface
+            interface.init()
 
 # set volume level
 
@@ -327,7 +325,7 @@ async def handleControlMessages():
             print(j)
             if 'command' in j and j['command'] == "RS_PONG":
                         lastPongTime['control'] = datetime.datetime.now()
-                        
+
             _thread.start_new_thread(interface.handleCommand, (j["command"],
                                                                j["key_position"]))
 
