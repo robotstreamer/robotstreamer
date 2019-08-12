@@ -7,7 +7,7 @@ import sys
 import pigpio
 
 straightSpeed=450
-turnSpeed=600
+turnSpeed=500
 straightDelay=0.5
 stopDelay=0.05
 turnDelay=0.4
