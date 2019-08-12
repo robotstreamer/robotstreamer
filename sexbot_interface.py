@@ -7,10 +7,10 @@ import sys
 import pigpio
 
 straightSpeed=450
-turnSpeed=500
-straightDelay=0.5
+turnSpeed=450
+straightDelay=0.6
 stopDelay=0.05
-turnDelay=0.4
+turnDelay=0.5
 ser=None
 movementSystemActive=None
 dildoActive=None
