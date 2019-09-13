@@ -107,6 +107,10 @@ elif commandArgs.type == "l298n":
             import l298n_interface as interface
             interface.init()
 
+elif commandArgs.type == "l298niq":
+            import l298niq_interface as interface
+            interface.init()
+
 elif commandArgs.type == "tank":
             import tank_interface as interface
             interface.init()
