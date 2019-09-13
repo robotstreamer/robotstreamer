@@ -1,5 +1,6 @@
 import time
-import RPi.GPIO as GPIO 
+import RPi.GPIO as GPIO
+import robot_util
 
 movementSystemActive = False
 
@@ -135,6 +136,7 @@ def handleCommand(command, keyPosition):
 
                 print("handleCommand", command)
                 if keyPosition == 'down':
+                    robot_util.handleSoundCommand(command, keyPosition)
                     l298n.move(command)
 
 
