@@ -1,3 +1,4 @@
+import subprocess
 import serial
 import time
 import _thread
@@ -6,7 +7,7 @@ import robot_util
 
 
 try:
-    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200)
+    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.03)
 except Exception as e:
     print("serial error 1", e)
 
@@ -19,6 +20,9 @@ PASSIVE = b'\x80'
 SAFE = b'\x83'
 CLEAN = b'\x87'
 BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
+VOLTAGE = b'\x8e\x16'
+POWER = b'\x85'
+LVCO = 11000 #roomba will power down at this battery voltage in mV
 
 movementSystemActive = False
 
@@ -29,6 +33,8 @@ def handleCommand(command, keyPosition):
     global lastCommand
 
     print("handling command")
+    print("keyposition: ", keyPosition)
+    print("command: ", command)
 
     if command == 'L':
         move(100, -100, 0, .20, 0)
@@ -39,6 +45,20 @@ def handleCommand(command, keyPosition):
     elif command == 'B':
         move(-100, -100, .09, .40, .18)
 
+    ser.reset_input_buffer()
+    ser.write(VOLTAGE)
+    ser.flush()
+    packet=b''
+    packet=ser.read(2)
+    if len(packet) == 2:
+        voltage=int.from_bytes(packet, 'big')
+        print('voltage:', voltage)
+        if voltage < LVCO:
+            robot_util.aplayFile('/home/pi/sound/recharge.wav')
+            ser.write(POWER)
+            ser.flush()
+            time.sleep(3)
+            subprocess.run(['/usr/bin/sudo', '/sbin/shutdown', '-h', 'now' ] )
     robot_util.handleSoundCommand(command, keyPosition)
 
     
