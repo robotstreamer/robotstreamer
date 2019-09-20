@@ -42,6 +42,8 @@ parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
 parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
+parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
+parser.set_defaults(tls_chat=True)
 parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
@@ -274,11 +276,15 @@ def getControlHost():
         print("response:", response)
         return json.loads(response)
             
-def getChatHost():
+def getChatHost(useTLS):
 
         #url = apiHost+'/v1/get_random_endpoint/rschat/'+commandArgs.robot_id #only for individual
-        url = apiHost+'/v1/get_random_endpoint/rschat/100' 
 
+        if useTLS:
+            url = apiHost+'/v1/get_random_endpoint/rschatssl/100'
+        else:
+            url = apiHost+'/v1/get_random_endpoint/rschat/100'
+                    
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
         print("response:", response)
         return json.loads(response)
@@ -343,11 +349,14 @@ async def handleControlMessages():
 async def handleChatMessages():
 
 
-    chatGet = getChatHost()
+    chatGet = getChatHost(commandArgs.tls_chat)
     chatHost = chatGet['host']
     chatPort = chatGet['port']
 
-    url = 'ws://%s:%s' % (chatHost, chatPort)
+    if commandArgs.tls_chat:
+                url = 'wss://%s:%s' % (chatHost, chatPort)
+    else:
+                url = 'ws://%s:%s' % (chatHost, chatPort)                
     print("chat url:", url)
 
     async with websockets.connect(url) as websocket:
