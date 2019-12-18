@@ -70,6 +70,7 @@ sudo apt-get -y update
 sudo apt-get -y install espeak git
 
 sudo pip3 install websockets
+sudo pip3 install pyusb
 
 cd ~ &&\
 

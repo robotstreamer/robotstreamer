@@ -20,7 +20,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
 #from Queue import Queue # Python 2
-
+from usb.core import find as finddev
 
 class DummyProcess:
     def poll(self):
@@ -61,7 +61,7 @@ parser.add_argument('--mic-channels', type=int, help='microphone channels, typic
 parser.add_argument('--audio-input-device', default='Microphone (HD Webcam C270)') # currently, this option is only used for windows screen capture
 parser.add_argument('--stream-key', default='hellobluecat')
 parser.add_argument('--ffmpeg-path', default='/usr/local/bin/ffmpeg')
-
+parser.add_argument('--usb-reset-id', default=None)
 
 charCount = {}
 lastCharCount = None
@@ -202,6 +202,12 @@ def startAudioCaptureLinux():
     audioCommandLine = '%s -f alsa -ar %d -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
                         % (robotSettings.ffmpeg_path, robotSettings.audio_rate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
+    if commandArgs.usb_reset_id != None:
+      if len(commandArgs.usb_reset_id) == 8:
+        vendor_id=int(commandArgs.usb_reset_id[0:4], 16)
+        product_id=int(commandArgs.usb_reset_id[4:], 16)
+        dev=finddev(idVendor=vendor_id, idProduct=product_id)
+        dev.reset()
     #return subprocess.Popen(shlex.split(audioCommandLine))
     return runAndMonitor("audio", shlex.split(audioCommandLine))
 
