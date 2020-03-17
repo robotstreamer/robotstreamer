@@ -218,7 +218,7 @@ First run this script to kill all the processess running:
 ```/home/pi/robotstreamer/scripts/kill_command```
 
 Now in your robotstreamer directory (/home/pi/robostreamer), start up send_video with a command like this:
-```python send_video.py YOURCAMERAID 0 --stream-key YOURKEY --ffmpeg-path /usr/bin/ffmpeg```
+```/usr/bin/python3 send_video.py YOURCAMERAID 0 --stream-key YOURKEY --ffmpeg-path /usr/bin/ffmpeg```
 
 You'll need to use your stream key and you may need to adjust your path to ffmpeg. You can find it by using the command "which ffmpeg".
 
