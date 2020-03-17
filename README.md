@@ -11,9 +11,6 @@ You can create streams with Robots (movable cameras with TTS), that's our specia
 
 We have a system called funbits that lets the streamers monetize their streams.
 
-<h1> API Documentation </h1>
-
-https://github.com/Jackool/robotstreamer-api/
 
 
 <h1> How to contribute </h1>
@@ -303,6 +300,10 @@ The robot client connects to four external services: API Service, Chat Service, 
 
 <h4>API Service</h4>
 Provides information about which host and port to connect to for the chat service, video/audio service, and control service
+
+<h1> API Documentation </h1>
+
+https://github.com/Jackool/robotstreamer-api/
 
 <h4>Chat Service</h4>
 Relays chat messages sent from the web clients to the robot
