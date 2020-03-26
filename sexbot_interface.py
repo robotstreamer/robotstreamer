@@ -18,7 +18,7 @@ dildoDutyCycle1=10 #percentage
 dildoDutyCycle2=20 #percentage
 dildoDutyCycle3=30 #percentage
 dildoFreq=25      #Hertz
-dildoDelay=10     #seconds
+dildoDelay=3      #seconds
 pipwm=None        #object representing the pwm pin
 
 def getSerial():
