@@ -187,7 +187,7 @@ def espeak(hardwareNumber, message, voice, volume):
                                     print("--------------", cmd)
                                     os.system(cmd)
 
-                        cropCommand = "/usr/local/bin/ffmpeg -i %s -ss 0 -to %d -filter:audio volume=%f %s" % (wavFile, maximumTTSTime, volume, croppedWavFile)
+                        cropCommand = "ffmpeg -i %s -ss 0 -to %d -filter:audio volume=%f %s" % (wavFile, maximumTTSTime, volume, croppedWavFile)
                         print(cropCommand)
                         cropResult = os.system(cropCommand)
                         print("crop result code", cropResult)
