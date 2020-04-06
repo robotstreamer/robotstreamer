@@ -50,7 +50,9 @@ parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
+parser.add_argument('--disable-chat', dest='disable_chat', action='store_true')
 parser.set_defaults(disable_volume_set=False)
+parser.set_defaults(disable_chat=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
 parser.add_argument('--free-tts-queue-size', type=int, default=2)
@@ -270,7 +272,7 @@ def say(message, messageVolume, voice='en-us'):
 
 def getControlHost():
 
-        url = apiHost+'/get_control_host_port/'+commandArgs.robot_id 
+        url = apiHost+'v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
 
         response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
         print("response:", response)
@@ -317,16 +319,27 @@ async def handleControlMessages():
     controlHost = controlGet['host']
     controlPort = controlGet['port']
 
-    print("handle control messages get control port, connecting to port:", controlPort)
-    url = 'ws://%s:%s/echo' % (controlHost, controlPort)
+    if controlGet.get('version') == int(2): 
+        url = 'wss://%s:%s/echo' % (controlHost, controlPort)
+    else:
+        url = 'ws://%s:%s/echo' % (controlHost, controlPort)
+
+    print("handle control messages get control port, connecting to url:", url)
+
 
     async with websockets.connect(url) as websocket:
 
-        print("connected to control service at", url)
         print("control websocket object:", websocket)
 
-        # validation handshake
-        await websocket.send(json.dumps({"command":commandArgs.stream_key}))
+        if controlGet.get('version') == int(2): 
+            # validation handshake new
+            await websocket.send(json.dumps({"type":"robot_connect",
+                                             "robot_id":commandArgs.robot_id,
+                                             "stream_key":commandArgs.stream_key}))
+        else:
+            # validation handshake old
+            await websocket.send(json.dumps({"command":commandArgs.stream_key}))
+
 
         currentWebsocket['control'] = websocket
         
@@ -491,11 +504,14 @@ def main():
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
+            
             for key in websocketOK:
-                        _thread.start_new_thread(startWebsocketTester, (key,))
-            _thread.start_new_thread(startChat, ())            
-            #_thread.start_new_thread(startTest, ())
-            #startTest()
+                _thread.start_new_thread(startWebsocketTester, (key,))
+
+            if not commandArgs.disable_chat:
+                _thread.start_new_thread(startChat, ())            
+                #_thread.start_new_thread(startTest, ())
+                #startTest()
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)
