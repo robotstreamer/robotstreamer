@@ -22,7 +22,7 @@ maximumTTSTime = 5
 
 currentWebsocket = {'chat': None, 'control': None}
 lastPongTime = {'chat': datetime.datetime.now(), 'control': datetime.datetime.now()}
-websocketOK = {'chat': True, 'control': True}
+websocketOK = {}
 
 
 print("temporary directory:", tempDir)
@@ -311,15 +311,16 @@ async def handleWesocketTester(key):
                                     websocketOK[key] = False
 
                                     
-            
-            
+
 async def handleControlMessages():
 
     controlGet = getControlHost()
     controlHost = controlGet['host']
     controlPort = controlGet['port']
 
+    
     if controlGet.get('version') == int(2): 
+        # force connect with TLS
         url = 'wss://%s:%s/echo' % (controlHost, controlPort)
     else:
         url = 'ws://%s:%s/echo' % (controlHost, controlPort)
@@ -331,6 +332,7 @@ async def handleControlMessages():
 
         print("control websocket object:", websocket)
 
+        # if version in response and version == 2 connect with new method
         if controlGet.get('version') == int(2): 
             # validation handshake new
             await websocket.send(json.dumps({"type":"robot_connect",
@@ -348,28 +350,29 @@ async def handleControlMessages():
             print("awaiting control message")
             
             message = await websocket.recv()
-            print("< {}".format(message))
+            #print("< {}".format(message))
             j = json.loads(message)
             print(j)
-            if 'command' in j and j['command'] == "RS_PONG":
+            if j.get('command') == "RS_PONG":
                         lastPongTime['control'] = datetime.datetime.now()
 
-            _thread.start_new_thread(interface.handleCommand, (j["command"],
-                                                               j["key_position"]))
+            if j.get('command') and j.get('key_position'):
+                _thread.start_new_thread(interface.handleCommand, (j["command"],
+                                                                   j["key_position"]))
 
 
             
 async def handleChatMessages():
 
-
+    #todo: limit getChatHost refresh intervals
     chatGet = getChatHost(commandArgs.tls_chat)
     chatHost = chatGet['host']
     chatPort = chatGet['port']
 
     if commandArgs.tls_chat:
-                url = 'wss://%s:%s' % (chatHost, chatPort)
+        url = 'wss://%s:%s' % (chatHost, chatPort)
     else:
-                url = 'ws://%s:%s' % (chatHost, chatPort)                
+        url = 'ws://%s:%s' % (chatHost, chatPort)                
     print("chat url:", url)
 
     async with websockets.connect(url) as websocket:
@@ -377,8 +380,12 @@ async def handleChatMessages():
         print("connected to control service at", url)
         print("chat websocket object:", websocket)
 
-        #todo: you do need this as an connection initializer, but you should make the server not need it
-        await websocket.send(json.dumps({"message":"message"}))     
+        # removed comment: you do need this as an connection initializer, but you should make the server not need it
+        # chat server requires atleast a robot_id for when non global chat is enforced but otherwise no initialiser required
+        # treat stream_key as token when type robot_connect for future use
+        await websocket.send(json.dumps({"type":"robot_connect",
+                                         "token":str(commandArgs.stream_key),
+                                         "robot_id":str(commandArgs.robot_id) }))     
 
         currentWebsocket['chat'] = websocket
         
@@ -479,9 +486,6 @@ def startChat():
 #                        x = await websocket.recv()
 #                        print(x)
 
-#def startTest():
-#        asyncio.get_event_loop().run_until_complete(
-#                hello('ws://54.219.138.36:8765'))
 
 
 def runPeriodicTasks():
@@ -504,14 +508,17 @@ def main():
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
-            
-            for key in websocketOK:
-                _thread.start_new_thread(startWebsocketTester, (key,))
+            websocketOK['control'] = True # enable tester
 
             if not commandArgs.disable_chat:
-                _thread.start_new_thread(startChat, ())            
-                #_thread.start_new_thread(startTest, ())
-                #startTest()
+
+                _thread.start_new_thread(startChat, ()) 
+                websocketOK['chat'] = True # enable tester
+
+            for key in websocketOK:
+                # run tester
+                _thread.start_new_thread(startWebsocketTester, (key,))
+
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)
