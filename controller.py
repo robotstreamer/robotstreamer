@@ -50,8 +50,8 @@ parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
-parser.add_argument('--disable-chat', dest='disable_chat', action='store_true')
 parser.set_defaults(disable_volume_set=False)
+parser.add_argument('--disable-chat', dest='disable_chat', action='store_true')
 parser.set_defaults(disable_chat=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
@@ -272,24 +272,38 @@ def say(message, messageVolume, voice='en-us'):
 
 def getControlHost():
 
-        url = apiHost+'v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
+        url = apiHost+'v1/get_service/rscontrol'
+        response = json.loads(robot_util.getWithRetry(url, secure=commandArgs.secure_cert))
+        response['protocol'] = 'wss'
+        print("get_service response:", response)
+        
+        
+        if response is None:
+            
+            url = apiHost+'v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
+            response = json.loads(robot_util.getWithRetry(url, secure=commandArgs.secure_cert))
+            response['protocol'] = 'ws'
+            print("get_endpoint response:", response)
 
-        response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
-        print("response:", response)
-        return json.loads(response)
+        return response
             
 def getChatHost(useTLS):
 
-        #url = apiHost+'/v1/get_random_endpoint/rschat/'+commandArgs.robot_id #only for individual
+        url = apiHost+'v1/get_service/rschat0'
+        response = json.loads(robot_util.getWithRetry(url, secure=commandArgs.secure_cert))
+        print("get_chat response:", response)
+        
+        if response is None:
+            
+            if useTLS:
+                url = apiHost+'/v1/get_random_endpoint/rschatssl/100'
+            else:
+                url = apiHost+'/v1/get_random_endpoint/rschat/100'
 
-        if useTLS:
-            url = apiHost+'/v1/get_random_endpoint/rschatssl/100'
-        else:
-            url = apiHost+'/v1/get_random_endpoint/rschat/100'
-                    
-        response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
-        print("response:", response)
-        return json.loads(response)
+            response = json.loads(robot_util.getWithRetry(url, secure=commandArgs.secure_cert))
+            print("get_endpoint response:", response)
+
+        return response
 
 
 async def handleWesocketTester(key):
@@ -314,26 +328,16 @@ async def handleWesocketTester(key):
 
 async def handleControlMessages():
 
-    controlGet = getControlHost()
-    controlHost = controlGet['host']
-    controlPort = controlGet['port']
-
+    h = getControlHost()
     
-    if controlGet.get('version') == int(2): 
-        # force connect with TLS
-        url = 'wss://%s:%s/echo' % (controlHost, controlPort)
-    else:
-        url = 'ws://%s:%s/echo' % (controlHost, controlPort)
-
+    url = '%s://%s:%s/echo' % (h['protocol'], h['host'], h['port'])
     print("handle control messages get control port, connecting to url:", url)
-
 
     async with websockets.connect(url) as websocket:
 
         print("control websocket object:", websocket)
 
-        # if version in response and version == 2 connect with new method
-        if controlGet.get('version') == int(2): 
+        if h['protocol'] == 'wss': 
             # validation handshake new
             await websocket.send(json.dumps({"type":"robot_connect",
                                              "robot_id":commandArgs.robot_id,
@@ -365,14 +369,12 @@ async def handleControlMessages():
 async def handleChatMessages():
 
     #todo: limit getChatHost refresh intervals
-    chatGet = getChatHost(commandArgs.tls_chat)
-    chatHost = chatGet['host']
-    chatPort = chatGet['port']
+    h = getChatHost(commandArgs.tls_chat)
 
-    if commandArgs.tls_chat:
-        url = 'wss://%s:%s' % (chatHost, chatPort)
-    else:
-        url = 'ws://%s:%s' % (chatHost, chatPort)                
+    if commandArgs.tls_chat: h['protocol'] = 'wss'
+    else: h['protocol'] = 'ws'
+
+    url = '%s://%s:%s/echo' % (h['protocol'], h['host'], h['port'])
     print("chat url:", url)
 
     async with websockets.connect(url) as websocket:
