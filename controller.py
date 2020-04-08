@@ -319,7 +319,10 @@ async def handleWesocketTester(key):
             time.sleep(5)
             if currentWebsocket[key] is not None:
                         print(key.upper()+": sending rs ping message")
-                        await currentWebsocket[key].send('{"command":"RS_PING"}')
+                        try:
+                            await currentWebsocket[key].send('{"command":"RS_PING"}')
+                        except:
+                            print(key.upper()+": control ping error") 
             else:
                         print(key.upper()+": control websocket is not initialized")
 
@@ -364,10 +367,15 @@ async def handleControlMessages():
             #print("< {}".format(message))
             j = json.loads(message)
             print("CONTROL message: ",j)
+
             if j.get('command') == "RS_PONG":
                         lastPongTime['control'] = datetime.datetime.now()
 
-            if j.get('command') and j.get('key_position'):
+            if j.get('type') == "RS_PING":
+                        #ws keepalive new
+                        lastPongTime['control'] = datetime.datetime.now()
+
+            elif j.get('command') and j.get('key_position'):
                 _thread.start_new_thread(interface.handleCommand, (j["command"],
                                                                    j["key_position"]))
 
@@ -445,7 +453,7 @@ def startWebsocketTester(key):
                 try:
                             asyncio.new_event_loop().run_until_complete(handleWesocketTester(key))
                 except:
-                            print("error")
+                            print(key.upper()+" :error")
                             traceback.print_exc()
                 print(key.upper()+": socket tester event handler died so killing process")
                 time.sleep(2)
@@ -461,7 +469,7 @@ def startControl():
                 try:
                             asyncio.new_event_loop().run_until_complete(handleControlMessages())
                 except:
-                            print("error")
+                            print("CONTROL: error")
                             traceback.print_exc()
                 print("CONTROL: control event handler died")
                 # sleep to stop hammering endpoint requests
@@ -481,7 +489,7 @@ def startChat():
                     try:
                                 asyncio.new_event_loop().run_until_complete(handleChatMessages())
                     except:
-                                print("error")
+                                print("CHAT: error")
                                 traceback.print_exc()
                     print("CHAT: event handler died")
                     # sleep to stop hammering endpoint requests
