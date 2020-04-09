@@ -272,7 +272,7 @@ def say(message, messageVolume, voice='en-us'):
 
 def getControlHost():
 
-        url = apiHost+'v1/get_service/rscontrol'
+        url = apiHost+'/v1/get_service/rscontrol'
         response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
         if response is not None:
             response = json.loads(response)
@@ -282,7 +282,7 @@ def getControlHost():
         
         if response is None:
             
-            url = apiHost+'v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
+            url = apiHost+'/v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
             response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
             if response is not None:
                 response = json.loads(response)
@@ -293,7 +293,7 @@ def getControlHost():
             
 def getChatHost(useTLS):
 
-        url = apiHost+'v1/get_service/rschat'
+        url = apiHost+'/v1/get_service/rschat'
         response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
         if response is not None:
             response = json.loads(response)
