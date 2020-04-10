@@ -274,18 +274,20 @@ def getControlHost():
 
         url = apiHost+'/v1/get_service/rscontrol'
         response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+        response = json.loads(response)
+        print("response:", response)
+
         if response is not None:
-            response = json.loads(response)
             response['protocol'] = 'wss'
             print("get_service response:", response)
-        
         
         if response is None:
             
             url = apiHost+'/v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
             response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+            response = json.loads(response)
+
             if response is not None:
-                response = json.loads(response)
                 response['protocol'] = 'ws'
                 print("get_endpoint response:", response)
 
@@ -295,8 +297,9 @@ def getChatHost(useTLS):
 
         url = apiHost+'/v1/get_service/rschat'
         response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+        response = json.loads(response)
+
         if response is not None:
-            response = json.loads(response)
             print("get_service response:", response)
         
         if response is None:
