@@ -210,7 +210,27 @@ insert following line and save:
 @reboot /bin/bash /home/pi/start_robot
 ```
 
-That's it!
+When you reboot, that line should cause start_robot to run.
+
+
+<h2> How to set robot type </h2>
+
+Edit the start_robot file:
+```nano ~/start_robot```
+
+You will see a line that looks something like this. Note this is just an example, yours will be different because of keys and any parameters you already have.
+
+```nohup scripts/repeat_start /usr/local/bin/python3.6 -u controller.py 100 --tts-volume 100 --straight-speed 180 --stream-key THISISAKEY1 &> /dev/null&```
+
+Use the --type parameter to set the type of robot, for example if you have a roomba:
+```--type open_roomba```
+
+So, for this example, the line would then be:
+
+```nohup scripts/repeat_start /usr/local/bin/python3.6 -u controller.py 100 --type open_roomba --tts-volume 100 --straight-speed 180 --stream-key THISISAKEY1 &> /dev/null&```
+
+After editing the file, save and restart the pi.
+
 
 <h2> How to figure out problems if it's not starting the video feed </h2>
 
