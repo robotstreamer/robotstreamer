@@ -48,7 +48,8 @@ echo
 sleep 3s
 
 # Write the start_robot file with the ID for robot and camera in
-echo '#!/bin/bash' >> ~/start_robot
+# Make first line overwrite
+echo '#!/bin/bash' > ~/start_robot
 echo '# suggested use for this:' >> ~/start_robot
 echo '# (1) Put in the ids for your robot, YOURROBOTID and YOURCAMERAID' >> ~/start_robot
 echo '# (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot' >> ~/start_robot
@@ -109,7 +110,9 @@ cd ~ &&\
 git clone https://github.com/robotstreamer/robotstreamer &&\
 
 # Add start_robot script to crontab, it might throw an error, but it works anyways
-sudo crontab -l | { cat; echo "@reboot /bin/bash /home/pi/init_robot"; } | sudo crontab -
+#sudo crontab -l | { cat; echo "@reboot /bin/bash /home/pi/init_robot"; } | sudo crontab -
+# Only allow one @reboot. No duplicates
+/bin/bash crontab -l 2>/dev/null; echo "@reboot /bin/bash /home/pi/init_robot" | sort - | uniq - | sudo crontab -
 
 echo
 echo
