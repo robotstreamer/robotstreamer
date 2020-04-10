@@ -1,0 +1,11 @@
+# update robot
+echo "::updating robot::"
+echo `date` : rsapi pulling >> /home/pi/updatelog.txt; cd /home/pi/robotstreamer/; git reset --hard;  git pull -f >> /home/pi/updatelog.txt
+
+# update robot dependencies 
+echo "::updating robot dependencies::"
+pip3 install -r requirements.txt
+
+# start robot
+echo "::starting robot::"
+./home/pi/start_robot

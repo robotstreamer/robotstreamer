@@ -22,7 +22,7 @@ maximumTTSTime = 5
 
 currentWebsocket = {'chat': None, 'control': None}
 lastPongTime = {'chat': datetime.datetime.now(), 'control': datetime.datetime.now()}
-websocketOK = {'chat': True, 'control': True}
+websocketOK = {}
 
 
 print("temporary directory:", tempDir)
@@ -51,6 +51,8 @@ parser.add_argument('--turn-delay', type=float, default=0.1)
 parser.add_argument('--api-url', default="http://api.robotstreamer.com:8080")
 parser.add_argument('--disable-volume-set', dest='disable_volume_set', action='store_true')
 parser.set_defaults(disable_volume_set=False)
+parser.add_argument('--disable-chat', dest='disable_chat', action='store_true')
+parser.set_defaults(disable_chat=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
 parser.add_argument('--free-tts-queue-size', type=int, default=2)
@@ -270,174 +272,211 @@ def say(message, messageVolume, voice='en-us'):
 
 def getControlHost():
 
-        url = apiHost+'/get_control_host_port/'+commandArgs.robot_id 
+        url = apiHost+'/v1/get_service/rscontrol'
+        response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+        if response is not None:
+            response = json.loads(response)
+            response['protocol'] = 'wss'
+            print("get_service response:", response)
+        
+        
+        if response is None:
+            
+            url = apiHost+'/v1/get_endpoint/rscontrol_robot/'+commandArgs.robot_id 
+            response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+            if response is not None:
+                response = json.loads(response)
+                response['protocol'] = 'ws'
+                print("get_endpoint response:", response)
 
-        response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
-        print("response:", response)
-        return json.loads(response)
+        return response
             
 def getChatHost(useTLS):
 
-        #url = apiHost+'/v1/get_random_endpoint/rschat/'+commandArgs.robot_id #only for individual
+        url = apiHost+'/v1/get_service/rschat'
+        response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+        if response is not None:
+            response = json.loads(response)
+            print("get_service response:", response)
+        
+        if response is None:
+            
+            if useTLS:
+                url = apiHost+'/v1/get_random_endpoint/rschatssl/100'
+            else:
+                url = apiHost+'/v1/get_random_endpoint/rschat/100'
 
-        if useTLS:
-            url = apiHost+'/v1/get_random_endpoint/rschatssl/100'
-        else:
-            url = apiHost+'/v1/get_random_endpoint/rschat/100'
-                    
-        response = robot_util.getWithRetry(url, secure=commandArgs.secure_cert)
-        print("response:", response)
-        return json.loads(response)
+            response = robot_util.getNoRetry(url, secure=commandArgs.secure_cert)
+            response = json.loads(response)
+            print("get_endpoint response:", response)
+
+        return response
 
 
 async def handleWesocketTester(key):
 
-            while True:
-                        time.sleep(5)
-                        if currentWebsocket[key] is not None:
-                                    print("sending rs ping message")
-                                    await currentWebsocket[key].send('{"command":"RS_PING"}')
-                        else:
-                                    print("control websocket is not initialized")
+        while True:
+            time.sleep(5)
+            if currentWebsocket[key] is not None:
+                        print(key.upper()+": sending rs ping message")
+                        try:
+                            await currentWebsocket[key].send('{"command":"RS_PING"}')
+                        except:
+                            print(key.upper()+": control ping error") 
+            else:
+                        print(key.upper()+": control websocket is not initialized")
 
 
-                        elapsed = datetime.datetime.now() - lastPongTime[key]
-                        print("elapsed time since last acklowledgement (%s):" % key,
-                              elapsed.total_seconds())
-                        if (elapsed.total_seconds() > 60):
-                                    print(key, "test failed, signaling restart")
-                                    websocketOK[key] = False
+            elapsed = datetime.datetime.now() - lastPongTime[key]
+            print(key.upper()+": elapsed time since last acklowledgement (%s):" % key,
+                  elapsed.total_seconds())
+            if (elapsed.total_seconds() > 60):
+                        print(key.upper()+": test failed, signaling restart")
+                        websocketOK[key] = False
 
                                     
-            
-            
+
 async def handleControlMessages():
 
-    controlGet = getControlHost()
-    controlHost = controlGet['host']
-    controlPort = controlGet['port']
+    h = getControlHost()
 
-    print("handle control messages get control port, connecting to port:", controlPort)
-    url = 'ws://%s:%s/echo' % (controlHost, controlPort)
+    url = '%s://%s:%s/echo' % (h['protocol'], h['host'], h['port'])
+    print("CONTROL url:", url)
 
     async with websockets.connect(url) as websocket:
 
-        print("connected to control service at", url)
-        print("control websocket object:", websocket)
+        print("CONTROL: control websocket object:", websocket)
 
-        # validation handshake
-        await websocket.send(json.dumps({"command":commandArgs.stream_key}))
+        if h['protocol'] == 'wss': 
+            # validation handshake new
+            await websocket.send(json.dumps({"type":"robot_connect",
+                                             "robot_id":commandArgs.robot_id,
+                                             "stream_key":commandArgs.stream_key}))
+        else:
+            # validation handshake old
+            await websocket.send(json.dumps({"command":commandArgs.stream_key}))
+
 
         currentWebsocket['control'] = websocket
         
         while True:
 
-            print("awaiting control message")
+            print("CONTROL: awaiting control message")
             
             message = await websocket.recv()
-            print("< {}".format(message))
+            #print("< {}".format(message))
             j = json.loads(message)
-            print(j)
-            if 'command' in j and j['command'] == "RS_PONG":
+            print("CONTROL message: ",j)
+
+            if j.get('command') == "RS_PONG":
                         lastPongTime['control'] = datetime.datetime.now()
 
-            _thread.start_new_thread(interface.handleCommand, (j["command"],
-                                                               j["key_position"]))
+            if j.get('type') == "RS_PING":
+                        #ws keepalive new
+                        lastPongTime['control'] = datetime.datetime.now()
+
+            elif j.get('command') and j.get('key_position'):
+                _thread.start_new_thread(interface.handleCommand, (j["command"],
+                                                                   j["key_position"]))
 
 
             
 async def handleChatMessages():
 
+    h = getChatHost(commandArgs.tls_chat)
 
-    chatGet = getChatHost(commandArgs.tls_chat)
-    chatHost = chatGet['host']
-    chatPort = chatGet['port']
+    if commandArgs.tls_chat: h['protocol'] = 'wss'
+    else: h['protocol'] = 'ws'
 
-    if commandArgs.tls_chat:
-                url = 'wss://%s:%s' % (chatHost, chatPort)
-    else:
-                url = 'ws://%s:%s' % (chatHost, chatPort)                
-    print("chat url:", url)
+    url = '%s://%s:%s/echo' % (h['protocol'], h['host'], h['port'])
+    print("CHAT url:", url)
 
     async with websockets.connect(url) as websocket:
 
-        print("connected to control service at", url)
-        print("chat websocket object:", websocket)
+        print("CHAT connected to chat service at: ", url)
+        print("CHAT chat websocket object: ", websocket)
 
-        #todo: you do need this as an connection initializer, but you should make the server not need it
-        await websocket.send(json.dumps({"message":"message"}))     
+        # removed comment: you do need this as an connection initializer, but you should make the server not need it
+        # chat server requires atleast a robot_id for when non global chat is enforced but otherwise no initialiser required
+        # treat stream_key as token when type robot_connect for future use
+        await websocket.send(json.dumps({"type":"robot_connect",
+                                         "token":str(commandArgs.stream_key),
+                                         "robot_id":str(commandArgs.robot_id) }))     
 
         currentWebsocket['chat'] = websocket
         
         while True:
 
-            print("awaiting chat message")
+            print("CHAT: awaiting chat message")
             
             message = await websocket.recv()
-            print("< {}".format(message))
+            #print("< {}".format(message))
             j = json.loads(message)
-            print("message:", j)
+            print("CHAT message:", j)
 
-            if 'command' in j and j['command'] == "RS_PONG":
-                        lastPongTime['chat'] = datetime.datetime.now()
-            
-            if ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
-                        if ('tts' in j) and j['tts'] == True:
-                                    print("tts option is on")
-                                    # paid messages can queue but unpaid cannot
-                                    if len(messagesToTTS) < commandArgs.free_tts_queue_size or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
-                                                messagesToTTS.append((j['message'], 1))
-                        else:
-                                    print("tts option is off")
-                                    if commandArgs.play_nontts_softly:
-                                                if len(j['message']) > 0:
-                                                            if len(messagesToTTS) == 0:
-                                                                        messagesToTTS.append((j['message'][1:], 0.15))
-                        #if audio.espeakBytes(j['message']) < 400000:
-                        #            print("length", audio.espeakBytes(j['message']))
-                        #            _thread.start_new_thread(say, (j['message'],))
-                        #else:
-                        #            print("message too long")
+
+            if j.get('command') == "RS_PONG":
+                lastPongTime['chat'] = datetime.datetime.now()
+
+            elif j.get('type') == "RS_PING":
+                print("CHAT: RS_PING keepalive")
+
+            elif ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
+                            if ('tts' in j) and j['tts'] == True:
+                                        print("CHAT: tts option is on")
+                                        # paid messages can queue but unpaid cannot
+                                        if len(messagesToTTS) < commandArgs.free_tts_queue_size or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
+                                                    messagesToTTS.append((j['message'], 1))
+                            else:
+                                        print("CHAT: tts option is off")
+                                        if commandArgs.play_nontts_softly:
+                                                    if len(j['message']) > 0:
+                                                                if len(messagesToTTS) == 0:
+                                                                            messagesToTTS.append((j['message'][1:], 0.15))
+                            #if audio.espeakBytes(j['message']) < 400000:
+                            #            print("length", audio.espeakBytes(j['message']))
+                            #            _thread.start_new_thread(say, (j['message'],))
+                            #else:
+                            #            print("message too long")
             else:
-                print("error, message not valid:", j)
-
-            
-
-            
-def startControl():
-    print("waiting a few seconds")
-    time.sleep(6) #todo: only wait as needed (wait for interent)
-
-    while True:
-                print("starting control loop")
-                time.sleep(0.25)
-                try:
-                            asyncio.new_event_loop().run_until_complete(handleControlMessages())
-                except:
-                            print("error")
-                            traceback.print_exc()
-                print("control event handler died")
-                interface.movementSystemActive = False
+                print("CHAT: error, message not valid:", j)
 
 
 
 def startWebsocketTester(key):
-    print(key, "tester, waiting a few seconds")
+    print(key.upper()+": tester, waiting a few seconds")
     time.sleep(6) #todo: only wait as needed (wait for interent)
 
     if True:
-                print("starting", key, "tester loop")
+                print(key.upper()+": starting tester loop")
                 time.sleep(1)
                 try:
                             asyncio.new_event_loop().run_until_complete(handleWesocketTester(key))
                 except:
-                            print("error")
+                            print(key.upper()+" :error")
                             traceback.print_exc()
-                print("control tester event handler died so killing process")
+                print(key.upper()+": socket tester event handler died so killing process")
+                time.sleep(2)
 
 
 
-                
+def startControl():
+    print("CONTROL: waiting a few seconds")
+    time.sleep(6) #todo: only wait as needed (wait for internet) note:has a retry now
+
+    while True:
+                print("CONTROL: starting control loop")
+                try:
+                            asyncio.new_event_loop().run_until_complete(handleControlMessages())
+                except:
+                            print("CONTROL: error")
+                            traceback.print_exc()
+                print("CONTROL: control event handler died")
+                # sleep to stop hammering endpoint requests
+                time.sleep(2)
+                interface.movementSystemActive = False
+    
+
 
 def startChat():
         time.sleep(10) #todo: only wait as needed (wait for interenet)
@@ -445,18 +484,16 @@ def startChat():
         time.sleep(0.25)
 
         while True:
-                    print("starting chat loop")
-                    time.sleep(0.25)
+                    print("CHAT: starting chat loop")
                     
-
-        
                     try:
                                 asyncio.new_event_loop().run_until_complete(handleChatMessages())
                     except:
-                                print("error")
+                                print("CHAT: error")
                                 traceback.print_exc()
-                    print("chat event handler died")
-
+                    print("CHAT: event handler died")
+                    # sleep to stop hammering endpoint requests
+                    time.sleep(2)
 
 #async def hello(uri):
 #       async with websockets.connect(uri) as websocket:
@@ -466,9 +503,6 @@ def startChat():
 #                        x = await websocket.recv()
 #                        print(x)
 
-#def startTest():
-#        asyncio.get_event_loop().run_until_complete(
-#                hello('ws://54.219.138.36:8765'))
 
 
 def runPeriodicTasks():
@@ -491,11 +525,17 @@ def main():
             print(commandArgs)
             
             _thread.start_new_thread(startControl, ())
+            websocketOK['control'] = True # enable tester
+
+            if not commandArgs.disable_chat:
+
+                _thread.start_new_thread(startChat, ()) 
+                websocketOK['chat'] = True # enable tester
+
             for key in websocketOK:
-                        _thread.start_new_thread(startWebsocketTester, (key,))
-            _thread.start_new_thread(startChat, ())            
-            #_thread.start_new_thread(startTest, ())
-            #startTest()
+                # run tester
+                _thread.start_new_thread(startWebsocketTester, (key,))
+
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)

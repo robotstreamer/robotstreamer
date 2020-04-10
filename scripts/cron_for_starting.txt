@@ -1,6 +1,6 @@
 # using sudo crontab -e and putting this line at the bottom
 
-@reboot /bin/bash /home/pi/start_robot
+@reboot /bin/bash /home/pi/init_robot
 
 
 # optional cron entry to kill the controller occationally, which will cause it to be restarted:

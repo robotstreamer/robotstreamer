@@ -44,6 +44,27 @@ def getWithRetry(url, secure=True):
     return data.decode(encoding)
 
 
+def getNoRetry(url, secure=True):
+    #socket test has retry
+        try:
+            print("GET", url)
+            if secure:
+                object = urllib.request.urlopen(url)
+
+            else:
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                object = urllib.request.urlopen(url, context=ctx)
+
+        except:
+            print("could not open url", url)
+            return
+
+        data = object.read()
+        encoding = object.info().get_content_charset('utf-8')
+        return data.decode(encoding)
+
 
 def sendSerialCommand(ser, command):
 
