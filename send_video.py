@@ -16,6 +16,7 @@ import copy
 import argparse
 import audio_util
 import urllib.request
+import rtc_signalling
 from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
@@ -41,6 +42,15 @@ parser.add_argument('--audio-device-number', default=1, type=int)
 parser.add_argument('--audio-device-name')
 parser.add_argument('--audio-rate', default=48000, type=int, help="this is 44100 or 48000 usually")
 parser.add_argument('--kbps', default=350, type=int)
+parser.add_argument('--kbps-audio', default=64, type=int)
+parser.add_argument('--framerate', default=25, type=int)
+
+parser.add_argument('--protocol', default='jsmpeg') # "H264" "VP8"
+parser.add_argument('--h264preset', default='ultrafast')
+parser.add_argument('--h264extraParams', default='-tune zerolatency')
+parser.add_argument('--h264codecParams', default='nal-hrd=cbr:keyint=50')
+parser.add_argument('--VPXextraParams', default='')
+
 parser.add_argument('--brightness', type=int, help='camera brightness')
 parser.add_argument('--contrast', type=int, help='camera contrast')
 parser.add_argument('--saturation', type=int, help='camera saturation')
@@ -71,6 +81,7 @@ resolutionChanged = False
 currentXres = None
 currentYres = None
 apiServer = commandArgs.api_url
+websocketSFU = None
 
 audioProcess = None
 videoProcess = None
@@ -79,7 +90,6 @@ videoProcess = None
 
 # enable raspicam driver in case a raspicam is being used
 os.system("sudo modprobe bcm2835-v4l2")
-
 
 
 
@@ -129,6 +139,11 @@ def getVideoEndpoint():
 
 def getAudioEndpoint():
     url = '%s/v1/get_endpoint/jsmpeg_audio_capture/%s' % (apiServer, commandArgs.camera_id)
+    response = robot_util.getWithRetry(url)
+    return json.loads(response)
+
+def getVideoSFU():
+    url = '%s/v1/get_endpoint/webrtc_sfu/100' % (apiServer)
     response = robot_util.getWithRetry(url)
     return json.loads(response)
 
@@ -183,7 +198,7 @@ def startVideoCaptureLinux():
     print(videoCommandLine)
 
     #return subprocess.Popen(shlex.split(videoCommandLine))
-    return runAndMonitor("video", shlex.split(videoCommandLine))
+    return runAndMonitor("video", shlex.split(videoCommandLine)) 
 
 
 
@@ -313,6 +328,8 @@ def refreshFromOnlineSettings():
 def checkForStuckProcesses():
 
     global lastCharCount
+    global videoProcess
+
     if lastCharCount is not None:
 
         if robotSettings.camera_enabled:
@@ -323,22 +340,143 @@ def checkForStuckProcesses():
                 print("KILLING VIDEO PROCESS")
                 videoProcess.kill()
 
-        if robotSettings.mic_enabled:
+        if robotSettings.mic_enabled and robotSettings.protocol == 'jsmpeg':
             audioInfoRate = charCount['audio'] - lastCharCount['audio']
             print("audio info rate:", audioInfoRate)
             if abs(audioInfoRate) < 10:
                 print("audio process has stopped outputting info")
                 print("KILLING AUDIO PROCESS")
                 audioProcess.kill()
-        
-
-
             
     print("ffmpeg output character count:", charCount)
     lastCharCount = copy.deepcopy(charCount)
 
 
+def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
+
+    # set brightness
+    if (robotSettings.brightness is not None):
+        print("brightness")
+        os.system("v4l2-ctl -c brightness={brightness}".format(brightness=robotSettings.brightness))
+
+    # set contrast
+    if (robotSettings.contrast is not None):
+        print("contrast")
+        os.system("v4l2-ctl -c contrast={contrast}".format(contrast=robotSettings.contrast))
+
+    # set saturation
+    if (robotSettings.saturation is not None):
+        print("saturation")
+        os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
+
+    audioDevNum = robotSettings.audio_device_number
+    if robotSettings.audio_device_name is not None:
+        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
     
+    if robotSettings.protocol == 'video/VP8':
+        #ffmpeg -h encoder=libvpx
+        videoParameters =   '-c:v libvpx \
+                                {VPXextraParams} \
+                                -tune psnr \
+                                -deadline realtime \
+                                -quality realtime \
+                                -cpu-used  16 \
+                                -pix_fmt yuv420p \
+                                -b:v {kbps}k \
+                                -preset ultrafast \
+                                -map 0:v:0'\
+                                .format(kbps=robotSettings.kbps, 
+                                        VPXextraParams=robotSettings.VPXextraParams)
+    else:
+        #ffmpeg -h encoder=libx264    
+        videoParameters =   '-c:v libx264 \
+                                -pix_fmt yuv420p \
+                                -vsync 2 \
+                                -x264-params "{h264codecParams}" \
+                                -b:v {kbps}k -minrate {kbps}k -maxrate {kbps}k -bufsize 2M \
+                                -preset {h264preset} \
+                                {h264extraParams}\
+                                -g 50 \
+                                -map 0:v:0'\
+                                .format(kbps=robotSettings.kbps, 
+                                        h264codecParams=robotSettings.h264codecParams,
+                                        h264preset=robotSettings.h264preset,
+                                        h264extraParams=robotSettings.h264extraParams)
+
+
+    videoCommandLine = '{ffmpeg_path} \
+                        -f v4l2 -video_size {xres}x{yres} -r {framerate} -i /dev/video{video_device_number} {rotation_option}  \
+                        -f alsa -i hw:{audio_device_number} \
+                        {video} \
+                        -c:a libopus \
+                            -b:a {kbpsAudio}k \
+                            -async 1 \
+                            -preset ultrafast \
+                            -map 1:a:0 \
+                        -f tee "[select=a:f=rtp:ssrc={SSRCA}:payload_type=100]rtp://{audio_host}:{audio_port}|[select=v:f=rtp:ssrc={SSRCV}:payload_type=101]rtp://{video_host}:{video_port}"'\
+                        .format(ffmpeg_path=robotSettings.ffmpeg_path, 
+                                video_device_number=robotSettings.video_device_number, 
+                                xres=robotSettings.xres, 
+                                yres=robotSettings.yres,
+                                framerate=robotSettings.framerate,
+                                audio_device_number=audioDevNum,
+                                rotation_option=rotationOption(),
+                                video=videoParameters,
+                                kbpsAudio=robotSettings.kbps_audio, 
+                                audio_host=audioEndpoint['localIp'], audio_port=audioEndpoint['localPort'], 
+                                video_host=videoEndpoint['localIp'], video_port=videoEndpoint['localPort'], 
+                                SSRCA=SSRCA, SSRCV=SSRCV)
+
+
+    print(videoCommandLine)
+    return runAndMonitor("video", shlex.split(videoCommandLine))
+    #return subprocess.Popen(shlex.split(videoCommandLine))
+
+
+def startRTCvideo():
+
+    global websocketSFU
+    global videoProcess
+
+    print("RTC Codec: ", robotSettings.protocol)
+    # convert camera_id to robot
+    robotID   = str(int(commandArgs.camera_id) - int(100))
+    videoSSRC = int(random.randint(1000,9999))
+    audioSSRC = int(random.randint(1000,9999))
+    peerID    = str(random.randint(100000,999999))
+
+    videoSFU = getVideoSFU()
+    print("robotID: ", robotID)
+    print("videoSSRC: ", videoSSRC)
+    print("audioSSRC: ", audioSSRC)
+    print("SFU", videoSFU)
+    
+    if websocketSFU:
+        # close if open to dump the old transports
+        websocketSFU.close()
+
+    websocketSFU = rtc_signalling.SFUClient('wss://'+str(videoSFU['host'])+':'+str(videoSFU['port'])\
+                                  +'/?roomId='+robotID+'&peerId=p:robot_'+peerID, protocols=['protoo'])
+
+    websocketSFU.init(robotSettings.stream_key, 
+                      robotSettings.protocol, 
+                      videoSSRC, 
+                      audioSSRC)
+
+    websocketSFU.connect()
+    websocketSFU.getRouterRtpCapabilities() #n/a producer
+    websocketSFU.requestPlainTransportVideo() 
+    websocketSFU.requestPlainTransportAudio()
+
+    # wait for endpoint results
+    while websocketSFU.videoEndpoint == False:
+        pass
+    while websocketSFU.audioEndpoint == False:
+        pass
+
+    videoProcess = startRTCffmpeg(websocketSFU.videoEndpoint, videoSSRC, websocketSFU.audioEndpoint, audioSSRC)
+    return
+
 
 def main():
 
@@ -346,49 +484,43 @@ def main():
     global audioProcess
     global videoProcess
 
+    numVideoRestarts = 0
+    numAudioRestarts = 0
+    count = 0
 
     # overrides command line parameters using config file
     print("args on command line:", commandArgs)
-
-    robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id, commandArgs.stream_key)
-    #starts the backend services and
-
     print("camera id:", commandArgs.camera_id)
-
     refreshFromOnlineSettings()
-
     print("args after loading from server:", robotSettings)
 
-    #todo need to implement for robotstreamer
-    # appServerSocketIO.on('command_to_robot', onCommandToRobot)
-    # appServerSocketIO.on('connection', onConnection)
-    # appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
+    if robotSettings.protocol != 'jsmpeg':
+        robotSettings.protocol = 'video/'+str(robotSettings.protocol)
 
-
-
+    robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id, commandArgs.stream_key)
     sys.stdout.flush()
 
 
-    if robotSettings.camera_enabled:
-        if not commandArgs.dry_run:
-            videoProcess = startVideoCaptureLinux()
-        else:
-            videoProcess = DummyProcess()
+    if robotSettings.protocol != 'jsmpeg':
+        # RTC
+        startRTCvideo()
 
-    if robotSettings.mic_enabled:
-        if not commandArgs.dry_run:
-            audioProcess = startAudioCaptureLinux()
-            if commandArgs.audio_restart_enabled:
-                _thread.start_new_thread(killallFFMPEGIn30Seconds, ())
-            #appServerSocketIO.emit('send_video_process_start_event', {'camera_id': commandArgs.camera_id})
-        else:
-            audioProcess = DummyProcess()
+    else:
+        # jsmpeg
+        if robotSettings.camera_enabled:
+            if not commandArgs.dry_run:
+                videoProcess = startVideoCaptureLinux()
+            else:
+                videoProcess = DummyProcess()
 
-
-    numVideoRestarts = 0
-    numAudioRestarts = 0
-
-    count = 0
+        if robotSettings.mic_enabled:
+            if not commandArgs.dry_run:
+                audioProcess = startAudioCaptureLinux()
+                if commandArgs.audio_restart_enabled:
+                    _thread.start_new_thread(killallFFMPEGIn30Seconds, ())
+                #appServerSocketIO.emit('send_video_process_start_event', {'camera_id': commandArgs.camera_id})
+            else:
+                audioProcess = DummyProcess()
 
 
     # loop forever and monitor status of ffmpeg processes
@@ -401,18 +533,13 @@ def main():
 
         time.sleep(1)
 
-
-
-        # todo: note about the following ffmpeg_process_exists is not technically true, but need to update
+        # todo jsmpeg: note about the following ffmpeg_process_exists is not technically true, but need to update
         # server code to check for send_video_process_exists if you want to set it technically accurate
         # because the process doesn't always exist, like when the relay is not started yet.
         # send status to server
         ######appServerSocketIO.emit('send_video_status', {'send_video_process_exists': True,
         ######                                    'ffmpeg_process_exists': True,
         ######                                    'camera_id':commandArgs.camera_id})
-
-
-
 
         if numVideoRestarts > 20:
             if commandArgs.restart_on_video_fail:
@@ -442,28 +569,30 @@ def main():
                                               commandArgs.camera_id,
                                               robotSettings.stream_key)
 
-
-
         if (count % 2) == 0:
             checkForStuckProcesses()
             
-            
-
-        if robotSettings.camera_enabled:
+        # poll when jsmpeg and rtc
+        if robotSettings.camera_enabled and videoProcess:
 
             print("video process poll", videoProcess.poll(), "pid", videoProcess.pid, "restarts", numVideoRestarts)
 
             # restart video if needed
             if videoProcess.poll() != None:
                 randomSleep()
-                videoProcess = startVideoCaptureLinux()
+                if robotSettings.protocol != 'jsmpeg':
+                    print("RESTART RTC")
+                    startRTCvideo()
+                else:
+                    #jsmpeg restart
+                    videoProcess = startVideoCaptureLinux()
                 numVideoRestarts += 1
+
         else:
             print("video process poll: camera_enabled is false")
 
-
-
-        if robotSettings.mic_enabled:
+        # only poll when jsmpeg; rtc has no audio process
+        if robotSettings.mic_enabled and robotSettings.protocol == 'jsmpeg':
 
             if audioProcess is None:
                 print("audio process poll: audioProcess object is None")
@@ -479,7 +608,6 @@ def main():
                 numAudioRestarts += 1
         else:
             print("audio process poll: mic_enabled is false")
-
 
         count += 1
 
