@@ -22,7 +22,7 @@ CLEAN = b'\x87'
 BEEP = b'\x8c\x03\x01\x40\x10\x8d\x03'
 VOLTAGE = b'\x8e\x16'
 POWER = b'\x85'
-LVCO = 11000 #roomba will power down at this battery voltage in mV
+LVCO = 11500 #roomba will power down at this battery voltage in mV
 
 movementSystemActive = False
 
@@ -41,9 +41,9 @@ def handleCommand(command, keyPosition):
     elif command == 'R':
         move(-100, 100, 0, .20, 0)
     elif command == 'F':
-        move(100, 100, .09, .40, .18)
+        move(200, 200, .09, .40, .18)
     elif command == 'B':
-        move(-100, -100, .09, .40, .18)
+        move(-200, -200, .09, .40, .18)
 
     ser.reset_input_buffer()
     ser.write(VOLTAGE)

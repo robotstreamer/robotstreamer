@@ -20,7 +20,7 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
 #from Queue import Queue # Python 2
-
+from usb.core import find as finddev
 
 class DummyProcess:
     def poll(self):
@@ -202,6 +202,8 @@ def startAudioCaptureLinux():
     audioCommandLine = '%s -f alsa -ar %d -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
                         % (robotSettings.ffmpeg_path, robotSettings.audio_rate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
+    dev=finddev(idVendor=0x046d, idProduct=0x082d)
+    dev.reset()
     #return subprocess.Popen(shlex.split(audioCommandLine))
     return runAndMonitor("audio", shlex.split(audioCommandLine))
 
