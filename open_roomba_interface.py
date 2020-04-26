@@ -26,6 +26,7 @@ LVCO = 11000 #roomba will power down at this battery voltage in mV
 
 movementSystemActive = False
 
+commandArgs = None
 
 
 def handleCommand(command, keyPosition):
@@ -36,14 +37,16 @@ def handleCommand(command, keyPosition):
     print("keyposition: ", keyPosition)
     print("command: ", command)
 
+    speed = int(commandArgs.straight_speed / 2)
+
     if command == 'L':
         move(100, -100, 0, .20, 0)
     elif command == 'R':
         move(-100, 100, 0, .20, 0)
     elif command == 'F':
-        move(100, 100, .09, .40, .18)
+        move(speed, speed, .09, .40, .18)
     elif command == 'B':
-        move(-100, -100, .09, .40, .18)
+        move(-speed, -speed, .09, .40, .18)
 
     ser.reset_input_buffer()
     ser.write(VOLTAGE)
@@ -63,7 +66,9 @@ def handleCommand(command, keyPosition):
 
     
 
-def init():
+def init(cArgs):
+    global commandArgs
+    commandArgs = cArgs
     try:
         print("init roomba")
         ser.write(RESET)
