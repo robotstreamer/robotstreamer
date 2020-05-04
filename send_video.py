@@ -45,7 +45,7 @@ parser.add_argument('--kbps', default=350, type=int)
 parser.add_argument('--kbps-audio', default=64, type=int)
 parser.add_argument('--framerate', default=25, type=int)
 
-parser.add_argument('--protocol', default='jsmpeg') # "H264" "VP8"
+parser.add_argument('--protocol', default='jsmpeg', help="options: jsmpeg, H264, VP8")
 parser.add_argument('--h264preset', default='ultrafast')
 parser.add_argument('--h264extraParams', default='-tune zerolatency')
 parser.add_argument('--h264codecParams', default='nal-hrd=cbr:keyint=50')
