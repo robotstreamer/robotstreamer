@@ -98,7 +98,7 @@ elif commandArgs.type == "roomba_kristie":
             
 elif commandArgs.type == "open_roomba":
             import open_roomba_interface as interface
-            interface.init()
+            interface.init(commandArgs)
 
 elif commandArgs.type == "humanoid":
             import humanoid_interface as interface
