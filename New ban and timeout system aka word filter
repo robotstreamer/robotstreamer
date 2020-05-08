@@ -1,0 +1,14 @@
+var censorjs = require('censorjs');
+
+var cleaned = censorjs.clean("nigger shit asshole bastard idiot gay penis anus gooch naked sex sexual fuck nazi ass nlgger:(");
+console.log(cleaned);
+
+
+"snipe/banbuilder": "dev-master",
+
+[0] => 'ass' [0] => /(a|a\.|a\-|4|@|Á|á|À|Â|à|Â|â|Ä|ä|Ã|ã|Å|å|α)(s|s\.|s\-|5|\$|§)(s|s\.|s\-|5|\$|§)/i
+
+array_push($badwords,
+'word1',
+'word2',
+);
