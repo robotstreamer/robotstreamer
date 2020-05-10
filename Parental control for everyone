@@ -1,0 +1,89 @@
+
+	
+/*
+	
+ * Copyright © 2019 Endless Mobile, Inc.
+	
+ *
+	
+ * This library is free software; you can redistribute it and/or
+	
+ * modify it under the terms of the GNU Lesser General Public
+	
+ * License as published by the Free Software Foundation; either
+	
+ * version 2.1 of the License, or (at your option) any later version.
+	
+ *
+	
+ * This library is distributed in the hope that it will be useful,
+	
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	
+ * Lesser General Public License for more details.
+	
+ *
+	
+ * You should have received a copy of the GNU Lesser General Public
+	
+ * License along with this library; if not, write to the Free Software
+	
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	
+ *
+	
+ * Authors:
+	
+ *  - Philip Withnall <withnall@endlessm.com>
+	
+ */
+	
+
+	
+polkit.addRule(function(action, subject) {
+	
+    /* Allow administrators to read parental controls (for any account) without
+	
+     * needing an additional polkit authorisation dialogue. */
+	
+    if ((action.id == "com.endlessm.ParentalControls.AppFilter.ReadOwn" ||
+	
+         action.id == "com.endlessm.ParentalControls.AppFilter.ReadAny") &&
+	
+        subject.active && subject.local &&
+	
+        subject.isInGroup("sudo")) {
+	
+            return polkit.Result.YES;
+	
+    }
+	
+
+	
+    return polkit.Result.NOT_HANDLED;
+	
+});
+
+i18n.merge_file('com.endlessm.ParentalControls.policy',
+  input: 'com.endlessm.ParentalControls.policy.in',
+  output: 'com.endlessm.ParentalControls.policy',
+  po_dir: po_dir,
+  install: true,
+  install_dir: polkitpolicydir,
+)
+
+install_data('com.endlessm.ParentalControls.AppFilter.xml',
+  install_dir: dbusinterfacesdir)
+meson.add_install_script(meson_make_symlink,
+  join_paths(dbusinterfacesdir, 'com.endlessm.ParentalControls.AppFilter.xml'),
+  join_paths(accountsserviceinterfacesdir, 'com.endlessm.ParentalControls.AppFilter.xml'))
+
+install_data('com.endlessm.ParentalControls.rules',
+  install_dir: join_paths(get_option('datadir'), 'polkit-1', 'rules.d'))
+  
+  usr/share/accountsservice/interfaces/com.endlessm.ParentalControls.AppFilter.xml
+usr/share/dbus-1/interfaces/com.endlessm.ParentalControls.AppFilter.xml
+usr/share/polkit-1/actions/com.endlessm.ParentalControls.policy
+usr/share/polkit-1/rules.d/com.endlessm.ParentalControls.rules
