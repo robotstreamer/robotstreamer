@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>webRTC Test</title>
+</head>
+<body onload="init();" style="background-color:#ababab;" >
+<div style="width:352px; height:625px; margin:0 auto; background-color:#fff;" >
+    <div>
+      <video id="camFeed" width="320" height="240" autoplay>
+    </video>
+  </div>
+
+    <div>
+        <canvas id="photo" width="320" height="240">
+        </canvas>
+    </div>
+
+    <div style="margin:0 auto; width:82px;">
+        <input type="button" value="Take Photo" onclick="takePhoto();">
+    </div>
+</div>
+<script>
+function init()
+{
+    if(navigator.webkitGetUserMedia)
+    {
+        navigator.webkitGetUserMedia({video:true}, onSuccess, onFail);
+    }
+    else
+    {
+        alert('webRTC not available');
+    }
+}
+
+function onSuccess(stream)
+{
+    document.getElementById('camFeed').srcObject = stream;
+}
+
+function onFail()
+{
+    alert('could not connect stream');
+}
+
+function takePhoto()
+{
+    var c = document.getElementById('photo');
+    var v = document.getElementById('camFeed');
+    c.getContext('2d').drawImage(v, 0, 0, 320, 240);
+}
+</script>
+</body>
+</html>
+
+<input type="file" accept="image/*;capture=camera">
+<input type="file" accept="video/*;capture=camcorder">
+<input type="file" accept="audio/*;capture=microphone">
+
+<device type="media" onchange="update(this.data)"></device>
+<video autoplay></video>
+<script>
+  function update(stream) {
+    document.querySelector('video').src = stream.url;
+  }
+</script>
+
+navigator.MediaDevices.getUserMedia()
+
+function hasGetUserMedia() {
+  return !!(navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia);
+}
+
+if (hasGetUserMedia()) {
+  // Good to go!
+} else {
+  alert('getUserMedia() is not supported by your browser');
+}
+
+<video autoplay></video>
+
+<script>
+const constraints = {
+  video: true
+};
+
+const video = document.querySelector('video');
+
+navigator.mediaDevices.getUserMedia(constraints).
+  then((stream) => {video.srcObject = stream});
+</script>
+
+const hdConstraints = {
+  video: {width: {min: 1280}, height: {min: 720}}
+};
+
+navigator.mediaDevices.getUserMedia(hdConstraints).
+  then((stream) => {video.srcObject = stream});
+
+...
+
+const vgaConstraints = {
+  video: {width: {exact: 640}, height: {exact: 480}}
+};
+
+navigator.mediaDevices.getUserMedia(vgaConstraints).
+  then((stream) => {video.srcObject = stream});
+  
+  const videoElement = document.querySelector('video');
+const audioSelect = document.querySelector('select#audioSource');
+const videoSelect = document.querySelector('select#videoSource');
+
+navigator.mediaDevices.enumerateDevices()
+  .then(gotDevices).then(getStream).catch(handleError);
+
+audioSelect.onchange = getStream;
+videoSelect.onchange = getStream;
+
+function gotDevices(deviceInfos) {
+  for (let i = 0; i !== deviceInfos.length; ++i) {
+    const deviceInfo = deviceInfos[i];
+    const option = document.createElement('option');
+    option.value = deviceInfo.deviceId;
+    if (deviceInfo.kind === 'audioinput') {
+      option.text = deviceInfo.label ||
+        'microphone ' + (audioSelect.length + 1);
+      audioSelect.appendChild(option);
+    } else if (deviceInfo.kind === 'videoinput') {
+      option.text = deviceInfo.label || 'camera ' +
+        (videoSelect.length + 1);
+      videoSelect.appendChild(option);
+    } else {
+      console.log('Found another kind of device: ', deviceInfo);
+    }
+  }
+}
+
+function getStream() {
+  if (window.stream) {
+    window.stream.getTracks().forEach(function(track) {
+      track.stop();
+    });
+  }
+
+  const constraints = {
+    audio: {
+      deviceId: {exact: audioSelect.value}
+    },
+    video: {
+      deviceId: {exact: videoSelect.value}
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints).
+    then(gotStream).catch(handleError);
+}
+
+function gotStream(stream) {
+  window.stream = stream; // make stream available to console
+  videoElement.srcObject = stream;
+}
+
+function handleError(error) {
+  console.error('Error: ', error);
+}
+
+<video autoplay></video>
+<img src="">
+<canvas style="display:none;"></canvas>
+
+<script>
+const captureVideoButton =
+  document.querySelector('#screenshot .capture-button');
+const screenshotButton = document.querySelector('#screenshot-button');
+const img = document.querySelector('#screenshot img');
+const video = document.querySelector('#screenshot video');
+
+const canvas = document.createElement('canvas');
+
+captureVideoButton.onclick = function() {
+  navigator.mediaDevices.getUserMedia(constraints).
+    then(handleSuccess).catch(handleError);
+};
+
+screenshotButton.onclick = video.onclick = function() {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  // Other browsers will fall back to image/png
+  img.src = canvas.toDataURL('image/webp');
+};
+
+function handleSuccess(stream) {
+  screenshotButton.disabled = false;
+  video.srcObject = stream;
+}
+</script>
+
+<video autoplay></video>
+<p><button class="capture-button">Capture video</button>
+<p><button id="cssfilters-apply">Apply CSS filter</button></p>
+
+<script>
+const captureVideoButton =
+  document.querySelector('#cssfilters .capture-button');
+const cssFiltersButton =
+  document.querySelector('#cssfilters-apply');
+const video =
+  document.querySelector('#cssfilters video');
+
+let filterIndex = 0;
+const filters = [
+  'grayscale',
+  'sepia',
+  'blur',
+  'brightness',
+  'contrast',
+  'hue-rotate',
+  'hue-rotate2',
+  'hue-rotate3',
+  'saturate',
+  'invert',
+  ''
+];
+
+captureVideoButton.onclick = function() {
+  navigator.mediaDevices.getUserMedia(constraints).
+    then(handleSuccess).catch(handleError);
+};
+
+cssFiltersButton.onclick = video.onclick = function() {
+  video.className = filters[filterIndex++ % filters.length];
+};
+
+function handleSuccess(stream) {
+  video.srcObject = stream;
+}
+</script>
+
+window.AudioContext = window.AudioContext ||
+                      window.webkitAudioContext;
+
+const context = new AudioContext();
+
+navigator.mediaDevices.getUserMedia({audio: true}).
+  then((stream) => {
+    const microphone = context.createMediaStreamSource(stream);
+    const filter = context.createBiquadFilter();
+    // microphone -> filter -> destination
+    microphone.connect(filter);
+    filter.connect(context.destination);
+});
