@@ -21,7 +21,10 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
 #from Queue import Queue # Python 2
-from usb.core import find as finddev
+try:
+  from usb.core import find as finddev
+except:
+  print("usb MODULE IMPORT FAILED, TRY INSTALLING WITH pip")
 
 class DummyProcess:
     def poll(self):

@@ -82,6 +82,9 @@ elif commandArgs.type == "mac":
 elif commandArgs.type == "gopigo3":
             import gopigo3_interface as interface
 
+elif commandArgs.type == "http_example":
+            import http_example_interface as interface
+
 elif commandArgs.type == "gopigo":
             import gopigo_interface as interface
 
