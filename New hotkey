@@ -1,0 +1,115 @@
+import React from "react";
+import "./robot.css";
+
+const renderButtons = ({
+  controls,
+  renderPresses,
+  renderCurrentKey,
+  onClick,
+  user,
+  controls_id,
+  socket
+}) => {
+  const buttons = ({ button, style, hotKeyStyle }) => {
+    return (
+      <button
+        className={button.hot_key ? "robtn robtn-hot-key" : "robtn"}
+        key={button.id}
+        onClick={() =>
+          onClick({
+            user: user,
+            controls_id: controls_id,
+            socket: socket,
+            button: button
+          })
+        }
+        style={style}
+      >
+        {button.hot_key ? (
+          <span className={hotKeyStyle}>{button.hot_key}</span>
+        ) : (
+          <React.Fragment />
+        )}
+        {button.label}
+      </button>
+    );
+  };
+
+  if (controls) {
+    return controls.map(button => {
+      let hotKeyStyle = "hotkey";
+      let style = {};
+      if (button.hot_key === renderCurrentKey) {
+        style = {
+          boxShadow: "inset 0 0 0 2px rgb(5, 214, 186)",
+          transform: "translateY(4px)",
+          WebkitTransform: "translateY(4px)"
+        }; // noice!
+      }
+      renderPresses.map(press => {
+        if (press && press.button.id === button.id) {
+          style.backgroundColor = "rgb(64, 76, 131)";
+          hotKeyStyle = "hotkey hotkey-highlight";
+        }
+        return null;
+      });
+      if (button.break) {
+        console.log("Break!!!!!");
+      }
+      return buttons(button, style, hotKeyStyle);
+    });
+  }
+};
+
+export default renderButtons;
+[9:29 AM]
+TypeError: Cannot read property 'hot_key' of undefined
+buttons
+src/components/layout/robot/renderButtons.jsx:16
+  13 | const buttons = ({ button, style, hotKeyStyle }) => {
+  14 |   return (
+  15 |     <button
+16 |       className={button.hot_key ? "robtn robtn-hot-key" : "robtn"}
+     | ^  17 |       key={button.id}
+  18 |       onClick={() =>
+  19 |         onClick({
+ renderButtons = () => {
+    return (
+      <RenderButtons
+        controls={this.state.controls}
+        renderPresses={this.state.renderPresses}
+        renderCurrentKey={this.state.renderCurrentKey}
+        onClick={e => this.handleClick(e)}
+        user={this.props.user}
+        controls_id={this.state.controlsId}
+        socket={this.props.socket}
+      />
+    );
+  };
+module.exports.getControlsFromId = async (channel_id, user) => {
+  const { getControlsForChannel } = require("../models/controls");
+  const { getServerIdFromChannelId } = require("../models/channel");
+  const { getRobotServer } = require("../models/robotServer");
+  let controls = await getControlsForChannel(channel_id);
+
+  let sendButtons = [];
+  if (controls && controls.buttons) {
+    const { buttons } = controls;
+    buttons.map(async button => {
+      if (button.access && button.access === "owner") {
+        //A VERY TEMPORARY SOLUTION!!!!
+        const getServerId = await getServerIdFromChannelId(channel_id);
+        const getServer = await getRobotServer(getServerId.result);
+        if (getServer.owner_id === user.id) {
+          console.log("SEND ADMIN COMMAND: ", user.username, button.label);
+          sendButtons.push(button);
+          console.log(sendButtons);
+        }
+      } else if (!button.access) sendButtons.push(button);
+    });
+  }
+  if (controls.buttons && sendButtons) {
+    controls.buttons = sendButtons;
+  }
+  return controls;
+};
