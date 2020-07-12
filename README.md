@@ -53,7 +53,7 @@ https://discord.gg/n6B7ymy
 
 <h1> Robot Live Stream: Installation </h1>
 
-RobotStreamer runs some software on your robot to connect to the server and send audio/video streams. If you'd like to order a robot, contact rick at rgiuly@gmail.com or you can make your own.
+RobotStreamer runs some software on your robot to connect to the server and send audio/video streams. If you'd like to order a robot, contact rick at rick@robotstreamer.com or you can make your own.
 
 Some information about typical robots on this system:
 http://www.robotstreamer.com/robots.html
