@@ -18,7 +18,7 @@ statusEndpoint = {'host': 'status.robotstreamer.com', 'port': 6020}
 
 parser = argparse.ArgumentParser(description='start reverse ssh program')
 parser.add_argument('robot_id', help='Robot ID')
-parser.add_argument('--reverse-ssh-host', default='ubuntu@52.52.223.119')
+parser.add_argument('--reverse-ssh-host', default='name@52.1.2.3')
 parser.add_argument('--reverse-ssh-key-file', default='/home/pi/rsjumpbox0.pem')
 
 
