@@ -39,18 +39,20 @@ async def startReverseSSH(websocketToStatusService):
 
     
     try:
-            result = subprocess.check_output(["/usr/bin/ssh",
-                                  "-X",
-                                  "-i", commandArgs.reverse_ssh_key_file,
-                                  "-N",
-                                  "-R", "2222:localhost:22",
-                                  "-o", "StrictHostKeyChecking=no",
-                                                  commandArgs.reverse_ssh_host], stderr=subprocess.STDOUT)
+        commandList = ["/usr/bin/ssh",
+                       "-X",
+                       "-i", commandArgs.reverse_ssh_key_file,
+                       "-N",
+                       "-R", "2222:localhost:22",
+                       "-o", "StrictHostKeyChecking=no",
+                       commandArgs.reverse_ssh_host]
+        print(" ".join(commandList))
+        result = subprocess.check_output(commandList, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
-            result = str(e.returncode) + " " + str(e.output)
+        result = str(e.returncode) + " " + str(e.output)
     except:
-            result = sys.exc_info()[0]
-            traceback.print_exc()
+        result = sys.exc_info()[0]
+        traceback.print_exc()
 
             
     print("sending start reverse ssh info message to", websocketToStatusService)
