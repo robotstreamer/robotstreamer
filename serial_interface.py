@@ -7,6 +7,5 @@ except Exception as e:
     print("Serial Error, Failed to connect.", e)
 
 def handleCommand(command, keyPosition):
-    global lastCommand
     print("Sending command to serial device")
     ser.write(command.encode())
