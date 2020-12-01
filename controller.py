@@ -40,6 +40,7 @@ parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='s
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
+parser.add_argument('--audio-output-hardware-number', type=int, default=None)
 parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
 parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
@@ -264,8 +265,12 @@ def say(message, messageVolume, voice='en-us'):
                 _thread.start_new_thread(espeakMac, (message, voice))
 
         else:
-            for hardwareNumber in (0, 2, 3, 1, 4):
-                _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+            if commandArgs.audio_output_hardware_number is None:
+                        for hardwareNumber in (0, 2, 3, 1, 4):
+                                    print("starting espeak thread")
+                                    _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+            else:
+                                    _thread.start_new_thread(espeak, (commandArgs.audio_output_hardware_number, message, voice, messageVolume))
                 #espeak(hardwareNumber, message, voice)
 
 
