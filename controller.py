@@ -134,6 +134,9 @@ elif commandArgs.type == "parallaxy":
 elif commandArgs.type == "blank":
             import blank_interface as interface
 
+elif commandArgs.type == "serial":
+            import serial_interface as interface
+
 elif commandArgs.type == "sexbot":
             import sexbot_interface as interface
             interface.init()
