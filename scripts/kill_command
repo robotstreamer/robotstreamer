@@ -1,1 +1,4 @@
-sudo killall /bin/bash python python3.6 python3 ffmpeg
+#sudo killall /bin/bash python python3.6 python3 ffmpeg
+sudo pkill -f controller.py
+sudo pkill -f send_video.py
+sudo pkill -f ffmpeg

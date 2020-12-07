@@ -43,7 +43,7 @@ parser.add_argument('--xres', type=int, default=768)
 parser.add_argument('--yres', type=int, default=432)
 parser.add_argument('--audio-device-number', default=1, type=int)
 parser.add_argument('--audio-device-name')
-parser.add_argument('--audio-rate', default=48000, type=int, help="this is 44100 or 48000 usually")
+parser.add_argument('--audio-rate', default=48000, help="this is 44100 or 48000 usually")
 parser.add_argument('--kbps', default=350, type=int)
 parser.add_argument('--kbps-audio', default=64, type=int)
 parser.add_argument('--framerate', default=25, type=int)
@@ -204,21 +204,31 @@ def startVideoCaptureLinux():
     return runAndMonitor("video", shlex.split(videoCommandLine)) 
 
 
-
+startAudioCounter = 0
 def startAudioCaptureLinux():
-
+    global startAudioCounter
 
     audioEndpoint = getAudioEndpoint()
     audioHost = audioEndpoint['host']
     audioPort = audioEndpoint['port']
 
+    # if a comma delimited list of rates is given, this
+    # switches the rate each time this is called. for some reason this makes a C920 work more reliably
+    # particularly on cornbot
+    if ',' in robotSettings.audio_rate:
+      rates = robotSettings.audio_rate.split(',')
+      audioRate = int(rates[startAudioCounter % len(rates)])
+      startAudioCounter += 1
+    else:
+      audioRate = int(robotSettings.audio_rate)
+    
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
+        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
 
     #audioCommandLine = '%s -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
     audioCommandLine = '%s -f alsa -ar %d -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
-                        % (robotSettings.ffmpeg_path, robotSettings.audio_rate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
+                        % (robotSettings.ffmpeg_path, audioRate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
     if commandArgs.usb_reset_id != None:
       if len(commandArgs.usb_reset_id) == 8:
@@ -374,7 +384,7 @@ def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
+        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
     
     if robotSettings.protocol == 'video/VP8':
         #ffmpeg -h encoder=libvpx
