@@ -11,6 +11,7 @@ import tempfile
 import uuid
 import audio
 import datetime
+import audio_util
 
 
 
@@ -40,6 +41,7 @@ parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='s
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
+parser.add_argument('--audio-output-hardware-name', default=None)
 parser.add_argument('--audio-output-hardware-number', type=int, default=None)
 parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
@@ -241,6 +243,11 @@ def espeakMac(message, voice):
 
 def say(message, messageVolume, voice='en-us'):
 
+    audioOutputNumber = commandArgs.audio_output_hardware_number
+            
+    if commandArgs.audio_output_hardware_name is not None:
+        audioOutputNumber = audio_util.getAudioPlayingDeviceByName(commandArgs.audio_output_hardware_name)
+            
     os.system("killall espeak")
     
     if voice not in allowedVoices:
@@ -268,12 +275,12 @@ def say(message, messageVolume, voice='en-us'):
                 _thread.start_new_thread(espeakMac, (message, voice))
 
         else:
-            if commandArgs.audio_output_hardware_number is None:
+            if audioOutputNumber is None: # if none specified try many
                         for hardwareNumber in (0, 2, 3, 1, 4):
                                     print("starting espeak thread")
                                     _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
             else:
-                                    _thread.start_new_thread(espeak, (commandArgs.audio_output_hardware_number, message, voice, messageVolume))
+                                    _thread.start_new_thread(espeak, (audioOutputNumber, message, voice, messageVolume))
                 #espeak(hardwareNumber, message, voice)
 
 

@@ -27,4 +27,6 @@ if __name__ == "__main__":
         print(getAudioRecordingDeviceByName("Yeti"))
         print("as a test, checking for C920 mic")
         print(getAudioRecordingDeviceByName("C920_1 [HD Pro Webcam C920]"))
+        print("as a test, checking for USB2.0 Device (the usb speaker)")
+        print(getAudioPlayingDeviceByName("USB2.0 Device"))
 
