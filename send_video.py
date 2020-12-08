@@ -81,6 +81,12 @@ parser.add_argument('--usb-reset-id', default=None)
 charCount = {}
 lastCharCount = None
 commandArgs = parser.parse_args()
+
+#print("sleeping")
+#time.sleep(commandArgs.video_device_number * 2) # this is so they don't run at the same time if you start many simultaneously
+#workingVideoDevices = video_util.findWorkingVideoDevices() 
+
+
 robotSettings = None
 resolutionChanged = False
 currentXres = None
@@ -95,6 +101,9 @@ videoProcess = None
 
 # enable raspicam driver in case a raspicam is being used
 os.system("sudo modprobe bcm2835-v4l2")
+
+
+
 
 def sayInfo(message):
   f = open("/tmp/tempfile", "w")
@@ -178,7 +187,6 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
-    workingVideoDevices = video_util.findWorkingVideoDevices() 
   
     videoEndpoint = getVideoEndpoint()
     videoHost = videoEndpoint['host']
@@ -205,7 +213,7 @@ def startVideoCaptureLinux():
 
     videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} \
                         -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'\
-                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=workingVideoDevices[robotSettings.video_device_number], rotation_option=rotationOption(),\
+                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(),\
                         kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)

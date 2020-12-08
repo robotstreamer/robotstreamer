@@ -1,7 +1,10 @@
 
 import subprocess
+import time
+
 
 def tryFFmpeg(num):
+
     command = f"ffmpeg -i /dev/video{num} -t 0.1 -framerate 10 -video_size 128d0x720 -f null -"
     print(command)
     if subprocess.call(command.split()) == 0:
