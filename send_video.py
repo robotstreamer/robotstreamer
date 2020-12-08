@@ -94,6 +94,12 @@ videoProcess = None
 # enable raspicam driver in case a raspicam is being used
 os.system("sudo modprobe bcm2835-v4l2")
 
+def sayInfo(message):
+  f = open("/tmp/tempfile", "w")
+  f.write(message)
+  f.close()
+  os.system("espeak -a 20 -p 160 -f /tmp/tempfile -ven-sc+f3 test --stdout | aplay -D plughw:3,0")
+  os.unlink("/tmp/tempfile")
 
 
 def reader(pipe, queue):
@@ -491,6 +497,15 @@ def startRTCvideo():
     return
 
 
+def checkVideoDevices():
+
+  import os.path 
+  if os.path.isfile("/dev/video" + str(robotSettings.video_device_number)):
+    sayInfo("video device " + str(robotSettings.video_device_number) + " exists")
+  else:
+    sayInfo("video device " + str(robotSettings.video_device_number) + " missing")
+
+    
 def main():
 
     global robotID
@@ -513,6 +528,9 @@ def main():
     robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id, commandArgs.stream_key)
     sys.stdout.flush()
 
+
+    checkVideoDevices()
+    
 
     if robotSettings.protocol != 'jsmpeg':
         # RTC
