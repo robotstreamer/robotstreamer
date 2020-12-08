@@ -500,10 +500,11 @@ def startRTCvideo():
 def checkVideoDevices():
 
   import os.path 
-  if os.path.isfile("/dev/video" + str(robotSettings.video_device_number)):
-    sayInfo("video device " + str(robotSettings.video_device_number) + " exists")
+  if os.path.exists("/dev/video" + str(robotSettings.video_device_number)):
+    #sayInfo("video device " + str(robotSettings.video_device_number) + " exists")
+    pass
   else:
-    sayInfo("video device " + str(robotSettings.video_device_number) + " missing")
+    sayInfo("video device " + str(robotSettings.video_device_number) + " is missing")
 
     
 def main():
