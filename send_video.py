@@ -21,6 +21,8 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
 #from Queue import Queue # Python 2
+import video_util
+
 try:
   from usb.core import find as finddev
 except:
@@ -176,6 +178,8 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
+    workingVideoDevices = video_util.findWorkingVideoDevices() 
+  
     videoEndpoint = getVideoEndpoint()
     videoHost = videoEndpoint['host']
     videoPort = videoEndpoint['port']
@@ -201,7 +205,7 @@ def startVideoCaptureLinux():
 
     videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} \
                         -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'\
-                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(),\
+                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=workingVideoDevices[robotSettings.video_device_number], rotation_option=rotationOption(),\
                         kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)
