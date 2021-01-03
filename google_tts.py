@@ -34,7 +34,7 @@ def text_to_wav(voice_name, text):
         input=text_input, voice=voice_params, audio_config=audio_config
     )
 
-    filename = f"{language_code}.wav"
+    filename = f"/tmp/tts.wav"
     with open(filename, "wb") as out:
         out.write(response.audio_content)
         print(f'Audio content written to "{filename}"')
@@ -43,7 +43,7 @@ def text_to_wav(voice_name, text):
 
 def speak(message, audioOutputNumber):
     text_to_wav("en-US-Wavenet-D", message)
-    os.system("ffmpeg -y -i en-US.wav -ac 2 -ar 48000 en-US2.wav;aplay en-US2.wav --device=hw:%d,0" % audioOutputNumber)
+    os.system("ffmpeg -y -i /tmp/tts.wav -ac 2 -ar 48000 /tmp/tts2.wav;aplay /tmp/tts2.wav --device=hw:%d,0" % audioOutputNumber)
 
 #list_voices()
 
