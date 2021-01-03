@@ -6,8 +6,8 @@ import serial
 import sys
 import pigpio
 
-straightSpeed=300#450
-turnSpeed=700#450
+straightSpeed=200#300#450
+turnSpeed=500#700#450
 straightDelay=0.6
 stopDelay=0.05
 turnDelay=0.5
