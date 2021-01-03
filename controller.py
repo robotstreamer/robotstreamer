@@ -251,7 +251,11 @@ def say(message, messageVolume, voice='en-us'):
 
     if commandArgs.tts_synth == "google":
         # google text to speach api
-        google_tts.speak(message, audioOutputNumber)
+        if audioOutputNumber is None: # if none specified try many
+            for hardwareNumber in (0, 2, 3, 1, 4):
+                google_tts.speak(message, hardwareNumber)
+        else:
+            google_tts.speak(message, audioOutputNumber)
         return
 
         
