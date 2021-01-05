@@ -56,6 +56,7 @@ parser.set_defaults(disable_chat=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
 parser.add_argument('--free-tts-queue-size', type=int, default=2)
+parser.add_argument('--ffmpeg-path', default='/usr/local/bin/ffmpeg')
 
 
 commandArgs = parser.parse_args()
@@ -195,7 +196,7 @@ def espeak(hardwareNumber, message, voice, volume):
                                     print("--------------", cmd)
                                     os.system(cmd)
 
-                        cropCommand = "ffmpeg -i %s -ss 0 -to %d -filter:audio volume=%f %s" % (wavFile, maximumTTSTime, volume, croppedWavFile)
+                        cropCommand = "%s -i %s -ss 0 -to %d -filter:audio volume=%f %s" % (commandArgs.ffmpeg_path, wavFile, maximumTTSTime, volume, croppedWavFile)
                         print(cropCommand)
                         cropResult = os.system(cropCommand)
                         print("crop result code", cropResult)
