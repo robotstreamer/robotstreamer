@@ -11,7 +11,8 @@ import tempfile
 import uuid
 import audio
 import datetime
-
+import audio_util
+import google_tts
 
 
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
@@ -35,11 +36,13 @@ parser.add_argument('--left', default='[1,1,1,1]')
 parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false')
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
-parser.add_argument('--festival-tts', dest='festival_tts', action='store_true')
+parser.add_argument('--tts-synth', help='options: espeak, festival, google')
 parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='store_true')
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
+parser.add_argument('--audio-output-hardware-name', default=None)
+parser.add_argument('--audio-output-hardware-number', type=int, default=None)
 parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
 parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
@@ -241,6 +244,22 @@ def espeakMac(message, voice):
 
 def say(message, messageVolume, voice='en-us'):
 
+    audioOutputNumber = commandArgs.audio_output_hardware_number
+            
+    if commandArgs.audio_output_hardware_name is not None:
+        audioOutputNumber = audio_util.getAudioPlayingDeviceByName(commandArgs.audio_output_hardware_name)
+
+
+    if commandArgs.tts_synth == "google":
+        # google text to speach api
+        if audioOutputNumber is None: # if none specified try many
+            for hardwareNumber in (0, 2, 3, 1, 4):
+                google_tts.speak(message, hardwareNumber)
+        else:
+            google_tts.speak(message, audioOutputNumber)
+        return
+
+        
     os.system("killall espeak")
     
     if voice not in allowedVoices:
@@ -254,12 +273,11 @@ def say(message, messageVolume, voice='en-us'):
 
 
     #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
-    
-    if commandArgs.festival_tts:
+
+
+    if commandArgs.tts_synth == "festival":
         # festival tts
         os.system('festival --tts < ' + tempFilePath)
-    #os.system('espeak < /tmp/speech.txt')
-
     else:
         # espeak tts
         #todo: these could be defined in the interface modules perhaps
@@ -268,8 +286,12 @@ def say(message, messageVolume, voice='en-us'):
                 _thread.start_new_thread(espeakMac, (message, voice))
 
         else:
-            for hardwareNumber in (0, 2, 3, 1, 4):
-                _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+            if audioOutputNumber is None: # if none specified try many
+                        for hardwareNumber in (0, 2, 3, 1, 4):
+                                    print("starting espeak thread")
+                                    _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+            else:
+                                    _thread.start_new_thread(espeak, (audioOutputNumber, message, voice, messageVolume))
                 #espeak(hardwareNumber, message, voice)
 
 

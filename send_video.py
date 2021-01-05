@@ -21,6 +21,8 @@ from subprocess import Popen, PIPE
 from threading import Thread
 from queue import Queue
 #from Queue import Queue # Python 2
+import video_util
+
 try:
   from usb.core import find as finddev
 except:
@@ -43,7 +45,7 @@ parser.add_argument('--xres', type=int, default=768)
 parser.add_argument('--yres', type=int, default=432)
 parser.add_argument('--audio-device-number', default=1, type=int)
 parser.add_argument('--audio-device-name')
-parser.add_argument('--audio-rate', default=48000, type=int, help="this is 44100 or 48000 usually")
+parser.add_argument('--audio-rate', default="32000", help="examples: 44100 or 48000 or 16000,32000 it will alternate if comma delimited, this helped make a C920 work for whatever reason")
 parser.add_argument('--kbps', default=350, type=int)
 parser.add_argument('--kbps-audio', default=64, type=int)
 parser.add_argument('--framerate', default=25, type=int)
@@ -63,8 +65,8 @@ parser.add_argument('--screen-capture', dest='screen_capture', action='store_tru
 parser.set_defaults(screen_capture=False)
 parser.add_argument('--no-mic', dest='mic_enabled', action='store_false')
 parser.set_defaults(mic_enabled=True)
-parser.add_argument('--no-restart-on-video-fail', dest='restart_on_video_fail', action='store_false')
-parser.set_defaults(restart_on_video_fail=True)
+parser.add_argument('--restart-on-video-fail', dest='restart_on_video_fail', action='store_true')
+parser.set_defaults(restart_on_video_fail=False)
 parser.add_argument('--no-audio-restart', dest='audio_restart_enabled', action='store_false')
 parser.set_defaults(audio_restart_enabled=True)
 parser.add_argument('--no-camera', dest='camera_enabled', action='store_false')
@@ -79,6 +81,12 @@ parser.add_argument('--usb-reset-id', default=None)
 charCount = {}
 lastCharCount = None
 commandArgs = parser.parse_args()
+
+#print("sleeping")
+#time.sleep(commandArgs.video_device_number * 2) # this is so they don't run at the same time if you start many simultaneously
+#workingVideoDevices = video_util.findWorkingVideoDevices() 
+
+
 robotSettings = None
 resolutionChanged = False
 currentXres = None
@@ -94,6 +102,15 @@ videoProcess = None
 # enable raspicam driver in case a raspicam is being used
 os.system("sudo modprobe bcm2835-v4l2")
 
+
+
+
+def sayInfo(message):
+  f = open("/tmp/tempfile", "w")
+  f.write(message)
+  f.close()
+  os.system("espeak -a 20 -p 160 -f /tmp/tempfile -ven-sc+f3 test --stdout | aplay -D plughw:3,0")
+  os.unlink("/tmp/tempfile")
 
 
 def reader(pipe, queue):
@@ -170,6 +187,7 @@ def randomSleep():
 
 def startVideoCaptureLinux():
 
+  
     videoEndpoint = getVideoEndpoint()
     videoHost = videoEndpoint['host']
     videoPort = videoEndpoint['port']
@@ -204,21 +222,35 @@ def startVideoCaptureLinux():
     return runAndMonitor("video", shlex.split(videoCommandLine)) 
 
 
-
+startAudioCounter = 0
 def startAudioCaptureLinux():
-
+    global startAudioCounter
 
     audioEndpoint = getAudioEndpoint()
     audioHost = audioEndpoint['host']
     audioPort = audioEndpoint['port']
 
+    # if a comma delimited list of rates is given, this
+    # switches the rate each time this is called. for some reason this makes a C920 work more reliably
+    # particularly on cornbot
+    if ',' in robotSettings.audio_rate:
+      rates = robotSettings.audio_rate.split(',')
+      audioRate = int(rates[startAudioCounter % len(rates)])
+      startAudioCounter += 1
+    else:
+      audioRate = int(robotSettings.audio_rate)
+    
     audioDevNum = robotSettings.audio_device_number
-    if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
 
+    if robotSettings.audio_device_name is not None:
+        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
+        if audioDevNum is None:
+          raise Exception("the name doesn't exist" + robotSettings.audio_device_name)
+        
+    print((robotSettings.ffmpeg_path, audioRate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key))
     #audioCommandLine = '%s -f alsa -ar 44100 -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.ffmpeg_path, robotSettings.mic_channels, audioDevNum, audioHost, audioEndpoint['port'], robotSettings.stream_key)
     audioCommandLine = '%s -f alsa -ar %d -ac %d -i hw:%d -f mpegts -codec:a mp2 -b:a 64k -muxdelay 0.01 http://%s:%s/%s/640/480/'\
-                        % (robotSettings.ffmpeg_path, robotSettings.audio_rate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
+                        % (robotSettings.ffmpeg_path, audioRate, robotSettings.mic_channels, audioDevNum, audioHost, audioPort, robotSettings.stream_key)
     print(audioCommandLine)
     if commandArgs.usb_reset_id != None:
       if len(commandArgs.usb_reset_id) == 8:
@@ -374,7 +406,7 @@ def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
+        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
     
     if robotSettings.protocol == 'video/VP8':
         #ffmpeg -h encoder=libvpx
@@ -481,6 +513,16 @@ def startRTCvideo():
     return
 
 
+def checkVideoDevices():
+
+  import os.path 
+  if os.path.exists("/dev/video" + str(robotSettings.video_device_number)):
+    #sayInfo("video device " + str(robotSettings.video_device_number) + " exists")
+    pass
+  else:
+    sayInfo("video device " + str(robotSettings.video_device_number) + " is missing")
+
+    
 def main():
 
     global robotID
@@ -503,6 +545,9 @@ def main():
     robot_util.sendCameraAliveMessage(apiServer, commandArgs.camera_id, commandArgs.stream_key)
     sys.stdout.flush()
 
+
+    checkVideoDevices()
+    
 
     if robotSettings.protocol != 'jsmpeg':
         # RTC
