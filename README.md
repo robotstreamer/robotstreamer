@@ -4,9 +4,11 @@
 Note: We have a discord group here with a technical support channel if you have any questions:
 https://discord.gg/syRQN7B
 
+
 RobotStreamer is a unique streaming platform that allows users to interact not only with traditional video streams but through low latency telepresence. This is a new concept enabling the viewers of the stream to join the action through the "body" of a robot. So at a technical level, RobotStreamer is a robot control network and low latency live streaming platform. You can stream from a robot (typically a mobile robot with camera connected by wifi) or from a traditional camera. Yes that means you can stream whatever kind of live video you want on here. Yo can use a standard camera to stream, and we do support OBS. Also, you can buy robots from robotstreamer.com's store or make your own if you want the fully immersive robot (telepresence) stream.
 
 Connect your movable cameras with TTS (robots) to *RobotStreamer.com*. We're a new project but already have interest from top live streamers like Ice Poseidon for robot camera control with massive numbers of users.
+
 
 Broadcasters make the rules for their channels. Unlike most platforms, RobotStreamer is open to just about any content. Edgy stuff is welcome here. It is the internet after all. Just maintain basic ethical decency, keep it legal, and keep it entertaining. For language, it's up to the broadcaster to decide how they want to moderate if at all.
 
@@ -47,8 +49,9 @@ Note that you'll want to visit the discord for questions and such. Streaming fro
 https://discord.gg/n6B7ymy
 
 
+<h1> Doing device interface customization </h1>
 
-
+Look at the python files with "interface" in the name to see how to connect your custom device.
 
 
 <h1> Robot Live Stream: Installation </h1>
@@ -249,7 +252,11 @@ You'll need to use your stream key and you may need to adjust your path to ffmpe
 
 <h2> How to add sounds </h2>
 
-Save 16 bit wav file in /home/pi/sound folder and it has to be all capital letters even the file extension.
+Save 16 bit wav file in /home/pi/sound folder and it has to be all c
+
+
+
+tal letters even the file extension.
 
 For example: SOUND1.WAV
 
@@ -323,10 +330,6 @@ The robot client connects to four external services: API Service, Chat Service, 
 
 <h4>API Service</h4>
 Provides information about which host and port to connect to for the chat service, video/audio service, and control service
-
-<h1> API Documentation </h1>
-
-https://github.com/Jackool/robotstreamer-api/
 
 <h4>Chat Service</h4>
 Relays chat messages sent from the web clients to the robot
