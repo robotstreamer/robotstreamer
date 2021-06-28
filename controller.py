@@ -147,6 +147,9 @@ elif commandArgs.type == "sexbot":
             import sexbot_interface as interface
             interface.init()
 
+elif commandArgs.type == "lovense":
+            import lovense_interface as interface
+
 # set volume level
 
 # tested for 3.5mm audio jack
