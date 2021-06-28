@@ -11,6 +11,7 @@ def handleCommand(command, keyPosition):
 
                 print("***********************************", command)
                 if command == 'F':
+                  print('\a')
                   print("command is F")
                   PARAMS = {'v':50}
                   print(URL, PARAMS)
@@ -26,6 +27,7 @@ def handleCommand(command, keyPosition):
 
 
                 if command == 'B':
+                  print('\a')
                   print("command is B")
                   PARAMS = {'v':100}
                   print(URL, PARAMS)
