@@ -47,7 +47,7 @@ parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default='rsbot')
 parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
 parser.set_defaults(tls_chat=True)
-parser.add_argument('--stream-key', default='123')
+parser.add_argument('--stream-key')
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--turn-delay', type=float, default=0.1)
@@ -66,6 +66,9 @@ commandArgs = parser.parse_args()
 
 print(commandArgs)
 
+if commandArgs.stream_key is None:
+    print("--stream-key command line parameter is required")
+    exit(0)
 
 apiHost = commandArgs.api_url
 
@@ -143,6 +146,9 @@ elif commandArgs.type == "serial":
 elif commandArgs.type == "sexbot":
             import sexbot_interface as interface
             interface.init()
+
+elif commandArgs.type == "lovense":
+            import lovense_interface as interface
 
 # set volume level
 
