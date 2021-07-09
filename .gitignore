@@ -16,3 +16,5 @@ output.mp3
 #ignore emacs temporary files
 \#*\#
 .\#*
+
+\.DS_store
