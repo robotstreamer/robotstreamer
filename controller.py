@@ -36,7 +36,7 @@ parser.add_argument('--left', default='[1,1,1,1]')
 parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false')
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
-parser.add_argument('--tts-synth', default='espeak', help='options: espeak, festival, google')
+parser.add_argument('--tts-synth', help='options: espeak, festival, google')
 parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='store_true')
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
@@ -44,10 +44,10 @@ parser.add_argument('--tts-volume', type=int, default=80)
 parser.add_argument('--audio-output-hardware-name', default=None)
 parser.add_argument('--audio-output-hardware-number', type=int, default=None)
 parser.add_argument('--tts-pitch', type=int, default=50)
-parser.add_argument('--type', default='rsbot')
+parser.add_argument('--type', default="rsbot")
 parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
 parser.set_defaults(tls_chat=True)
-parser.add_argument('--stream-key')
+parser.add_argument('--stream-key', default="123")
 parser.add_argument('--straight-speed', type=int, default=255)
 parser.add_argument('--turn-speed', type=int, default=255)
 parser.add_argument('--turn-delay', type=float, default=0.1)
@@ -66,9 +66,6 @@ commandArgs = parser.parse_args()
 
 print(commandArgs)
 
-if commandArgs.stream_key is None:
-    print("--stream-key command line parameter is required")
-    exit(0)
 
 apiHost = commandArgs.api_url
 
@@ -145,10 +142,7 @@ elif commandArgs.type == "serial":
 
 elif commandArgs.type == "sexbot":
             import sexbot_interface as interface
-            interface.init()
-
-elif commandArgs.type == "lovense":
-            import lovense_interface as interface
+            interface.init(commandArgs)
 
 # set volume level
 

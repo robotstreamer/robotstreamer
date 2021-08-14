@@ -6,8 +6,10 @@ import serial
 import sys
 import pigpio
 
+commandArgs = None
+
 straightSpeed=200#300#450
-turnSpeed=500#700#450
+#turnSpeed=500#700#450
 straightDelay=0.6
 stopDelay=0.05
 turnDelay=0.5
@@ -56,11 +58,12 @@ def exitTasks():
     stopMotors(ser)
     ser.close()
 
-def init():
+def init(cArgs):
     global ser
     global movementSystemActive
     global pipwm
     global dildoActive
+    global commandArgs
 
     ser=getSerial()
     movementSystemActive=False
@@ -69,9 +72,12 @@ def init():
     atexit.register(exitTasks)
     pipwm.hardware_PWM(18,0,0)
 
+    commandArgs = cArgs
+
+    
 def handleCommand(command, keyPosition):
     global straightSpeed
-    global turnSpeed
+    #global turnSpeed
     global turnDelay
     global straightDelay
     global ser
@@ -116,7 +122,7 @@ def handleCommand(command, keyPosition):
         else:
             print("onleft")
             movementSystemActive=True
-            turnLeft(ser, turnSpeed)
+            turnLeft(ser, commandArgs.turn_speed)
             time.sleep(turnDelay)
             stopMotors(ser)
 #            time.sleep(stopDelay)
@@ -128,7 +134,7 @@ def handleCommand(command, keyPosition):
         else:
             print("onright")
             movementSystemActive=True
-            turnRight(ser, turnSpeed)
+            turnRight(ser, commandArgs.turn_speed)
             time.sleep(turnDelay)
             stopMotors(ser)
 #            time.sleep(stopDelay)
