@@ -8,8 +8,9 @@ import pigpio
 
 commandArgs = None
 
-straightSpeed=200#300#450
-#turnSpeed=500#700#450
+#straight speeds 200#300#450
+#turn speeds 500#700#450
+
 straightDelay=0.6
 stopDelay=0.05
 turnDelay=0.5
@@ -76,8 +77,6 @@ def init(cArgs):
 
     
 def handleCommand(command, keyPosition):
-    global straightSpeed
-    #global turnSpeed
     global turnDelay
     global straightDelay
     global ser
@@ -98,7 +97,7 @@ def handleCommand(command, keyPosition):
         else:
             print("onforward")
             movementSystemActive=True
-            goForward(ser, straightSpeed)
+            goForward(ser, commandArgs.straight_speed)
             time.sleep(straightDelay)
             stopMotors(ser)
 #            time.sleep(stopDelay)
@@ -110,7 +109,7 @@ def handleCommand(command, keyPosition):
         else:
             print("onback")
             movementSystemActive=True
-            goBackward(ser, straightSpeed)
+            goBackward(ser, commandArgs.straight_speed)
             time.sleep(straightDelay)
             stopMotors(ser)
 #            time.sleep(stopDelay)
