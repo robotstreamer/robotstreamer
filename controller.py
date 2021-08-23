@@ -12,7 +12,11 @@ import uuid
 import audio
 import datetime
 import audio_util
-import google_tts
+try:
+    import google_tts
+except ImportError:
+    print("warning: google tts module does not exist so google tts will not work. you can install the python module if you want to use google tts.")
+
 
 
 allowedVoices = ['en-us', 'af', 'bs', 'da', 'de', 'el', 'eo', 'es', 'es-la', 'fi', 'fr', 'hr', 'hu', 'it', 'kn', 'ku', 'lv', 'nl', 'pl', 'pt', 'pt-pt', 'ro', 'sk', 'sr', 'sv', 'sw', 'ta', 'tr', 'zh', 'ru']
