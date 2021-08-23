@@ -111,7 +111,7 @@ cd ~ &&\
 git clone https://github.com/robotstreamer/robotstreamer &&\
 
 # Add start_robot script to crontab, it might throw an error, but it works anyways
-#sudo crontab -l | { cat; echo "@reboot /bin/bash /home/pi/init_robot"; } | sudo crontab -
+#sudo crontab -l | { cat; echo "@reboot /bin/bash /home/pi/start_robot"; } | sudo crontab -
 # Only allow one @reboot. No duplicates
 /bin/bash crontab -l 2>/dev/null; echo "@reboot /bin/bash /home/pi/init_robot" | sort - | uniq - | sudo crontab -
 
