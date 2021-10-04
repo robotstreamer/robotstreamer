@@ -61,6 +61,8 @@ echo "nohup scripts/repeat_start /usr/bin/python3 send_video.py ${input_camera} 
 # Make sure the system is up to date
 sudo apt-get -y update
 
+sudo apt-get -y install python3-pip
+
 # This stuff takes forever, therefore not a default, but enable it if you want
 #sudo apt-get -y upgrade
 #sudo apt-get -y dist-upgrade
