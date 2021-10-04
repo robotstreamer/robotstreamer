@@ -57,34 +57,24 @@ echo 'cd /home/pi/robotstreamer' >> ~/start_robot
 echo "nohup scripts/repeat_start /usr/bin/python3 reverse_ssh.py ${input_robot} &> /dev/null &" >> ~/start_robot
 echo "nohup scripts/repeat_start /usr/bin/python3 controller.py ${input_robot} --stream-key ${input_stream_key} &> /dev/null &" >> ~/start_robot
 echo "nohup scripts/repeat_start /usr/bin/python3 send_video.py ${input_camera} 0 --stream-key ${input_stream_key} --ffmpeg-path /usr/bin/ffmpeg &> /dev/null &" >> ~/start_robot
-
 # Make sure the system is up to date
 sudo apt-get -y update
-
 sudo apt-get -y install python3-pip
-
 # This stuff takes forever, therefore not a default, but enable it if you want
 #sudo apt-get -y upgrade
 #sudo apt-get -y dist-upgrade
-
 # Start installing everything needed
 #sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
-
 sudo apt-get -y install espeak git
-
 sudo pip3 install websockets
 sudo pip3 install pyusb
 sudo pip3 install ws4py
-
 cd ~ &&\
-
 git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 cd Adafruit-Motor-HAT-Python-Library &&\
-
+sudo python3 setup.py install &&\
 sudo apt-get -y install emacs &&\
 #sudo apt-get -y install python-dev &&\
-sudo python3 setup.py install &&\
-
 #cd ~ &&\
 #wget ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.0.25.tar.bz2 &&\
 #tar xjf alsa-lib-1.0.25.tar.bz2 &&\
@@ -92,20 +82,19 @@ sudo python3 setup.py install &&\
 #./configure --host=arm-unknown-linux-gnueabi &&\
 #make -j4 &&\
 #sudo make install &&\
-
 #cd ~ &&\
 #git clone git://git.videolan.org/x264 &&\
 #cd x264 &&\
 #./configure --host=arm-unknown-linux-gnueabi --enable-static --disable-opencl &&\
 #make -j4 &&\
 #sudo make install &&\
-
 #cd ~ &&\
 #git clone https://github.com/FFmpeg/FFmpeg.git &&\
 #cd FFmpeg &&\
 #./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree --extra-libs=-ldl &&\
 #make -j4 &&\
 #sudo make install
+
 
 sudo apt-get -y install ffmpeg
 
