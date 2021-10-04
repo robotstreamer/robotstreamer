@@ -416,7 +416,7 @@ async def handleControlMessages():
                         #ws keepalive new
                         lastPongTime['control'] = datetime.datetime.now()
 
-            elif j.get('command') and j.get('key_position'):
+            elif j.get('command') and j.get('key_position'): # apparently use of _thread for this on new os (2021) causes seg fault
                 _thread.start_new_thread(interface.handleCommand, (j["command"],
                                                                    j["key_position"]))
 
