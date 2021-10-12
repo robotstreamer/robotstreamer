@@ -238,6 +238,17 @@ So, for this example, the line would then be:
 After editing the file, save and restart the pi.
 
 
+<h2> Recommended Hardware </h2>
+
+It's good to have a webcam with a mic for the robot. Stardard USB cams should work. Here are some tips on choosing hardware:
+
+Don't use a Logitech C270 because it will have intermittent audio issues.
+
+Don't use a Logitech C920 because you have have to unplug it and plug it back in to USB every time you restart to make it work.
+
+We've verified that an Aluretek AWCL05F works for audio and video.
+
+
 <h2> How to figure out problems if it's not starting the video feed </h2>
 
 First run this script to kill all the processess running:
