@@ -63,7 +63,7 @@ parser.set_defaults(disable_chat=False)
 parser.add_argument('--kill-on-failed-connection', dest='kill_on_failed_connection', action='store_true')
 parser.set_defaults(kill_on_failed_connection=False)
 parser.add_argument('--free-tts-queue-size', type=int, default=2)
-parser.add_argument('--ffmpeg-path', default='/usr/local/bin/ffmpeg')
+parser.add_argument('--ffmpeg-path', default='/usr/bin/ffmpeg')
 
 
 commandArgs = parser.parse_args()
