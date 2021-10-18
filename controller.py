@@ -418,7 +418,8 @@ async def handleControlMessages():
 
             elif j.get('command') and j.get('key_position'): # apparently use of _thread for this on new os (2021) causes seg fault
                 _thread.start_new_thread(interface.handleCommand, (j["command"],
-                                                                   j["key_position"]))
+                                                                   j["key_position"],
+                                                                   j.get('command_price', 0)))
 
 
             
@@ -554,9 +555,13 @@ def runPeriodicTasks():
                                     exit(1)
 
             
-            if len(messagesToTTS) > 0 and numActiveEspeak == 0:
-                        message, messageVolume = messagesToTTS.pop(0)
-                        _thread.start_new_thread(say, (message, messageVolume))
+            if robot_util.getSoundQueueSize() < 1:
+                if len(messagesToTTS) > 0 and numActiveEspeak == 0 and robot_util.getNumActiveSounds() == 0:
+                            message, messageVolume = messagesToTTS.pop(0)
+                            _thread.start_new_thread(say, (message, messageVolume))
+            else:
+                if numActiveEspeak == 0 and robot_util.getNumActiveSounds() == 0:
+                    _thread.start_new_thread(robot_util.aplayFile, (robot_util.popSoundQueue(),))
                         
 
             

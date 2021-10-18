@@ -6,6 +6,6 @@ try:
 except Exception as e:
     print("Serial Error, Failed to connect.", e)
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
     print("Sending command to serial device")
     ser.write(command.encode())

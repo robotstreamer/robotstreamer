@@ -1,5 +1,5 @@
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
     # only uses pressing down of keys
     if keyPosition != "down":

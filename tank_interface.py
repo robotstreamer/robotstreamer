@@ -110,7 +110,7 @@ def init():
     tiltPercentage=50.0
 
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
     global movementSystemActive
     global tiltPercentage
     global panPercentage
@@ -120,7 +120,7 @@ def handleCommand(command, keyPosition):
     if keyPosition != "down":
         return
 
-    robot_util.handleSoundCommand(command, keyPosition)
+    robot_util.handleSoundCommand(command, keyPosition, price)
 
     if command == 'F':
         if movementSystemActive:

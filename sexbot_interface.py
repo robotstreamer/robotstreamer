@@ -76,7 +76,7 @@ def init(cArgs):
     commandArgs = cArgs
 
     
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
     global turnDelay
     global straightDelay
     global ser
@@ -89,7 +89,7 @@ def handleCommand(command, keyPosition):
     if keyPosition != "down":
         return
 
-    robot_util.handleSoundCommand(command, keyPosition)
+    robot_util.handleSoundCommand(command, keyPosition, price)
 
     if command == 'F':
         if movementSystemActive:

@@ -11,7 +11,7 @@ def getSpeed(command):
   # assume the command is like vibrate50 or vibrate100
   return int(command[7:])
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
                 print("***********************************", command)
                 if command[0:7] == 'vibrate':

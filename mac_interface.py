@@ -2,7 +2,7 @@ import pyautogui
 import time
 freePongActive = False
 #todo: should be called process command
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
                 global freePongActive
                 if command == 'FIRE':
                     print("fire, clicking mouse")

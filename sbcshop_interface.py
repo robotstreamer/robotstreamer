@@ -145,14 +145,14 @@ def init():
 
 
 #called by controller.py every time a command is sent
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
     global movementSystemActive
 
     print("\n\n\n\nhandleCommand called.\n")
 
     if keyPosition != "down":
       return
-    robot_util.handleSoundCommand(command, keyPosition)
+    robot_util.handleSoundCommand(command, keyPosition, price)
     if command == 'F':
         if movementSystemActive:
             print("skip")

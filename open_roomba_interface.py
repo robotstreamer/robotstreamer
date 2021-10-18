@@ -29,7 +29,7 @@ movementSystemActive = False
 commandArgs = None
 
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
     global lastCommand
 
@@ -62,7 +62,7 @@ def handleCommand(command, keyPosition):
             ser.flush()
             time.sleep(3)
             subprocess.run(['/usr/bin/sudo', '/sbin/shutdown', '-h', 'now' ] )
-    robot_util.handleSoundCommand(command, keyPosition)
+    robot_util.handleSoundCommand(command, keyPosition, price)
 
     
 

@@ -5,7 +5,7 @@ import robot_util
 
 
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
     # only uses pressing down of keys
     if keyPosition != "down":
@@ -31,7 +31,7 @@ def handleCommand(command, keyPosition):
         time.sleep(0.15)
         gopigo.stop()
 
-    robot_util.handleSoundCommand(command, keyPosition)
+    robot_util.handleSoundCommand(command, keyPosition, price)
 
 
     

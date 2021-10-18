@@ -132,11 +132,11 @@ def init():
     #5 in a row = 5,6,13,19,26
 
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
                 print("handleCommand", command)
                 if keyPosition == 'down':
-                    robot_util.handleSoundCommand(command, keyPosition)
+                    robot_util.handleSoundCommand(command, keyPosition, price)
                     l298n.move(command)
 
 

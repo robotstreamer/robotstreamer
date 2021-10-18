@@ -11,6 +11,8 @@ import _thread
 ConfigFilename = "/home/pi/config_" + getpass.getuser() + ".json" #this is never used 
 
 KeepAlivePeriod = 6
+numActiveSounds = 0
+soundQueue = []
 
 
 def times(lst, number):
@@ -112,16 +114,38 @@ def sendCameraAliveMessage(apiServer, cameraID, streamKey):
             print("could not make post to", url)
 
 
+def getNumActiveSounds():
+    return numActiveSounds
+
+
+def getSoundQueueSize():
+    return len(soundQueue)
+
+
+def popSoundQueue():
+    return soundQueue.pop(0)
+
+
+def playSound(command):
+    global numActiveSounds
+    numActiveSounds += 1
+    os.system(command)
+    numActiveSounds -= 1
+
 
 def aplayFile(filename):
         for hardwareNumber in (2, 0, 1):
-                _thread.start_new_thread(os.system, ('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename),))
+                _thread.start_new_thread(playSound, ('aplay -D plughw:%d,0 %s' % (hardwareNumber, filename),))
                         
 
-def handleSoundCommand(command, keyPosition):
-        print("command:", command, "key position:", keyPosition)
+def handleSoundCommand(command, keyPosition, price):
+        print("command:", command, "key position:", keyPosition, "price:", price)
         if len(command) >= 6:
                 if command[0:5] == "SOUND" and keyPosition == "down":
-                        number = int(command[5:])
-                        aplayFile('/home/pi/sound/SOUND%d.WAV' % number)
+                    number = int(command[5:])
+                    if price > 0:
+                        soundQueue.append('/home/pi/sound/SOUND%d.WAV' % number)
+                    else:
+                        if getSoundQueueSize() < 2:
+                            soundQueue.append('/home/pi/sound/SOUND%d.WAV' % number)
 

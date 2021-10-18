@@ -15,7 +15,7 @@ SAFE = b'\x83'
 CLEAN = b'\x87'
 
 
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
     global lastCommand
 

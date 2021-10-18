@@ -8,7 +8,7 @@ def init():
   print("init")
                 
     
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
                 print("***********************************", command)
                 if command == 'F':

@@ -130,7 +130,7 @@ def demoShots():
     
 
 #todo: should be called process command
-def handleCommand(command, keyPosition):
+def handleCommand(command, keyPosition, price=0):
 
     
                 global movementSystemActive
@@ -145,7 +145,7 @@ def handleCommand(command, keyPosition):
                 motorA.setSpeed(speed1)
                 motorB.setSpeed(speed1)
 
-                robot_util.handleSoundCommand(command, keyPosition)
+                robot_util.handleSoundCommand(command, keyPosition, price)
                 
                 if command == 'F':
                     if movementSystemActive:
