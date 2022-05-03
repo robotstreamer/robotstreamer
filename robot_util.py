@@ -99,19 +99,24 @@ def makePOST(url, data):
     return response
 
 
-def sendCameraAliveMessage(apiServer, cameraID, streamKey):
+def sendCameraAliveMessage(apiServer: str, cameraID: str, streamKey: str) -> None:
 
     print("sending camera alive message")
-    url = '%s/v1/set_camera_status' % (apiServer)
+    url = "%s/v1/set_camera_status" % (apiServer)
     print("url", url)
     try:
-            response = makePOST(url, {'camera_id': cameraID,
-                                      'camera_status': 'online',
-                                      'stream_key': streamKey,
-                                      'type': 'robot_git'}) 
-                                    #todo:send unified stream key here
+        response = makePOST(
+            url,
+            {
+                "camera_id": cameraID,
+                "camera_status": "online",
+                "stream_key": streamKey,
+                "type": "robot_git",
+            },
+        )
+        # todo:send unified stream key here
     except:
-            print("could not make post to", url)
+        print("could not make post to", url)
 
 
 def getNumActiveSounds():
