@@ -298,10 +298,12 @@ def say(message, messageVolume, voice='en-us'):
             if audioOutputNumber is None: # if none specified try many
                         for hardwareNumber in (0, 2, 3, 1, 4):
                                     print("starting espeak thread")
-                                    _thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+                                    #_thread.start_new_thread(espeak, (hardwareNumber, message, voice, messageVolume))
+                                    espeak(hardwareNumber, message, voice, messageVolume)
             else:
-                                    _thread.start_new_thread(espeak, (audioOutputNumber, message, voice, messageVolume))
-                #espeak(hardwareNumber, message, voice)
+                                    #_thread.start_new_thread(espeak, (audioOutputNumber, message, voice, messageVolume))
+                                    print("espeak on a specific audio output")
+                                    espeak(audioOutputNumber, message, voice, messageVolume)
 
 
     os.remove(tempFilePath)
@@ -558,7 +560,8 @@ def runPeriodicTasks():
             if robot_util.getSoundQueueSize() < 1:
                 if len(messagesToTTS) > 0 and numActiveEspeak == 0 and robot_util.getNumActiveSounds() == 0:
                             message, messageVolume = messagesToTTS.pop(0)
-                            _thread.start_new_thread(say, (message, messageVolume))
+                            #_thread.start_new_thread(say, (message, messageVolume))
+                            say(message, messageVolume)
             else:
                 if numActiveEspeak == 0 and robot_util.getNumActiveSounds() == 0:
                     _thread.start_new_thread(robot_util.aplayFile, (robot_util.popSoundQueue(),))
