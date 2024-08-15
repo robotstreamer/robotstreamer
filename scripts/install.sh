@@ -66,9 +66,9 @@ sudo apt-get -y install python3-pip
 # Start installing everything needed
 #sudo apt-get -y install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
 sudo apt-get -y install espeak git
-sudo pip3 install websockets
-sudo pip3 install pyusb
-sudo pip3 install ws4py
+sudo pip3 install websockets --break-system-packages
+sudo pip3 install pyusb --break-system-packages
+sudo pip3 install ws4py --break-system-packages
 cd ~ &&\
 git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 cd Adafruit-Motor-HAT-Python-Library &&\
