@@ -54,9 +54,9 @@ echo '# suggested use for this:' >> ~/start_robot
 echo '# (1) Put in the ids for your robot, YOURROBOTID and YOURCAMERAID' >> ~/start_robot
 echo '# (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot' >> ~/start_robot
 echo 'cd /home/pi/robotstreamer' >> ~/start_robot
-echo "nohup scripts/repeat_start /usr/bin/python3 reverse_ssh.py ${input_robot} &> /dev/null &" >> ~/start_robot
-echo "nohup scripts/repeat_start /usr/bin/python3 controller.py ${input_robot} --stream-key ${input_stream_key} &> /dev/null &" >> ~/start_robot
-echo "nohup scripts/repeat_start /usr/bin/python3 send_video.py ${input_camera} 0 --stream-key ${input_stream_key} --ffmpeg-path /usr/bin/ffmpeg &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start /usr/bin/python3 -u reverse_ssh.py ${input_robot} &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start /usr/bin/python3 -u controller.py ${input_robot} --stream-key ${input_stream_key} &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start /usr/bin/python3 -u send_video.py ${input_camera} 0 --stream-key ${input_stream_key} --ffmpeg-path /usr/bin/ffmpeg &> /dev/null &" >> ~/start_robot
 # Make sure the system is up to date
 sudo apt-get -y update
 sudo apt-get -y install python3-pip
