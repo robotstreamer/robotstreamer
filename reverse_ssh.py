@@ -73,12 +73,12 @@ async def handleStatusMessages():
     print("running handle status messages")
 
     url = 'ws://%s:%s' % (statusEndpoint['host'], statusEndpoint['port'])
-    print("chat url:", url)
+    print("url:", url)
 
     async with websockets.connect(url) as websocket:
 
-        print("connected to control service at", url)
-        print("chat websocket object:", websocket)
+        print("connected to service at", url)
+        print("websocket object:", websocket)
 
         print("starting websocket.send")
         await websocket.send(json.dumps({"type":"connect",

@@ -16,7 +16,7 @@ turningSpeedActuallyUsed = 255
 
 
 
-straightDelay = 0.6
+straightDelay = 0.1
 movementSystemActive = False
 pingPongNumActive = 0
 freePongActive = False

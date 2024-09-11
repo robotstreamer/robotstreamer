@@ -110,8 +110,9 @@ def sendCameraAliveMessage(apiServer, cameraID, streamKey):
                                       'stream_key': streamKey,
                                       'type': 'robot_git'}) 
                                     #todo:send unified stream key here
-    except:
+    except Exception as e:
             print("could not make post to", url)
+            print(e)
 
 
 def getNumActiveSounds():
