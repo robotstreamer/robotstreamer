@@ -13,6 +13,7 @@ def getAudioDeviceByName(command, name):
         lines = text.splitlines()
         for line in lines:
                 line = line.decode("utf-8")
+                print(name, line)
                 if name in line:
                         print(line)
                         result = re.match("card (.*?):", line)

@@ -39,6 +39,7 @@ async def startReverseSSH(websocketToStatusService):
     
     try:
         commandList = ["/usr/bin/ssh",
+                       "-v",
                        "-X",
                        "-i", commandArgs.reverse_ssh_key_file,
                        "-N",
