@@ -73,7 +73,7 @@ cd ~ &&\
 #git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 #cd Adafruit-Motor-HAT-Python-Library &&\
 #sudo python3 setup.py install &&\
-pip3 install git+https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git --break &&\
+sudo pip3 install git+https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git --break &&\
 sudo apt-get -y install emacs &&\
 #sudo apt-get -y install python-dev &&\
 #cd ~ &&\
