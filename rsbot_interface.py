@@ -1,4 +1,5 @@
-from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
+from adafruit_motorkit import MotorKit
+#from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 from robot_util import times
 import time
 import atexit
@@ -10,22 +11,20 @@ import robot_util
 
 commandArgs = None
 
-
 turningSpeedActuallyUsed = 255
 #drivingSpeedAcutallyUsed = 255
-
-
 
 straightDelay = 0.1
 movementSystemActive = False
 pingPongNumActive = 0
 freePongActive = False
 
+kit = MotorKit()
 
-mh = Adafruit_MotorHAT(addr=0x60)
-def getMotorHAT():
-    global mh
-    return mh
+#mh = Adafruit_MotorHAT(addr=0x60)
+#def getMotorHAT():
+#    global mh
+#    return mh
     
     # occationally do this reinitialization in case it has stopped working
     #if random.randint(0, 50) == 0:
@@ -42,22 +41,30 @@ def runMotor(motorIndex, direction):
 
     global mh
 
-    mh = getMotorHAT()
-    
-    motor = mh.getMotor(motorIndex+1)
-    if direction == 1:
-        motor.setSpeed(drivingSpeed)
-        motor.run(Adafruit_MotorHAT.FORWARD)
-    if direction == -1:
-        motor.setSpeed(drivingSpeed)
-        motor.run(Adafruit_MotorHAT.BACKWARD)
-    if direction == 0.5:
-        motor.setSpeed(128)
-        motor.run(Adafruit_MotorHAT.FORWARD)
-    if direction == -0.5:
-        motor.setSpeed(128)
-        motor.run(Adafruit_MotorHAT.BACKWARD)
+    #mh = getMotorHAT()
 
+    fractionalDrivingSpeed = drivingSpeed / 255.0
+
+    motors = [kit.motor1, kit.motor2, kit.motor3, kit.motor4]
+    
+    #motor = mh.getMotor(motorIndex+1)
+    motor = motors[motorIndex]
+    if direction == 1:
+        #motor.setSpeed(drivingSpeed)
+        #motor.run(Adafruit_MotorHAT.FORWARD)
+        motor.throttle = fractionalDrivingSpeed
+    if direction == -1:
+        #motor.setSpeed(drivingSpeed)
+        #motor.run(Adafruit_MotorHAT.BACKWARD)
+        motor.throttle = -fractionalDrivingSpeed
+    if direction == 0.5:
+        #motor.setSpeed(128)
+        #motor.run(Adafruit_MotorHAT.FORWARD)
+        motor.throttle = fractionalDrivingSpeed / 2.0
+    if direction == -0.5:
+        #motor.setSpeed(128)
+        #motor.run(Adafruit_MotorHAT.BACKWARD)
+        motor.throttle = -fractionalDrivingSpeed / 2.0
 
 
 
@@ -100,8 +107,8 @@ def init(cArgs, forwardDefinition, leftDefinition, pEnabled):
                 _thread.start_new_thread(demoShots, ())
 
                 atexit.register(turnOffMotors)
-                motorA = mh.getMotor(1)
-                motorB = mh.getMotor(2)
+                #motorA = mh.getMotor(1)
+                #motorB = mh.getMotor(2)
                         
                 
                 atexit.register(turnOffMotors)
@@ -114,13 +121,16 @@ def turnOffMotors():
 
     global mh
 
-    mh = getMotorHAT()
+    #mh = getMotorHAT()
     
-    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)    
-    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
-                
+    #mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)    
+    #mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+    #mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+    #mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+    kit.motor1.throttle = None
+    kit.motor2.throttle = None
+    kit.motor3.throttle = None
+    kit.motor4.throttle = None
 
 
 def demoShots():
@@ -142,8 +152,8 @@ def handleCommand(command, keyPosition, price=0):
 
                 d = 255
     
-                motorA.setSpeed(speed1)
-                motorB.setSpeed(speed1)
+                #motorA.setSpeed(speed1)
+                #motorB.setSpeed(speed1)
 
                 robot_util.handleSoundCommand(command, keyPosition, price)
                 

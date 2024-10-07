@@ -429,6 +429,9 @@ async def handleChatMessages():
 
     h = getChatHost(commandArgs.tls_chat)
 
+    if h == False:
+        raise Exception("failed to get valid chat host")
+
     if commandArgs.tls_chat: h['protocol'] = 'wss'
     else: h['protocol'] = 'ws'
 
