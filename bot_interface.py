@@ -16,12 +16,12 @@ stopDelay=0.05
 turnDelay=0.5
 ser=None
 movementSystemActive=None
-dildoActive=None
-dildoDutyCycle1=10 #percentage
-dildoDutyCycle2=20 #percentage
-dildoDutyCycle3=30 #percentage
-dildoFreq=25      #Hertz
-dildoDelay=3      #seconds
+actuatorActive=None
+actuatorDutyCycle1=10 #percentage
+actuatorDutyCycle2=20 #percentage
+actuatorDutyCycle3=30 #percentage
+actuatorFreq=25      #Hertz
+actuatorDelay=3      #seconds
 pipwm=None        #object representing the pwm pin
 
 def getSerial():
@@ -63,12 +63,12 @@ def init(cArgs):
     global ser
     global movementSystemActive
     global pipwm
-    global dildoActive
+    global actuatorActive
     global commandArgs
 
     ser=getSerial()
     movementSystemActive=False
-    dildoActive=False
+    actuatorActive=False
     pipwm=pigpio.pi()
     atexit.register(exitTasks)
     pipwm.hardware_PWM(18,0,0)
@@ -82,7 +82,7 @@ def handleCommand(command, keyPosition, price=0):
     global ser
     global movementSystemActive
     global pipwm
-    global dildoActive
+    global actuatorActive
 
     print("\n\n")
 
@@ -139,15 +139,15 @@ def handleCommand(command, keyPosition, price=0):
 #            time.sleep(stopDelay)
             movementSystemActive=False
     if command[0:6] == 'THRUST':
-        if dildoActive:
+        if actuatorActive:
             print('skip')
         else:
-            dildoActive=True
-            dildoDutyCycle=int(command[6:])
-            pipwm.hardware_PWM(18, dildoFreq, dildoDutyCycle*10000)
-            time.sleep(dildoDelay)
-            pipwm.hardware_PWM(18, dildoFreq, 0)
-            dildoActive=False
+            actuatorActive=True
+            actuatorDutyCycle=int(command[6:])
+            pipwm.hardware_PWM(18, actuatorFreq, actuatorDutyCycle*10000)
+            time.sleep(actuatorDelay)
+            pipwm.hardware_PWM(18, actuatorFreq, 0)
+            actuatorActive=False
 
 
 

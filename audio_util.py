@@ -1,4 +1,5 @@
 import subprocess
+import requests
 import re
 
 def getAudioPlayingDeviceByName(name):
@@ -22,7 +23,15 @@ def getAudioDeviceByName(command, name):
                         return int(result.group(1))
 
 
+def postToLocalSpeechService(text, cardNumber):
+    url = 'http://127.0.0.1:5000/speak'
+    json_data = {'text': text, 'card_number': cardNumber}
+    response = requests.post(url, json=json_data)
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {response.text}")
 
+
+    
 if __name__ == "__main__":
         print("as a test, checking for Yeti mic")
         print(getAudioRecordingDeviceByName("Yeti"))

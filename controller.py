@@ -40,7 +40,7 @@ parser.add_argument('--left', default='[1,1,1,1]')
 parser.add_argument('--no-secure-cert', dest='secure_cert', action='store_false')
 parser.add_argument('--voice-number', type=int, default=1)
 parser.add_argument('--male', dest='male', action='store_true')
-parser.add_argument('--tts-synth', help='options: espeak, festival, google')
+parser.add_argument('--tts-synth', default="espeak", help='options: espeak, festival, google, local_service')
 parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='store_true')
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
@@ -144,9 +144,17 @@ elif commandArgs.type == "blank":
 elif commandArgs.type == "serial":
             import serial_interface as interface
 
-elif commandArgs.type == "sexbot":
-            import sexbot_interface as interface
+elif commandArgs.type == "bot":
+            import bot_interface as interface
             interface.init(commandArgs)
+
+else:
+    try:
+        print("loading custom interface", commandArgs.type)
+        interface = importlib.import_module(commandArgs.type)
+    except ImportError:
+        print(f"import error: {commandArgs.type} interface not found")
+
 
 # set volume level
 
@@ -259,16 +267,6 @@ def say(message, messageVolume, voice='en-us'):
         audioOutputNumber = audio_util.getAudioPlayingDeviceByName(commandArgs.audio_output_hardware_name)
 
 
-    if commandArgs.tts_synth == "google":
-        # google text to speach api
-        if audioOutputNumber is None: # if none specified try many
-            for hardwareNumber in (0, 2, 3, 1, 4):
-                google_tts.speak(message, hardwareNumber)
-        else:
-            google_tts.speak(message, audioOutputNumber)
-        return
-
-        
     os.system("killall espeak")
     
     if voice not in allowedVoices:
@@ -283,11 +281,26 @@ def say(message, messageVolume, voice='en-us'):
 
     #os.system('"C:\Program Files\Jampal\ptts.vbs" -u ' + tempFilePath) Whaa?
 
+    if commandArgs.tts_synth == "google":
+        # google text to speach api
+        if audioOutputNumber is None: # if none specified try many
+            for hardwareNumber in (0, 2, 3, 1, 4):
+                google_tts.speak(message, hardwareNumber)
+        else:
+            google_tts.speak(message, audioOutputNumber)
+        return
 
-    if commandArgs.tts_synth == "festival":
+    elif commandArgs.tts_synth == "local_service":
+        try:
+            audio_util.postToLocalSpeechService(message, audioOutputNumber)
+        except Exception as e:
+            print(f"An exception occurred: {e}")
+        
+    elif commandArgs.tts_synth == "festival":
         # festival tts
         os.system('festival --tts < ' + tempFilePath)
-    else:
+
+    elif commandArgs.tts_synth == "espeak":
         # espeak tts
         #todo: these could be defined in the interface modules perhaps
 
@@ -304,7 +317,8 @@ def say(message, messageVolume, voice='en-us'):
                                     #_thread.start_new_thread(espeak, (audioOutputNumber, message, voice, messageVolume))
                                     print("espeak on a specific audio output")
                                     espeak(audioOutputNumber, message, voice, messageVolume)
-
+    else:
+        raise Exception("invalid option for --tts-synth")
 
     os.remove(tempFilePath)
 
