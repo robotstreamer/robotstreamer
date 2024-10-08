@@ -11,6 +11,7 @@ import tempfile
 import uuid
 import audio
 import datetime
+import importlib
 import audio_util
 try:
     import google_tts
@@ -149,11 +150,10 @@ elif commandArgs.type == "bot":
             interface.init(commandArgs)
 
 else:
-    try:
-        print("loading custom interface", commandArgs.type)
-        interface = importlib.import_module(commandArgs.type)
-    except ImportError:
-        print(f"import error: {commandArgs.type} interface not found")
+    print("loading custom interface", commandArgs.type)
+    interface = importlib.import_module(commandArgs.type)
+    interface.init(commandArgs) # your interface module should have an init fuction that takes one parameter
+
 
 
 # set volume level
