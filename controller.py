@@ -547,6 +547,8 @@ def startControl():
 
 def startChat():
         time.sleep(10) #todo: only wait as needed (wait for interenet)
+        if not commandArgs.disable_volume_set:
+            setVolume(commandArgs.tts_volume)
         print("restarting loop")
         time.sleep(0.25)
 
