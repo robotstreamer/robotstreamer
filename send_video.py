@@ -243,7 +243,7 @@ def startAudioCaptureLinux():
     audioDevNum = robotSettings.audio_device_number
 
     if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
+        audioDevNum = audio_util.getAudioRecordingCardByName(robotSettings.audio_device_name)
         if audioDevNum is None:
           raise Exception("the name doesn't exist" + robotSettings.audio_device_name)
         
@@ -407,7 +407,7 @@ def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
 
     audioDevNum = robotSettings.audio_device_number
     if robotSettings.audio_device_name is not None:
-        audioDevNum = audio_util.getAudioRecordingDeviceByName(robotSettings.audio_device_name)
+        audioDevNum = audio_util.getAudioRecordingCardByName(robotSettings.audio_device_name)
     
     if robotSettings.protocol == 'video/VP8':
         #ffmpeg -h encoder=libvpx

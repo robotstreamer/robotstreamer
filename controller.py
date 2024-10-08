@@ -163,20 +163,26 @@ else:
 #if commandArgs.tts_volume > 50:
     #os.system("amixer set PCM -- -100")
 
+def setVolumeOnCard(cardNumber, percent):
+    for numid in range(0,5):
+        print("---------------------")
+        print("setting volume on card number:", cardNumber, "numid:", numid)
+        os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
+        print("---------------------")    
 
+                
 def setVolume(percent):
-            print("setting volume to", percent, "%")
-            for cardNumber in range(0, 5):
-                        for numid in range(0,5):
-                                    if cardNumber == 1 and numid == 3:
-                                                # this is audio input level so don't set it
-                                                continue
-                                    print("---------------------")
-                                    print("setting card number:", cardNumber, "numid:", numid)
-                                    os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
-                                    print("---------------------")
-                                    #time.sleep(5)
-            
+    print("setting volume to", percent, "%")
+    if commandArgs.audio_output_hardware_name is not None:
+        audioOutputCardNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_hardware_name)
+        setVolumeOnCard(audioOutputCardNumber, percent)
+    else:
+        print("warning: you should specify the audio output with --audio-output-hardware-name")
+        print("because the audio output card is not specified, volume will be adjusted on all")
+        #todo: it really should not change the audio input card settings (only audio output)
+        for cardNumber in range(0, 5):
+            setVolumeOnCard(cardNumber)
+           
 
 # volume=1 is normal
 def espeak(hardwareNumber, message, voice, volume):
@@ -264,7 +270,7 @@ def say(message, messageVolume, voice='en-us'):
     audioOutputNumber = commandArgs.audio_output_hardware_number
             
     if commandArgs.audio_output_hardware_name is not None:
-        audioOutputNumber = audio_util.getAudioPlayingDeviceByName(commandArgs.audio_output_hardware_name)
+        audioOutputNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_hardware_name)
 
 
     os.system("killall espeak")

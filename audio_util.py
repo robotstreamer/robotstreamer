@@ -2,13 +2,13 @@ import subprocess
 import requests
 import re
 
-def getAudioPlayingDeviceByName(name):
-        return getAudioDeviceByName('aplay', name)
+def getAudioPlayingCardByName(name):
+        return getAudioCardByName('aplay', name)
 
-def getAudioRecordingDeviceByName(name):
-        return getAudioDeviceByName('arecord', name)
+def getAudioRecordingCardByName(name):
+        return getAudioCardByName('arecord', name)
 
-def getAudioDeviceByName(command, name):
+def getAudioCardByName(command, name):
 
         text = subprocess.check_output([command, '-l'])
         lines = text.splitlines()
