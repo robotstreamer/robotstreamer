@@ -46,8 +46,8 @@ parser.add_argument('--play-nontts-softly', dest='play_nontts_softly', action='s
 parser.add_argument('--enable-ping-pong', dest='enable_ping_pong', action='store_true')
 parser.set_defaults(enable_ping_pong=False)
 parser.add_argument('--tts-volume', type=int, default=80)
-parser.add_argument('--audio-output-hardware-name', default=None)
-parser.add_argument('--audio-output-hardware-number', type=int, default=None)
+parser.add_argument('--audio-output-card-name', default=None)
+parser.add_argument('--audio-output-card-number', type=int, default=None)
 parser.add_argument('--tts-pitch', type=int, default=50)
 parser.add_argument('--type', default="rsbot")
 parser.add_argument('--no-tls-chat', dest='tls_chat', action='store_false')
@@ -173,11 +173,11 @@ def setVolumeOnCard(cardNumber, percent):
                 
 def setVolume(percent):
     print("setting volume to", percent, "%")
-    if commandArgs.audio_output_hardware_name is not None:
-        audioOutputCardNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_hardware_name)
+    if commandArgs.audio_output_card_name is not None:
+        audioOutputCardNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_card_name)
         setVolumeOnCard(audioOutputCardNumber, percent)
     else:
-        print("warning: you should specify the audio output with --audio-output-hardware-name")
+        print("warning: you should specify the audio output with --audio-output-card-name")
         print("because the audio output card is not specified, volume will be adjusted on all")
         #todo: it really should not change the audio input card settings (only audio output)
         for cardNumber in range(0, 5):
@@ -267,10 +267,10 @@ def espeakMac(message, voice):
 
 def say(message, messageVolume, voice='en-us'):
 
-    audioOutputNumber = commandArgs.audio_output_hardware_number
+    audioOutputNumber = commandArgs.audio_output_card_number
             
-    if commandArgs.audio_output_hardware_name is not None:
-        audioOutputNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_hardware_name)
+    if commandArgs.audio_output_card_name is not None:
+        audioOutputNumber = audio_util.getAudioPlayingCardByName(commandArgs.audio_output_card_name)
 
 
     os.system("killall espeak")
