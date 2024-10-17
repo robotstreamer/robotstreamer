@@ -69,12 +69,13 @@ sudo apt-get -y install espeak git
 sudo pip3 install websockets --break-system-packages
 sudo pip3 install pyusb --break-system-packages
 sudo pip3 install ws4py --break-system-packages
+sudo pip3 install adafruit-circuitpython-motorkit --break-system-packages
 cd ~ &&\
 #git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 #cd Adafruit-Motor-HAT-Python-Library &&\
 #sudo python3 setup.py install &&\
-sudo pip3 install git+https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git --break &&\
-sudo apt-get -y install emacs &&\
+#sudo pip3 install git+https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git --break
+sudo apt-get -y install emacs
 #sudo apt-get -y install python-dev &&\
 #cd ~ &&\
 #wget ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.0.25.tar.bz2 &&\
