@@ -181,7 +181,7 @@ def setVolume(percent):
         print("because the audio output card is not specified, volume will be adjusted on all")
         #todo: it really should not change the audio input card settings (only audio output)
         for cardNumber in range(0, 5):
-            setVolumeOnCard(cardNumber)
+            setVolumeOnCard(cardNumber, percent)
            
 
 # volume=1 is normal
