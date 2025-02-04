@@ -70,6 +70,7 @@ sudo pip3 install websockets --break-system-packages
 sudo pip3 install pyusb --break-system-packages
 sudo pip3 install ws4py --break-system-packages
 sudo pip3 install adafruit-circuitpython-motorkit --break-system-packages
+sudo apt-get install python3-rpi.gpio
 cd ~ &&\
 #git clone https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library.git &&\
 #cd Adafruit-Motor-HAT-Python-Library &&\
