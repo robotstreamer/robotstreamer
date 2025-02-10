@@ -5,6 +5,7 @@ nohup.out
 npm-debug.log
 gpio.conf
 output.mp3
+*.wav
 
 #ignore jetbrains files
 .idea/

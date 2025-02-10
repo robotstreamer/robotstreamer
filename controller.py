@@ -6,6 +6,7 @@ import argparse
 import json
 import robot_util
 import _thread
+import threading
 import traceback
 import tempfile
 import uuid
@@ -167,7 +168,9 @@ def setVolumeOnCard(cardNumber, percent):
     for numid in range(0,5):
         print("---------------------")
         print("setting volume on card number:", cardNumber, "numid:", numid)
-        os.system("amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent))
+        command = "amixer -c %d cset numid=%d %d%%" % (cardNumber, numid, percent)
+        print(command)
+        os.system(command)
         print("---------------------")    
 
                 
@@ -376,7 +379,7 @@ def getChatHost(useTLS):
         return response
 
 
-async def handleWesocketTester(key):
+async def handleWebsocketTester(key):
 
         while True:
             time.sleep(5)
@@ -518,7 +521,7 @@ def startWebsocketTester(key):
                 print(key.upper()+": starting tester loop")
                 time.sleep(1)
                 try:
-                            asyncio.new_event_loop().run_until_complete(handleWesocketTester(key))
+                            asyncio.new_event_loop().run_until_complete(handleWebsocketTester(key))
                 except:
                             print(key.upper()+" :error")
                             traceback.print_exc()
@@ -613,6 +616,10 @@ def main():
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)
+                # set volume may not work if the system is starting
+                # up, so wait some time and run it again
+                setVolumeTimer = threading.Timer(50, setVolume, (commandArgs.tts_volume,))
+                setVolumeTimer.start()
 
             while True:
                 time.sleep(0.20)
