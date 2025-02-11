@@ -14,6 +14,8 @@ import audio
 import datetime
 import importlib
 import audio_util
+import queue
+from http_server import runHttpServer, messageQueue
 try:
     import google_tts
 except ImportError:
@@ -388,9 +390,9 @@ async def handleWebsocketTester(key):
                         try:
                             await currentWebsocket[key].send('{"command":"RS_PING"}')
                         except:
-                            print(key.upper()+": control ping error") 
+                            print(key.upper()+": ping error") 
             else:
-                        print(key.upper()+": control websocket is not initialized")
+                        print(key.upper()+": websocket is not initialized")
 
 
             elapsed = datetime.datetime.now() - lastPongTime[key]
@@ -447,8 +449,8 @@ async def handleControlMessages():
                                                                    j.get('command_price', 0)))
 
 
-            
-async def handleChatMessages():
+
+async def getChatWebsocket():
 
     h = getChatHost(commandArgs.tls_chat)
 
@@ -461,56 +463,85 @@ async def handleChatMessages():
     url = '%s://%s:%s/echo' % (h['protocol'], h['host'], h['port'])
     print("CHAT url:", url)
 
-    async with websockets.connect(url) as websocket:
+    ws = await websockets.connect(url)
 
-        print("CHAT connected to chat service at: ", url)
-        print("CHAT chat websocket object: ", websocket)
+    print("CHAT connected to chat service at: ", url)
+    print("CHAT chat websocket object: ", ws)
+    
+    return ws
 
-        # removed comment: you do need this as an connection initializer, but you should make the server not need it
-        # chat server requires atleast a robot_id for when non global chat is enforced but otherwise no initialiser required
-        # treat stream_key as token when type robot_connect for future use
-        await websocket.send(json.dumps({"type":"robot_connect",
-                                         "token":str(commandArgs.stream_key),
-                                         "robot_id":str(commandArgs.robot_id) }))     
+                
+async def handleReceivingChatMessages(websocket):
+    print("CHAT: handle receiving chat messages function")
+    try:
 
-        currentWebsocket['chat'] = websocket
+            # removed comment: you do need this as an connection initializer, but you should make the server not need it
+            # chat server requires atleast a robot_id for when non global chat is enforced but otherwise no initialiser required
+            # treat stream_key as token when type robot_connect for future use
+            print("CHAT: sending initial message")
+            await websocket.send(json.dumps({"type":"robot_connect",
+                                             "token":str(commandArgs.stream_key),
+                                             "robot_id":str(commandArgs.robot_id) }))     
+
+            print("CHAT: current websocket", websocket)
+            currentWebsocket['chat'] = websocket
+
+            while True:
+
+                print("CHAT: awaiting chat message")
+
+                message = await websocket.recv()
+                #print("< {}".format(message))
+                j = json.loads(message)
+                print("CHAT message:", j)
+
+
+                if j.get('command') == "RS_PONG":
+                    lastPongTime['chat'] = datetime.datetime.now()
+
+                elif j.get('type') == "RS_PING":
+                    print("CHAT: RS_PING keepalive")
+
+                elif ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
+                                if ('tts' in j) and j['tts'] == True:
+                                            print("CHAT: tts option is on")
+                                            # paid messages can queue but unpaid cannot
+                                            if len(messagesToTTS) < commandArgs.free_tts_queue_size or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
+                                                        messagesToTTS.append((j['message'], 1))
+                                else:
+                                            print("CHAT: tts option is off")
+                                            if commandArgs.play_nontts_softly:
+                                                        if len(j['message']) > 0:
+                                                                    if len(messagesToTTS) == 0:
+                                                                                messagesToTTS.append((j['message'][1:], 0.15))
+                                #if audio.espeakBytes(j['message']) < 400000:
+                                #            print("length", audio.espeakBytes(j['message']))
+                                #            _thread.start_new_thread(say, (j['message'],))
+                                #else:
+                                #            print("message too long")
+                else:
+                    print("CHAT: error, message not valid:", j)
+    except Exception as e:
+        print("Exception when handling receiving chat messages:", e)
+        traceback.print_exc()
+
         
+async def handleSendingChatMessages(websocket):
+    print("CHAT: handle sending chat messages")
+    try:
         while True:
-
-            print("CHAT: awaiting chat message")
-            
-            message = await websocket.recv()
-            #print("< {}".format(message))
-            j = json.loads(message)
-            print("CHAT message:", j)
-
-
-            if j.get('command') == "RS_PONG":
-                lastPongTime['chat'] = datetime.datetime.now()
-
-            elif j.get('type') == "RS_PING":
-                print("CHAT: RS_PING keepalive")
-
-            elif ('message' in j) and (j['robot_id'] == commandArgs.robot_id):
-                            if ('tts' in j) and j['tts'] == True:
-                                        print("CHAT: tts option is on")
-                                        # paid messages can queue but unpaid cannot
-                                        if len(messagesToTTS) < commandArgs.free_tts_queue_size or (('tts_price' in j) and (j['tts_price'] >= 0.01)):
-                                                    messagesToTTS.append((j['message'], 1))
-                            else:
-                                        print("CHAT: tts option is off")
-                                        if commandArgs.play_nontts_softly:
-                                                    if len(j['message']) > 0:
-                                                                if len(messagesToTTS) == 0:
-                                                                            messagesToTTS.append((j['message'][1:], 0.15))
-                            #if audio.espeakBytes(j['message']) < 400000:
-                            #            print("length", audio.espeakBytes(j['message']))
-                            #            _thread.start_new_thread(say, (j['message'],))
-                            #else:
-                            #            print("message too long")
-            else:
-                print("CHAT: error, message not valid:", j)
-
+            try:
+                message = messageQueue.get_nowait()  # Non-blocking call
+            except queue.Empty:
+                message = None  # Handle empty queue case
+            if message is not None:
+                await websocket.send(message)  # Send message to the WebSocket
+            await asyncio.sleep(0.05)
+    except websockets.exceptions.ConnectionClosed:
+        print("CHAT: websocket connection closed (sending stopped).")
+    except Exception as e:
+        print("CHAT: Exception when handling sending chat messages:", e)
+        traceback.print_exc()
 
 
 def startWebsocketTester(key):
@@ -548,7 +579,7 @@ def startControl():
     
 
 
-def startChat():
+async def startChat():
         time.sleep(10) #todo: only wait as needed (wait for interenet)
         if not commandArgs.disable_volume_set:
             setVolume(commandArgs.tts_volume)
@@ -559,7 +590,25 @@ def startChat():
                     print("CHAT: starting chat loop")
                     
                     try:
-                                asyncio.new_event_loop().run_until_complete(handleChatMessages())
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        print("CHAT: getting websocket")
+                        ws = await getChatWebsocket()
+                        print("CHAT: websocket", ws)
+                        # run the handlers and stop running if either one finishes
+                        print("CHAT: creating receive task")
+                        receivingTask = asyncio.create_task(handleReceivingChatMessages(ws))
+                        print("CHAT: creating send task")
+                        sendingTask = asyncio.create_task(handleSendingChatMessages(ws))
+                        tasks = [receivingTask, sendingTask]
+                        print("CHAT: running receive and send tasks")
+                        #done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                        await asyncio.gather(*tasks)
+                        #for task in done:
+                        #    if task == receivingTask:
+                        #        print("❌ Receiving task died first!")
+                        #    elif task == sendingTask:
+                        #        print("❌ Sending task died first!")
                     except:
                                 print("CHAT: error")
                                 traceback.print_exc()
@@ -597,22 +646,25 @@ def runPeriodicTasks():
 
             
 def main():                
-
                        
             print(commandArgs)
-            
+
+            # start control thread
             _thread.start_new_thread(startControl, ())
             websocketOK['control'] = True # enable tester
 
+            # start chat thread
             if not commandArgs.disable_chat:
-
-                _thread.start_new_thread(startChat, ()) 
+                #_thread.start_new_thread(startChat, ())
+                _thread.start_new_thread(lambda: asyncio.run(startChat()), ())
                 websocketOK['chat'] = True # enable tester
 
+            # start http server thread
+            _thread.start_new_thread(runHttpServer, ())
+                
             for key in websocketOK:
                 # run tester
                 _thread.start_new_thread(startWebsocketTester, (key,))
-
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)
