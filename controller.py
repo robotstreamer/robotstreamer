@@ -388,9 +388,9 @@ async def handleWebsocketTester(key):
                         try:
                             await currentWebsocket[key].send('{"command":"RS_PING"}')
                         except:
-                            print(key.upper()+": control ping error") 
+                            print(key.upper()+": ping error") 
             else:
-                        print(key.upper()+": control websocket is not initialized")
+                        print(key.upper()+": websocket is not initialized")
 
 
             elapsed = datetime.datetime.now() - lastPongTime[key]
