@@ -466,12 +466,9 @@ async def handleChatMessages():
         print("CHAT connected to chat service at: ", url)
         print("CHAT chat websocket object: ", websocket)
 
-        # removed comment: you do need this as an connection initializer, but you should make the server not need it
-        # chat server requires atleast a robot_id for when non global chat is enforced but otherwise no initialiser required
-        # treat stream_key as token when type robot_connect for future use
-        await websocket.send(json.dumps({"type":"robot_connect",
-                                         "token":str(commandArgs.stream_key),
-                                         "robot_id":str(commandArgs.robot_id) }))     
+        await websocket.send(json.dumps({'type': 'connect',
+                                         'stream_key': str(commandArgs.stream_key),
+                                         'robot_id': str(commandArgs.robot_id) }))     
 
         currentWebsocket['chat'] = websocket
         
