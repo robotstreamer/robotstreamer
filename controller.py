@@ -14,6 +14,8 @@ import audio
 import datetime
 import importlib
 import audio_util
+from shared_controller_entities import currentWebsocket
+from http_server import startHTTP
 try:
     import google_tts
 except ImportError:
@@ -27,7 +29,6 @@ messagesToTTS = []
 numActiveEspeak = 0
 maximumTTSTime = 5
 
-currentWebsocket = {'chat': None, 'control': None}
 lastPongTime = {'chat': datetime.datetime.now(), 'control': datetime.datetime.now()}
 websocketOK = {}
 
@@ -538,7 +539,7 @@ def startControl():
                 except:
                             print("CONTROL: error")
                             traceback.print_exc()
-                print("CONTROL: control event handler died")
+                print("CONTROL: event handler died")
                 # sleep to stop hammering endpoint requests
                 time.sleep(2)
                 interface.movementSystemActive = False
@@ -602,14 +603,14 @@ def main():
             websocketOK['control'] = True # enable tester
 
             if not commandArgs.disable_chat:
-
                 _thread.start_new_thread(startChat, ()) 
                 websocketOK['chat'] = True # enable tester
 
+            _thread.start_new_thread(startHTTP, ())
+               
             for key in websocketOK:
                 # run tester
                 _thread.start_new_thread(startWebsocketTester, (key,))
-
 
             if not commandArgs.disable_volume_set:
                 setVolume(commandArgs.tts_volume)
