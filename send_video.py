@@ -37,7 +37,7 @@ class DummyProcess:
 
 parser = argparse.ArgumentParser(description='robot control')
 parser.add_argument('camera_id')
-parser.add_argument('video_device_number', default=0, type=int)
+parser.add_argument('video_device', default="/dev/video0")
 
 
 parser.add_argument('--api-url', help="Server that robot will connect to listen for API update events", default='https://api.robotstreamer.com')
@@ -211,9 +211,9 @@ def startVideoCaptureLinux():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
 
-    videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i /dev/video{video_device_number} {rotation_option} \
+    videoCommandLine = '{ffmpeg_path} -f v4l2 -framerate 25 -video_size {xres}x{yres} -r 25 -i {video_device} {rotation_option} \
                         -f mpegts -codec:v mpeg1video -b:v {kbps}k -bf 0 -muxdelay 0.001 http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/'\
-                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device_number=robotSettings.video_device_number, rotation_option=rotationOption(),\
+                        .format(ffmpeg_path=robotSettings.ffmpeg_path, video_device=robotSettings.video_device, rotation_option=rotationOption(),\
                         kbps=robotSettings.kbps, video_host=videoHost, video_port=videoPort, xres=robotSettings.xres, yres=robotSettings.yres, stream_key=robotSettings.stream_key)
     
     print(videoCommandLine)
@@ -441,7 +441,7 @@ def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
 
 
     videoCommandLine = '{ffmpeg_path} \
-                        -f v4l2 -video_size {xres}x{yres} -r {framerate} -i /dev/video{video_device_number} {rotation_option}  \
+                        -f v4l2 -video_size {xres}x{yres} -r {framerate} -i {video_device} {rotation_option}  \
                         -f alsa -i hw:{audio_device_number} \
                         {video} \
                         -c:a libopus \
@@ -451,7 +451,7 @@ def startRTCffmpeg(videoEndpoint, SSRCV, audioEndpoint, SSRCA):
                             -map 1:a:0 \
                         -f tee "[select=a:f=rtp:ssrc={SSRCA}:payload_type=100]rtp://{audio_host}:{audio_port}|[select=v:f=rtp:ssrc={SSRCV}:payload_type=101]rtp://{video_host}:{video_port}"'\
                         .format(ffmpeg_path=robotSettings.ffmpeg_path, 
-                                video_device_number=robotSettings.video_device_number, 
+                                video_device=robotSettings.video_device, 
                                 xres=robotSettings.xres, 
                                 yres=robotSettings.yres,
                                 framerate=robotSettings.framerate,
@@ -517,11 +517,11 @@ def startRTCvideo():
 def checkVideoDevices():
 
   import os.path 
-  if os.path.exists("/dev/video" + str(robotSettings.video_device_number)):
-    #sayInfo("video device " + str(robotSettings.video_device_number) + " exists")
+  if os.path.exists("/dev/video" + str(robotSettings.video_device)):
+    #sayInfo("video device " + str(robotSettings.video_device) + " exists")
     pass
   else:
-    sayInfo("video device " + str(robotSettings.video_device_number) + " is missing")
+    sayInfo("video device " + str(robotSettings.video_device) + " is missing")
 
     
 def main():
